@@ -25,13 +25,16 @@ public class StudentBookOrder extends AbstractEntity {
     public static final int STATE_PACK = 3;         //已打包
     public static final int STATE_SEND = 4;         //已发出
     public static final int STATE_SIGN = 5;         //已签收
+    public static final int STATE_DIFFICULT = 6;    //疑难
+    public static final int STATE_RETURNSIGN = 7;   //退签
+    public static final int STATE_RETURN = 8;       //退回
 
     private Long id;                            //主键
     private Long semesterId;                    //学期id
     private Long issueChannelId;                //渠道id
     private String orderCode;                   //订单号
     private String studentCode;                 //学号
-    private Integer state;                      //状态[0：未确认；1：已确认；2：分拣中；3：已打包；4：已发出；5：已签收]
+    private Integer state;                      //状态[0：未确认；1：已确认；2：分拣中；3：已打包；4：已发出；5：已签收；6：疑难；7：退签；8：退回]
     private Integer isStock;                    //是否有库存[0:是；1：否]
     private Integer isSpotOrder;                //是否学习中心订单[0：是；1：否]
     private String logisticCode;                //物流单号

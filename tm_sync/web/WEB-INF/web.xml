@@ -4,7 +4,7 @@
 
   <context-param>
     <param-name>webAppRootKey</param-name>
-    <param-value>teach_materials</param-value>
+    <param-value>tm_sync</param-value>
   </context-param>
 
   <!--由Sprng载入的Log4j配置文件位置 -->
@@ -77,16 +77,5 @@
   <session-config>
     <session-timeout>14400</session-timeout>
   </session-config>
-
-  <!-- 配置条形码生成器 -->
-  <servlet>
-    <servlet-name> BarcodeServlet </servlet-name>
-    <servlet-class> org.krysalis.barcode4j.servlet.BarcodeServlet </servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name> BarcodeServlet </servlet-name>
-    <url-pattern> /barcode </url-pattern>
-  </servlet-mapping>
 
 </web-app>

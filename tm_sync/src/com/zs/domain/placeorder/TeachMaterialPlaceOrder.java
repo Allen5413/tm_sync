@@ -23,6 +23,9 @@ public class TeachMaterialPlaceOrder extends AbstractEntity{
 	public static final String STATE_PACK = "3";         //已打包
 	public static final String STATE_SEND = "4";         //已发出
 	public static final String STATE_SIGN = "5";         //已签收
+	public static final String STATE_DIFFICULT = "6";    //疑难
+	public static final String STATE_RETURNSIGN = "7";   //退签
+	public static final String STATE_RETURN = "8";       //退回
 	
 	//ID
 	private Long id;   

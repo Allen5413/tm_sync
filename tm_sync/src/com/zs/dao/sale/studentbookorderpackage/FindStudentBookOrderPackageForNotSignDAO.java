@@ -11,6 +11,6 @@ import java.util.List;
  * Created by Allen on 2015/7/23.
  */
 public interface FindStudentBookOrderPackageForNotSignDAO extends EntityJpaDao<StudentBookOrderPackage, Long> {
-    @Query(nativeQuery = true, value = "from StudentBookOrderPackage where isSign = 1 and logisticCode is not null and semesterId = ?1")
+    @Query("from StudentBookOrderPackage where isSign = 1 and logisticCode is not null and semesterId = ?1")
     public List<StudentBookOrderPackage> findStudentBookOrderPackageForNotSign(long semesterId);
 }

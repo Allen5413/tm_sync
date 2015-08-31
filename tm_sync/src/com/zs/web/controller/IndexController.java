@@ -1,7 +1,5 @@
 package com.zs.web.controller;
 
-import com.zs.domain.basic.User;
-import com.zs.service.basic.user.ValidateLoginService;
 import com.zs.tools.DateTools;
 import com.zs.tools.UserTools;
 import org.apache.log4j.Logger;
@@ -30,7 +28,6 @@ public class IndexController extends LoggerController {
         request.setAttribute("week", week);
         request.setAttribute("loginName", UserTools.getLoginUserForLoginName(request));
         request.setAttribute("name", UserTools.getLoginUserForName(request));
-        request.setAttribute("menu", UserTools.getLoginUserForMenu(request));
         return "index";
     }
 }

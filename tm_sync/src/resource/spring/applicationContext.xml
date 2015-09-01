@@ -13,6 +13,7 @@
 	<import resource="applicationContext-jpa.xml" />
 	<!-- 快递100配置 -->
 	<import resource="applicationContext-kuaidi100.xml" />
+	<import resource="applicationContext-kuaidiwo.xml" />
 	<!-- 定时器 -->
 	<import resource="applicationContext-scheduling.xml" />
 </beans>

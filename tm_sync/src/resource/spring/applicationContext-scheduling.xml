@@ -9,7 +9,7 @@
 	<!-- 向快递100同步订单的快递状态定时器  每天0:10分执行-->
 	<task:scheduler id="orderKuaidiTaskScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="orderKuaidiTaskScheduler">
-	    <task:scheduled ref="orderKuaidiTaskService" method="orderKuaidiState" cron="0 43 16 * * ?"/>
+	    <task:scheduled ref="orderKuaidiTaskService" method="orderKuaidiState" cron="0 58 16 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 向快递100同步订单的快递状态定时器 END-->
 	<!-- 向快递100同步订单的快递状态业务接口 -->

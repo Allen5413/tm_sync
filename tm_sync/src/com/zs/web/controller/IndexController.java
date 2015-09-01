@@ -1,8 +1,5 @@
 package com.zs.web.controller;
 
-import com.zs.tools.DateTools;
-import com.zs.tools.UserTools;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -14,20 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping(value = "/index")
 public class IndexController extends LoggerController {
-    private static Logger log = Logger.getLogger(IndexController.class);
     @RequestMapping(value = "main")
     public String index(HttpServletRequest request){
-        //获取当前年月日星期
-        String year = DateTools.getThisYear();
-        String month = DateTools.getThisMonth();
-        String day = DateTools.getThisDay();
-        String week = DateTools.getThisWeek();
-        request.setAttribute("year", year);
-        request.setAttribute("month", month);
-        request.setAttribute("day", day);
-        request.setAttribute("week", week);
-        request.setAttribute("loginName", UserTools.getLoginUserForLoginName(request));
-        request.setAttribute("name", UserTools.getLoginUserForName(request));
+        //获取文件夹下面的内容
+
         return "index";
     }
 }

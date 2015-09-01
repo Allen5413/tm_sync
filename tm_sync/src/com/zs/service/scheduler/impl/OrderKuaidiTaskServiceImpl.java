@@ -19,11 +19,15 @@ import com.zs.service.kuaidi.bean.KuaidiOrder;
 import com.zs.service.kuaidi.bean.KuaidiRecordInfo;
 import com.zs.service.scheduler.OrderKuaidiTaskService;
 import com.zs.tools.DateTools;
+import com.zs.tools.FileTools;
+import com.zs.tools.PropertiesTools;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +37,7 @@ import java.util.List;
  * Created by Allen on 2015/8/30.
  */
 @Service("orderKuaidiTaskService")
-public class OrderKuaidiTaskServiceImpl implements OrderKuaidiTaskService {
+public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTaskService {
 
     @Resource
     private FindStudentBookOrderPackageForNotSignDAO findStudentBookOrderPackageForNotSignDAO;
@@ -56,9 +60,15 @@ public class OrderKuaidiTaskServiceImpl implements OrderKuaidiTaskService {
     @Resource
     private BatchKuaidiDAO batchKuaidiDAO;
 
+    //用来记录调用接口的快递单数量
+    private int tempNum = 0;
+
     @Override
     @Transactional
-    public void orderKuaidiState() {
+    public synchronized void orderKuaidiState() {
+        StringBuilder msg = new StringBuilder(DateTools.getLongNowTime()+": 开始执行快递信息同步\r\n");
+        String orderPackageCode = "";
+        String kuaidiCode = "";
         try {
             //要修改的学生订单包
             List<StudentBookOrderPackage> editStudentPackageList = new ArrayList<StudentBookOrderPackage>();
@@ -79,8 +89,15 @@ public class OrderKuaidiTaskServiceImpl implements OrderKuaidiTaskService {
             Timestamp operateTime = DateTools.getLongNowTime();
             if (null != studentBookOrderPackageList && 0 < studentBookOrderPackageList.size()) {
                 for (StudentBookOrderPackage studentBookOrderPackage : studentBookOrderPackageList) {
+                    orderPackageCode = studentBookOrderPackage.getCode();
+                    kuaidiCode = studentBookOrderPackage.getLogisticCode();
+                    System.out.println("tempNum: "+tempNum);
+                    //这里每分钟调用5个快递单号，防止调用太频繁，锁ip
+                    if (tempNum % 10 == 0 && 0 < tempNum) {
+                        Thread.sleep(1000l);
+                    }
                     String logisticCode = studentBookOrderPackage.getLogisticCode();
-                    KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
+                    KuaidiOrder kuaidiOrder = null; //kuaidiService.queryForEMSObject(logisticCode);
                     if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
                         /** 快递单当前状态
                          * 0：在途，即货物处于运输过程中
@@ -143,16 +160,24 @@ public class OrderKuaidiTaskServiceImpl implements OrderKuaidiTaskService {
                             addKuaidiList.add(kuaidi);
                         }
                     }
+                    tempNum++;
                 }
             }
 
             if (null != placeOrderPackageList && 0 < placeOrderPackageList.size()) {
                 for (PlaceOrderPackage placeOrderPackage : placeOrderPackageList) {
+                    orderPackageCode = placeOrderPackage.getCode();
                     if(!StringUtils.isEmpty(placeOrderPackage.getLogisticCode())) {
                         String[] logisticCodes = placeOrderPackage.getLogisticCode().split(",");
                         boolean isSign = true;
                         for(String logisticCode : logisticCodes) {
-                            KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
+                            kuaidiCode = logisticCode;
+                            //这里每分钟调用5个快递单号，防止调用太频繁，锁ip
+                            System.out.println("tempNum: "+tempNum);
+                            if (tempNum % 10 == 0 && 0 < tempNum) {
+                                Thread.sleep(1000l);
+                            }
+                            KuaidiOrder kuaidiOrder = null; //kuaidiService.queryForEMSObject(logisticCode);
                             if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
                                 /** 快递单当前状态
                                  * 0：在途，即货物处于运输过程中
@@ -191,6 +216,7 @@ public class OrderKuaidiTaskServiceImpl implements OrderKuaidiTaskService {
                                 isSign = false;
                             }
                         }
+                        tempNum++;
                         if(isSign){
                             //修改预订单包的状态
                             placeOrderPackage.setIsSign(PlaceOrderPackage.IS_SIGN_YES);
@@ -222,7 +248,21 @@ public class OrderKuaidiTaskServiceImpl implements OrderKuaidiTaskService {
                 batchKuaidiDAO.batchAdd(editKuaidiList, 1000);
             }
         }catch(Exception e){
-            e.printStackTrace();
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            msg.append("包裹编号："+orderPackageCode+" \r\n");
+            msg.append("快递单号："+kuaidiCode+"\r\n");
+            msg.append("异常信息："+sw.toString()+ "\r\n");
+        }finally {
+            msg.append("执行了"+tempNum+"条数据\r\n");
+            msg.append(DateTools.getLongNowTime()+": 快递信息同步结束");
+
+            PropertiesTools propertiesTools =  new PropertiesTools("resource/commons.properties");
+            String filePath = propertiesTools.getProperty("sync.kuaidi.log.file.path");
+            String nowDate = DateTools.transferLongToDate("yyyy-MM-dd", System.currentTimeMillis());
+            FileTools.createFile(filePath,   nowDate + ".txt");
+            FileTools.writeTxtFile(msg.toString(), filePath + nowDate + ".txt");
         }
     }
 

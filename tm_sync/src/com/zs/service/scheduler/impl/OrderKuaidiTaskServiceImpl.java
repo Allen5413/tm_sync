@@ -92,12 +92,12 @@ public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTas
                     orderPackageCode = studentBookOrderPackage.getCode();
                     kuaidiCode = studentBookOrderPackage.getLogisticCode();
                     System.out.println("tempNum: "+tempNum);
-                    //这里每分钟调用5个快递单号，防止调用太频繁，锁ip
-                    if (tempNum % 10 == 0 && 0 < tempNum) {
-                        Thread.sleep(1000l);
+                    //这里每2分钟调用5个快递单号，防止调用太频繁，锁ip
+                    if (tempNum % 5 == 0 && 0 < tempNum) {
+                        Thread.sleep(100000l);
                     }
                     String logisticCode = studentBookOrderPackage.getLogisticCode();
-                    KuaidiOrder kuaidiOrder = null; //kuaidiService.queryForEMSObject(logisticCode);
+                    KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
                     if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
                         /** 快递单当前状态
                          * 0：在途，即货物处于运输过程中
@@ -172,12 +172,12 @@ public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTas
                         boolean isSign = true;
                         for(String logisticCode : logisticCodes) {
                             kuaidiCode = logisticCode;
-                            //这里每分钟调用5个快递单号，防止调用太频繁，锁ip
+                            //这里每2分钟调用5个快递单号，防止调用太频繁，锁ip
                             System.out.println("tempNum: "+tempNum);
-                            if (tempNum % 10 == 0 && 0 < tempNum) {
-                                Thread.sleep(1000l);
+                            if (tempNum % 5 == 0 && 0 < tempNum) {
+                                Thread.sleep(100000l);
                             }
-                            KuaidiOrder kuaidiOrder = null; //kuaidiService.queryForEMSObject(logisticCode);
+                            KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
                             if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
                                 /** 快递单当前状态
                                  * 0：在途，即货物处于运输过程中
@@ -259,10 +259,11 @@ public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTas
             msg.append(DateTools.getLongNowTime()+": 快递信息同步结束");
 
             PropertiesTools propertiesTools =  new PropertiesTools("resource/commons.properties");
+            String rootPath = propertiesTools.getProperty("sync.log.file.path");
             String filePath = propertiesTools.getProperty("sync.kuaidi.log.file.path");
             String nowDate = DateTools.transferLongToDate("yyyy-MM-dd", System.currentTimeMillis());
-            FileTools.createFile(filePath,   nowDate + ".txt");
-            FileTools.writeTxtFile(msg.toString(), filePath + nowDate + ".txt");
+            FileTools.createFile(rootPath + filePath,   nowDate + ".txt");
+            FileTools.writeTxtFile(msg.toString(), rootPath + filePath + nowDate + ".txt");
         }
     }
 

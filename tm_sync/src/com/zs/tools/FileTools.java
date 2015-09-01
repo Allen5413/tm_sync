@@ -1,5 +1,8 @@
 package com.zs.tools;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import java.io.*;
 
 /**
@@ -84,5 +87,27 @@ public class FileTools {
             }
         }
         return result;
+    }
+
+    /**
+     * 得到一个路径下的文件和文件夹
+     * @param path
+     * @return
+     */
+    public static JSONArray getPathFile(String path){
+        JSONArray jsonArray = new JSONArray();
+        File file = new File(path);
+        if(file.isDirectory()){
+            String[] childFiles = file.list();
+            if(null != childFiles && 0 < childFiles.length) {
+                for (String childFile : childFiles) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("path", path);
+                    jsonObject.put("fileName", childFile);
+                    jsonArray.add(jsonObject);
+                }
+            }
+        }
+        return jsonArray;
     }
 }

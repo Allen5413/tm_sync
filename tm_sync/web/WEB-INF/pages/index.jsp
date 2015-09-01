@@ -7,6 +7,9 @@
   <%@ include file="/common/taglibs.jsp"%>
 </head>
 <body>
-111
+<c:forEach var="data" items="${result}">
+<a href="/index/main.htm?path=${data.path}&name=${data.fileName}">${data.fileName}</a><br />
+</c:forEach>
+${content}
 </body>
 </html>

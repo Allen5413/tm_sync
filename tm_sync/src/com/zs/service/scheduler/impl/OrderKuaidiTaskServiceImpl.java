@@ -1,5 +1,6 @@
 package com.zs.service.scheduler.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zs.dao.basic.kuaidi.BatchKuaidiDAO;
 import com.zs.dao.basic.kuaidi.FindKuaidiByNuDAO;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
@@ -15,6 +16,7 @@ import com.zs.domain.placeorder.PlaceOrderPackage;
 import com.zs.domain.placeorder.TeachMaterialPlaceOrder;
 import com.zs.domain.sale.StudentBookOrderPackage;
 import com.zs.service.kuaidi.KuaidiService;
+import com.zs.service.kuaidi.KuaidiwoService;
 import com.zs.service.kuaidi.bean.KuaidiOrder;
 import com.zs.service.kuaidi.bean.KuaidiRecordInfo;
 import com.zs.service.scheduler.OrderKuaidiTaskService;
@@ -59,6 +61,8 @@ public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTas
     private BatchPlaceOrderPackageDAO batchPlaceOrderPackageDAO;
     @Resource
     private BatchKuaidiDAO batchKuaidiDAO;
+    @Resource
+    private KuaidiwoService kuaidiwoService;
 
     //用来记录调用接口的快递单数量
     private int tempNum = 0;
@@ -97,69 +101,71 @@ public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTas
                         Thread.sleep(100000l);
                     }
                     String logisticCode = studentBookOrderPackage.getLogisticCode();
-                    KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
-                    if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
-                        /** 快递单当前状态
-                         * 0：在途，即货物处于运输过程中
-                         * 1：揽件，货物已由快递公司揽收并且产生了第一条跟踪信息
-                         * 2：疑难，货物寄送过程出了问题
-                         * 3：签收，收件人已签收
-                         * 4：退签，即货物由于用户拒签、超区等原因退回，而且发件人已经签收
-                         * 5：派件，即快递正在进行同城派件
-                         * 6：退回，货物正处于退回发件人的途中
-                         */
-                        String state = kuaidiOrder.getState();
-                        if ("2".equals(state)) {
-                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_DIFFICULT);
-                            studentBookOrderPackage.setOperator("管理员");
-                            studentBookOrderPackage.setOperateTime(operateTime);
-                            editStudentPackageList.add(studentBookOrderPackage);
-                        }
-                        if ("3".equals(state)) {
-                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_YES);
-                            studentBookOrderPackage.setOperator("管理员");
-                            studentBookOrderPackage.setOperateTime(operateTime);
-                            editStudentPackageList.add(studentBookOrderPackage);
-                        }
-                        if ("4".equals(state)) {
-                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_RETURNSIGN);
-                            studentBookOrderPackage.setOperator("管理员");
-                            studentBookOrderPackage.setOperateTime(operateTime);
-                            editStudentPackageList.add(studentBookOrderPackage);
-                        }
-                        if ("6".equals(state)) {
-                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_RETURN);
-                            studentBookOrderPackage.setOperator("管理员");
-                            studentBookOrderPackage.setOperateTime(operateTime);
-                            editStudentPackageList.add(studentBookOrderPackage);
-                        }
-
-                        //修改学生发书单包下的订单状态
-                        if ("2".equals(state) || "3".equals(state) || "4".equals(state) || "6".equals(state)) {
-                            editStudentOrderStateByPackageIdDAO.editStudentOrderStateByPackageId(Integer.parseInt(state), "管理员", operateTime, studentBookOrderPackage.getId());
-                        }
-
-                        //查询快递信息是否存在数据库, 如果存在就修改信息，如果不存在就新增记录
-                        Kuaidi kuaidi = findKuaidiByNuDAO.findKuaidiByNu(kuaidiOrder.getNu());
-                        if (null == kuaidi) {
-                            kuaidi = new Kuaidi();
-                            kuaidi.setNu(kuaidiOrder.getNu());
-                        }
-                        kuaidi.setCom(kuaidiOrder.getCom());
-                        kuaidi.setComName(kuaidiOrder.getComName());
-                        kuaidi.setStatus(kuaidiOrder.getStatus());
-                        kuaidi.setConditions(kuaidiOrder.getCondition());
-                        kuaidi.setState(kuaidiOrder.getState());
-                        kuaidi.setMessage(kuaidiOrder.getMessage());
-                        kuaidi.setSyncTime(operateTime);
-                        kuaidi.setRecord(this.assembleRecord(kuaidiOrder.getRecordInfoList()));
-
-                        if (null != kuaidi && kuaidi.getNu().equals(kuaidiOrder.getNu())) {
-                            editKuaidiList.add(kuaidi);
-                        } else {
-                            addKuaidiList.add(kuaidi);
-                        }
-                    }
+                    JSONObject jsonObject = kuaidiwoService.queryForEMSByJson(logisticCode);
+                    System.out.println("tempNum:  "+jsonObject.toString());
+//                    KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
+//                    if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
+//                        /** 快递单当前状态
+//                         * 0：在途，即货物处于运输过程中
+//                         * 1：揽件，货物已由快递公司揽收并且产生了第一条跟踪信息
+//                         * 2：疑难，货物寄送过程出了问题
+//                         * 3：签收，收件人已签收
+//                         * 4：退签，即货物由于用户拒签、超区等原因退回，而且发件人已经签收
+//                         * 5：派件，即快递正在进行同城派件
+//                         * 6：退回，货物正处于退回发件人的途中
+//                         */
+//                        String state = kuaidiOrder.getState();
+//                        if ("2".equals(state)) {
+//                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_DIFFICULT);
+//                            studentBookOrderPackage.setOperator("管理员");
+//                            studentBookOrderPackage.setOperateTime(operateTime);
+//                            editStudentPackageList.add(studentBookOrderPackage);
+//                        }
+//                        if ("3".equals(state)) {
+//                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_YES);
+//                            studentBookOrderPackage.setOperator("管理员");
+//                            studentBookOrderPackage.setOperateTime(operateTime);
+//                            editStudentPackageList.add(studentBookOrderPackage);
+//                        }
+//                        if ("4".equals(state)) {
+//                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_RETURNSIGN);
+//                            studentBookOrderPackage.setOperator("管理员");
+//                            studentBookOrderPackage.setOperateTime(operateTime);
+//                            editStudentPackageList.add(studentBookOrderPackage);
+//                        }
+//                        if ("6".equals(state)) {
+//                            studentBookOrderPackage.setIsSign(StudentBookOrderPackage.IS_SIGN_RETURN);
+//                            studentBookOrderPackage.setOperator("管理员");
+//                            studentBookOrderPackage.setOperateTime(operateTime);
+//                            editStudentPackageList.add(studentBookOrderPackage);
+//                        }
+//
+//                        //修改学生发书单包下的订单状态
+//                        if ("2".equals(state) || "3".equals(state) || "4".equals(state) || "6".equals(state)) {
+//                            editStudentOrderStateByPackageIdDAO.editStudentOrderStateByPackageId(Integer.parseInt(state), "管理员", operateTime, studentBookOrderPackage.getId());
+//                        }
+//
+//                        //查询快递信息是否存在数据库, 如果存在就修改信息，如果不存在就新增记录
+//                        Kuaidi kuaidi = findKuaidiByNuDAO.findKuaidiByNu(kuaidiOrder.getNu());
+//                        if (null == kuaidi) {
+//                            kuaidi = new Kuaidi();
+//                            kuaidi.setNu(kuaidiOrder.getNu());
+//                        }
+//                        kuaidi.setCom(kuaidiOrder.getCom());
+//                        kuaidi.setComName(kuaidiOrder.getComName());
+//                        kuaidi.setStatus(kuaidiOrder.getStatus());
+//                        kuaidi.setConditions(kuaidiOrder.getCondition());
+//                        kuaidi.setState(kuaidiOrder.getState());
+//                        kuaidi.setMessage(kuaidiOrder.getMessage());
+//                        kuaidi.setSyncTime(operateTime);
+//                        kuaidi.setRecord(this.assembleRecord(kuaidiOrder.getRecordInfoList()));
+//
+//                        if (null != kuaidi && kuaidi.getNu().equals(kuaidiOrder.getNu())) {
+//                            editKuaidiList.add(kuaidi);
+//                        } else {
+//                            addKuaidiList.add(kuaidi);
+//                        }
+//                    }
                     tempNum++;
                 }
             }
@@ -177,55 +183,57 @@ public class OrderKuaidiTaskServiceImpl extends Thread implements OrderKuaidiTas
                             if (tempNum % 5 == 0 && 0 < tempNum) {
                                 Thread.sleep(100000l);
                             }
-                            KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
-                            if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
-                                /** 快递单当前状态
-                                 * 0：在途，即货物处于运输过程中
-                                 * 1：揽件，货物已由快递公司揽收并且产生了第一条跟踪信息
-                                 * 2：疑难，货物寄送过程出了问题
-                                 * 3：签收，收件人已签收
-                                 * 4：退签，即货物由于用户拒签、超区等原因退回，而且发件人已经签收
-                                 * 5：派件，即快递正在进行同城派件
-                                 * 6：退回，货物正处于退回发件人的途中
-                                 */
-                                if (!"3".equals(kuaidiOrder.getState())) {
-                                    isSign = false;
-                                }
-
-                                //查询快递信息是否存在数据库, 如果存在就修改信息，如果不存在就新增记录
-                                Kuaidi kuaidi = findKuaidiByNuDAO.findKuaidiByNu(kuaidiOrder.getNu());
-                                if (null == kuaidi) {
-                                    kuaidi = new Kuaidi();
-                                    kuaidi.setNu(kuaidiOrder.getNu());
-                                }
-                                kuaidi.setCom(kuaidiOrder.getCom());
-                                kuaidi.setComName(kuaidiOrder.getComName());
-                                kuaidi.setStatus(kuaidiOrder.getStatus());
-                                kuaidi.setConditions(kuaidiOrder.getCondition());
-                                kuaidi.setState(kuaidiOrder.getState());
-                                kuaidi.setMessage(kuaidiOrder.getMessage());
-                                kuaidi.setSyncTime(operateTime);
-                                kuaidi.setRecord(this.assembleRecord(kuaidiOrder.getRecordInfoList()));
-
-                                if (null != kuaidi && kuaidi.getNu().equals(kuaidiOrder.getNu())) {
-                                    editKuaidiList.add(kuaidi);
-                                } else {
-                                    addKuaidiList.add(kuaidi);
-                                }
-                            }else{
-                                isSign = false;
-                            }
+                            JSONObject jsonObject = kuaidiwoService.queryForEMSByJson(logisticCode);
+                            System.out.println("tempNum:  "+jsonObject.toString());
+//                            KuaidiOrder kuaidiOrder = kuaidiService.queryForEMSObject(logisticCode);
+//                            if (null != kuaidiOrder && !StringUtils.isEmpty(kuaidiOrder.getNu())) {
+//                                /** 快递单当前状态
+//                                 * 0：在途，即货物处于运输过程中
+//                                 * 1：揽件，货物已由快递公司揽收并且产生了第一条跟踪信息
+//                                 * 2：疑难，货物寄送过程出了问题
+//                                 * 3：签收，收件人已签收
+//                                 * 4：退签，即货物由于用户拒签、超区等原因退回，而且发件人已经签收
+//                                 * 5：派件，即快递正在进行同城派件
+//                                 * 6：退回，货物正处于退回发件人的途中
+//                                 */
+//                                if (!"3".equals(kuaidiOrder.getState())) {
+//                                    isSign = false;
+//                                }
+//
+//                                //查询快递信息是否存在数据库, 如果存在就修改信息，如果不存在就新增记录
+//                                Kuaidi kuaidi = findKuaidiByNuDAO.findKuaidiByNu(kuaidiOrder.getNu());
+//                                if (null == kuaidi) {
+//                                    kuaidi = new Kuaidi();
+//                                    kuaidi.setNu(kuaidiOrder.getNu());
+//                                }
+//                                kuaidi.setCom(kuaidiOrder.getCom());
+//                                kuaidi.setComName(kuaidiOrder.getComName());
+//                                kuaidi.setStatus(kuaidiOrder.getStatus());
+//                                kuaidi.setConditions(kuaidiOrder.getCondition());
+//                                kuaidi.setState(kuaidiOrder.getState());
+//                                kuaidi.setMessage(kuaidiOrder.getMessage());
+//                                kuaidi.setSyncTime(operateTime);
+//                                kuaidi.setRecord(this.assembleRecord(kuaidiOrder.getRecordInfoList()));
+//
+//                                if (null != kuaidi && kuaidi.getNu().equals(kuaidiOrder.getNu())) {
+//                                    editKuaidiList.add(kuaidi);
+//                                } else {
+//                                    addKuaidiList.add(kuaidi);
+//                                }
+//                            }else{
+//                                isSign = false;
+//                            }
                         }
                         tempNum++;
-                        if(isSign){
-                            //修改预订单包的状态
-                            placeOrderPackage.setIsSign(PlaceOrderPackage.IS_SIGN_YES);
-                            placeOrderPackage.setOperator("管理员");
-                            placeOrderPackage.setOperateTime(operateTime);
-                            editPlacePackageList.add(placeOrderPackage);
-                            //修改预订单包下的订单状态
-                            editPlaceOrderStateByPackageIdDAO.editPlaceOrderStateByPackageId(TeachMaterialPlaceOrder.STATE_SIGN, "管理员", operateTime, placeOrderPackage.getId());
-                        }
+//                        if(isSign){
+//                            //修改预订单包的状态
+//                            placeOrderPackage.setIsSign(PlaceOrderPackage.IS_SIGN_YES);
+//                            placeOrderPackage.setOperator("管理员");
+//                            placeOrderPackage.setOperateTime(operateTime);
+//                            editPlacePackageList.add(placeOrderPackage);
+//                            //修改预订单包下的订单状态
+//                            editPlaceOrderStateByPackageIdDAO.editPlaceOrderStateByPackageId(TeachMaterialPlaceOrder.STATE_SIGN, "管理员", operateTime, placeOrderPackage.getId());
+//                        }
                     }
                 }
             }

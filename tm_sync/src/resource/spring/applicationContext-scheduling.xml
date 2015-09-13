@@ -16,4 +16,16 @@
 	<bean id="orderKuaidiTaskService" class="com.zs.service.scheduler.impl.OrderKuaidiTaskServiceImpl">
 	</bean>
 	<!-- 向快递100同步订单的快递状态业务接口END -->
+
+
+	<!-- 向快递100同步订单的快递状态定时器  每天0:10分执行-->
+	<task:scheduler id="createStudentExpenseScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="createStudentExpenseScheduler">
+		<task:scheduled ref="createStudentExpenseService" method="add" cron="0 15 17 * * ?"/>
+	</task:scheduled-tasks>
+	<!-- 向快递100同步订单的快递状态定时器 END-->
+	<!-- 向快递100同步订单的快递状态业务接口 -->
+	<bean id="createStudentExpenseService" class="com.zs.service.scheduler.impl.CreateStudentExpenseServiceImpl">
+	</bean>
+	<!-- 向快递100同步订单的快递状态业务接口END -->
 </beans>

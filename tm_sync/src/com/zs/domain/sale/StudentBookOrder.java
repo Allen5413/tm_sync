@@ -19,26 +19,29 @@ public class StudentBookOrder extends AbstractEntity {
     public static final int ISSTOCK_YES = 0;    //是
     public static final int ISSTOCK_NOT = 1;    //否
 
+    public static final int STUDENTSIGN_YES = 0;    //是
+    public static final int STUDENTSIGN_NOT = 1;    //否
+
     public static final int STATE_UNCONFIRMED = 0;  //未确认
     public static final int STATE_CONFIRMED = 1;    //已确认
     public static final int STATE_SORTING = 2;      //分拣中
     public static final int STATE_PACK = 3;         //已打包
     public static final int STATE_SEND = 4;         //已发出
     public static final int STATE_SIGN = 5;         //已签收
-    public static final int STATE_DIFFICULT = 6;    //疑难
-    public static final int STATE_RETURNSIGN = 7;   //退签
-    public static final int STATE_RETURN = 8;       //退回
+
 
     private Long id;                            //主键
     private Long semesterId;                    //学期id
     private Long issueChannelId;                //渠道id
     private String orderCode;                   //订单号
     private String studentCode;                 //学号
-    private Integer state;                      //状态[0：未确认；1：已确认；2：分拣中；3：已打包；4：已发出；5：已签收；6：疑难；7：退签；8：退回]
+    private Integer state;                      //状态[0：未确认；1：已确认；2：分拣中；3：已打包；4：已发出； 5：已签收]
     private Integer isStock;                    //是否有库存[0:是；1：否]
     private Integer isSpotOrder;                //是否学习中心订单[0：是；1：否]
     private String logisticCode;                //物流单号
     private Long packageId;                     //订单打包id
+    private Integer printSort;                  //打印顺序号
+    private Integer studentSign;                //学生签收[0:是；1:否]
     private String creator;                     //创建人
     private Date createTime = new Date();       //创建时间
     private String operator;                    //操作人
@@ -166,5 +169,21 @@ public class StudentBookOrder extends AbstractEntity {
 
     public void setIsStock(Integer isStock) {
         this.isStock = isStock;
+    }
+
+    public Integer getPrintSort() {
+        return printSort;
+    }
+
+    public void setPrintSort(Integer printSort) {
+        this.printSort = printSort;
+    }
+
+    public Integer getStudentSign() {
+        return studentSign;
+    }
+
+    public void setStudentSign(Integer studentSign) {
+        this.studentSign = studentSign;
     }
 }

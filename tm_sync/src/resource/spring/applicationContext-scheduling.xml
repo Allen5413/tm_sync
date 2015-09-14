@@ -6,26 +6,26 @@
 	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd"
 	default-lazy-init="true">
 	
-	<!-- 向快递100同步订单的快递状态定时器  每天0:10分执行-->
-	<task:scheduler id="orderKuaidiTaskScheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="orderKuaidiTaskScheduler">
-	    <task:scheduled ref="orderKuaidiTaskService" method="orderKuaidiState" cron="0 55 21 * * ?"/>
-	</task:scheduled-tasks>
-	<!-- 向快递100同步订单的快递状态定时器 END-->
-	<!-- 向快递100同步订单的快递状态业务接口 -->
-	<bean id="orderKuaidiTaskService" class="com.zs.service.scheduler.impl.OrderKuaidiTaskServiceImpl">
-	</bean>
-	<!-- 向快递100同步订单的快递状态业务接口END -->
+	<!--&lt;!&ndash; 向快递100同步订单的快递状态定时器  每天0:10分执行&ndash;&gt;-->
+	<!--<task:scheduler id="orderKuaidiTaskScheduler" pool-size="1"/>-->
+	<!--<task:scheduled-tasks scheduler="orderKuaidiTaskScheduler">-->
+	    <!--<task:scheduled ref="orderKuaidiTaskService" method="orderKuaidiState" cron="0 55 21 * * ?"/>-->
+	<!--</task:scheduled-tasks>-->
+	<!--&lt;!&ndash; 向快递100同步订单的快递状态定时器 END&ndash;&gt;-->
+	<!--&lt;!&ndash; 向快递100同步订单的快递状态业务接口 &ndash;&gt;-->
+	<!--<bean id="orderKuaidiTaskService" class="com.zs.service.scheduler.impl.OrderKuaidiTaskServiceImpl">-->
+	<!--</bean>-->
+	<!--&lt;!&ndash; 向快递100同步订单的快递状态业务接口END &ndash;&gt;-->
 
 
 	<!-- 向快递100同步订单的快递状态定时器  每天0:10分执行-->
-	<task:scheduler id="createStudentExpenseScheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="createStudentExpenseScheduler">
-		<task:scheduled ref="createStudentExpenseService" method="add" cron="0 15 17 * * ?"/>
+	<task:scheduler id="createStudentBookOrderScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="createStudentBookOrderScheduler">
+		<task:scheduled ref="createStudentBookOrderService" method="addStudentBookOrder" cron="0 30 15 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 向快递100同步订单的快递状态定时器 END-->
 	<!-- 向快递100同步订单的快递状态业务接口 -->
-	<bean id="createStudentExpenseService" class="com.zs.service.scheduler.impl.CreateStudentExpenseServiceImpl">
+	<bean id="createStudentBookOrderService" class="com.zs.service.scheduler.impl.CreateStudentBookOrderServiceImpl">
 	</bean>
 	<!-- 向快递100同步订单的快递状态业务接口END -->
 </beans>

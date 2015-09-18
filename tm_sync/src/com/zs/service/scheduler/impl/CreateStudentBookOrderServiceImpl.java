@@ -145,6 +145,7 @@ public class CreateStudentBookOrderServiceImpl
         studentBookOrder.setState(StudentBookOrder.STATE_UNCONFIRMED);
         studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
         studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
+        studentBookOrder.setPrintSort(null);
         studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
         studentBookOrder.setCreator(loginName);
         studentBookOrder.setOperator(loginName);

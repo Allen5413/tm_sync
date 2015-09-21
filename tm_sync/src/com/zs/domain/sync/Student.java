@@ -45,6 +45,7 @@ public class Student extends AbstractEntity {
     private Integer state;              //学生状态[网院(StudyState)：53--停生 77--休学 78--退学 54--在籍学生  55--已毕业学.  教材：0--在籍学生 1--停生 2--休学 3--退学 4--已毕业学.]
     private Integer studyEnterYear;     //学籍入学年
     private Integer studyQuarter;       //学籍入学季
+    private String changeSpotDetail;    //学生转学习中心情况说明
     private Date operateTime = new Date();  //操作时间
 
     @Id
@@ -207,5 +208,13 @@ public class Student extends AbstractEntity {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    public String getChangeSpotDetail() {
+        return changeSpotDetail;
+    }
+
+    public void setChangeSpotDetail(String changeSpotDetail) {
+        this.changeSpotDetail = changeSpotDetail;
     }
 }

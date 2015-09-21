@@ -19,13 +19,13 @@
 
 
 	<!-- 向快递100同步订单的快递状态定时器  每天0:10分执行-->
-	<task:scheduler id="createStudentBookOrderScheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="createStudentBookOrderScheduler">
-		<task:scheduled ref="createStudentBookOrderService" method="addStudentBookOrder" cron="0 30 15 * * ?"/>
+	<task:scheduler id="syncStudentScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="syncStudentScheduler">
+		<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 27 17 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 向快递100同步订单的快递状态定时器 END-->
 	<!-- 向快递100同步订单的快递状态业务接口 -->
-	<bean id="createStudentBookOrderService" class="com.zs.service.scheduler.impl.CreateStudentBookOrderServiceImpl">
+	<bean id="syncStudentTaskService" class="com.zs.service.scheduler.impl.SyncStudentTaskServiceImpl">
 	</bean>
 	<!-- 向快递100同步订单的快递状态业务接口END -->
 </beans>

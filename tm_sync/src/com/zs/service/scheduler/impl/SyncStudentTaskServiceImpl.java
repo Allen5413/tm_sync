@@ -4,10 +4,10 @@ import com.feinno.framework.common.exception.BusinessException;
 import com.zs.dao.basic.finance.spotexpenseoth.FindBySpotCodeAndSemesterDAO;
 import com.zs.dao.basic.finance.studentexpense.FindByStudentCodeDAO;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
-import com.zs.dao.basic.teachmaterialcourse.FindTeachMaterialCourseByCourseCodeDAO;
+import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
+import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForMaxCodeDAO;
 import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
-import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookorderlog.StudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
 import com.zs.dao.sync.FindStudentByCodeDAO;
@@ -16,7 +16,7 @@ import com.zs.dao.sync.SelectedCourseTempDAO;
 import com.zs.dao.sync.StudentTempDAO;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
-import com.zs.domain.basic.TeachMaterialCourse;
+import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.finance.SpotExpenseOth;
 import com.zs.domain.finance.StudentExpense;
 import com.zs.domain.sale.StudentBookOrder;
@@ -39,6 +39,7 @@ import javax.annotation.Resource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,8 +75,16 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     @Resource
     private StudentBookOrderTmDAO studentBookOrderTmDAO;
     @Resource
-    private FindTeachMaterialCourseByCourseCodeDAO findTeachMaterialCourseByCourseCodeDAO;
+    private FindTeachMaterialByCourseCodeDAO findTeachMaterialByCourseCodeDAO;
+    @Resource
+    private FindTeachMaterialFromSetTMByCourseCodeDAO findTeachMaterialFromSetTMByCourseCodeDAO;
 
+    //变更信息描述
+    private String detail = "";
+
+    /**
+     * 同步学生信息
+     */
     @Override
     @Transactional
     public void syncStudent() {
@@ -95,8 +104,21 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         boolean isUpdate = false;
                         boolean isChangeSpot = false;
                         String oldSpotCode = "";
+                        detail += "学号["+studentCode+"]: ";
+                        //入学季
+                        if (1 == studentTemp.getStudyQuarter() && 0 != student.getStudyQuarter()) {
+                            student.setStudyQuarter(0);
+                            isUpdate = true;
+                            detail += "入学季由 秋季 改为 春季 、";
+                        }
+                        if (2 == studentTemp.getStudyQuarter() && 1 != student.getStudyQuarter()) {
+                            student.setStudyQuarter(1);
+                            isUpdate = true;
+                            detail += "入学季由 春季 改为 秋季 、";
+                        }
                         //姓名
                         if (!student.getName().equals(studentTemp.getName())) {
+                            detail += "姓名由 "+student.getName()+" 改为 "+studentTemp.getName()+"、";
                             student.setName(studentTemp.getName());
                             isUpdate = true;
                         }
@@ -104,142 +126,364 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         if (StudentTemp.SEX_MAN == studentTemp.getSex() && Student.SEX_MAN != student.getSex()) {
                             student.setSex(Student.SEX_MAN);
                             isUpdate = true;
+                            detail += "性别由 女 改为 男、";
                         }
                         if (StudentTemp.SEX_FEMALE == studentTemp.getSex() && Student.SEX_FEMALE != student.getSex()) {
                             student.setSex(Student.SEX_FEMALE);
                             isUpdate = true;
+                            detail += "性别由 男 改为 女、";
                         }
                         //证件类型
                         if (StudentTemp.IDCARD_TYPE_IDCARD == studentTemp.getIdcardType() && Student.IDCARD_TYPE_IDCARD != student.getIdcardType()) {
+                            detail += "证件类型由 ";
+                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
+                                detail += "港、澳、台居民证件 ";
+                            }
+                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
+                                detail += "军官证 ";
+                            }
+                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
+                                detail += "其它 ";
+                            }
+                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
+                                detail += "护照 ";
+                            }
+                            detail += "改为 身份证、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_IDCARD);
                             isUpdate = true;
                         }
                         if (StudentTemp.IDCARD_TYPE_MILITARY_OFFICER == studentTemp.getIdcardType() && Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()) {
+                            detail += "证件类型由 ";
+                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
+                                detail += "港、澳、台居民证件 ";
+                            }
+                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
+                                detail += "身份证 ";
+                            }
+                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
+                                detail += "其它 ";
+                            }
+                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
+                                detail += "护照 ";
+                            }
+                            detail += "改为 军官证、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_MILITARY_OFFICER);
                             isUpdate = true;
                         }
                         if (StudentTemp.IDCARD_TYPE_PASSPORT == studentTemp.getIdcardType() && Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()) {
+                            detail += "证件类型由 ";
+                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
+                                detail += "港、澳、台居民证件 ";
+                            }
+                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
+                                detail += "军官证 ";
+                            }
+                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
+                                detail += "其它 ";
+                            }
+                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
+                                detail += "身份证 ";
+                            }
+                            detail += "改为 护照、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_PASSPORT);
                             isUpdate = true;
                         }
                         if (StudentTemp.IDCARD_TYPE_HK_MACAO_TAIWAN == studentTemp.getIdcardType() && Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()) {
+                            detail += "证件类型由 ";
+                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
+                                detail += "身份证 ";
+                            }
+                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
+                                detail += "军官证 ";
+                            }
+                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
+                                detail += "其它 ";
+                            }
+                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
+                                detail += "护照 ";
+                            }
+                            detail += "改为 港、澳、台居民证件、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_HK_MACAO_TAIWAN);
                             isUpdate = true;
                         }
                         if (StudentTemp.IDCARD_TYPE_OTHER == studentTemp.getIdcardType() && Student.IDCARD_TYPE_OTHER != student.getIdcardType()) {
+                            detail += "证件类型由 ";
+                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
+                                detail += "身份证 ";
+                            }
+                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
+                                detail += "军官证 ";
+                            }
+                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
+                                detail += "港、澳、台居民证件 ";
+                            }
+                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
+                                detail += "护照 ";
+                            }
+                            detail += "改为 其它、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_OTHER);
                             isUpdate = true;
                         }
                         //证件号码
                         if (!student.getIdcardNo().equals(studentTemp.getIdcardNo())) {
+                            detail += "证件号码由 "+student.getIdcardNo()+" 改为 "+studentTemp.getIdcardNo()+"、";
                             student.setIdcardNo(studentTemp.getIdcardNo());
                             isUpdate = true;
                         }
                         //邮编
-                        if (!student.getIdcardNo().equals(studentTemp.getIdcardNo())) {
-                            student.setIdcardNo(studentTemp.getIdcardNo());
+                        if (!student.getPostalCode().equals(studentTemp.getPostalCode())) {
+                            detail += "邮编由 "+student.getIdcardNo()+" 改为 "+studentTemp.getIdcardNo()+"、";
+                            student.setIdcardNo(studentTemp.getPostalCode());
                             isUpdate = true;
                         }
                         //地址
                         if (!student.getAddress().equals(studentTemp.getAddress())) {
+                            detail += "地址由 "+student.getAddress()+" 改为 "+studentTemp.getAddress()+"、";
                             student.setAddress(studentTemp.getAddress());
                             isUpdate = true;
                         }
                         //手机
                         if (!student.getMobile().equals(studentTemp.getMobile())) {
+                            detail += "手机由 "+student.getMobile()+" 改为 "+studentTemp.getMobile()+"、";
                             student.setMobile(studentTemp.getMobile());
                             isUpdate = true;
                         }
                         //家庭电话
                         if (!student.getHomeTel().equals(studentTemp.getHomeTel())) {
+                            detail += "家庭电话由 "+student.getHomeTel()+" 改为 "+studentTemp.getHomeTel()+"、";
                             student.setHomeTel(studentTemp.getHomeTel());
                             isUpdate = true;
                         }
                         //公司电话
                         if (!student.getCompanyTel().equals(studentTemp.getCompanyTel())) {
+                            detail += "公司电话由 "+student.getCompanyTel()+" 改为 "+studentTemp.getCompanyTel()+"、";
                             student.setCompanyTel(studentTemp.getCompanyTel());
                             isUpdate = true;
                         }
                         //邮箱
                         if (!student.getEmail().equals(studentTemp.getEmail())) {
+                            detail += "邮箱由 "+student.getEmail()+" 改为 "+studentTemp.getEmail()+"、";
                             student.setEmail(studentTemp.getEmail());
                             isUpdate = true;
                         }
                         //学习中心
                         if (!student.getSpotCode().equals(studentTemp.getSpotCode())) {
-                            oldSpotCode = student.getSpotCode();
+                            detail += "学习中心由 "+student.getSpotCode()+" 改为 "+studentTemp.getSpotCode()+"、";
                             student.setSpotCode(studentTemp.getSpotCode());
                             isUpdate = true;
                             isChangeSpot = true;
                         }
                         //专业
                         if (!student.getSpecCode().equals(studentTemp.getSpecCode())) {
+                            detail += "专业由 "+student.getSpecCode()+" 改为 "+studentTemp.getSpecCode()+"、";
                             student.setSpecCode(studentTemp.getSpecCode());
                             isUpdate = true;
                         }
                         //层次
                         if (!student.getLevelCode().equals(studentTemp.getLevelCode())) {
+                            detail += "层次由 "+student.getLevelCode()+" 改为 "+studentTemp.getLevelCode()+"、";
                             student.setLevelCode(studentTemp.getLevelCode());
                             isUpdate = true;
                         }
                         //类型
                         if (1 == studentTemp.getType() && 3 != student.getType()) {
+                            detail += "类型由 ";
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程";
+                            }
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            detail += " 改为 函授、 ";
                             student.setType(3);
                             isUpdate = true;
                         }
                         if (2 == studentTemp.getType() && 4 != student.getType()) {
+                            detail += "类型由 ";
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            detail += " 改为 业余、 ";
                             student.setType(4);
                             isUpdate = true;
                         }
                         if (26 == studentTemp.getType() && 0 != student.getType()) {
+                            detail += "类型由 ";
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            detail += " 改为 普通、 ";
                             student.setType(0);
                             isUpdate = true;
                         }
                         if (27 == studentTemp.getType() && 1 != student.getType()) {
+                            detail += "类型由 ";
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            detail += " 改为 免试、 ";
                             student.setType(1);
                             isUpdate = true;
                         }
                         if (67 == studentTemp.getType() && 2 != student.getType()) {
+                            detail += "类型由 ";
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            detail += " 改为 课程、 ";
                             student.setType(2);
                             isUpdate = true;
                         }
                         //状态
                         if (53 == studentTemp.getState() && 1 != student.getState()) {
+                            detail += "状态由 ";
+                            if(0 == student.getState()){
+                                detail += "在籍";
+                            }
+                            if(2 == student.getState()){
+                                detail += "休学";
+                            }
+                            if(3 == student.getState()){
+                                detail += "退学";
+                            }
+                            if(4 == student.getState()){
+                                detail += "毕业";
+                            }
+                            detail += " 改为 停用、 ";
                             student.setState(1);
                             isUpdate = true;
                         }
                         if (77 == studentTemp.getState() && 2 != student.getState()) {
+                            detail += "状态由 ";
+                            if(0 == student.getState()){
+                                detail += "在籍";
+                            }
+                            if(1 == student.getState()){
+                                detail += "停用";
+                            }
+                            if(3 == student.getState()){
+                                detail += "退学";
+                            }
+                            if(4 == student.getState()){
+                                detail += "毕业";
+                            }
+                            detail += " 改为 休学、 ";
                             student.setState(2);
                             isUpdate = true;
                         }
                         if (78 == studentTemp.getState() && 3 != student.getState()) {
+                            detail += "状态由 ";
+                            if(0 == student.getState()){
+                                detail += "在籍";
+                            }
+                            if(1 == student.getState()){
+                                detail += "停用";
+                            }
+                            if(2 == student.getState()){
+                                detail += "休学";
+                            }
+                            if(4 == student.getState()){
+                                detail += "毕业";
+                            }
+                            detail += " 改为 退学、 ";
                             student.setState(3);
                             isUpdate = true;
                         }
                         if (54 == studentTemp.getState() && 0 != student.getState()) {
+                            detail += "状态由 ";
+                            if(3 == student.getState()){
+                                detail += "退学";
+                            }
+                            if(1 == student.getState()){
+                                detail += "停用";
+                            }
+                            if(2 == student.getState()){
+                                detail += "休学";
+                            }
+                            if(4 == student.getState()){
+                                detail += "毕业";
+                            }
+                            detail += " 改为 在籍、 ";
                             student.setState(0);
                             isUpdate = true;
                         }
                         if (55 == studentTemp.getState() && 4 != student.getState()) {
+                            detail += "状态由 ";
+                            if(3 == student.getState()){
+                                detail += "退学";
+                            }
+                            if(1 == student.getState()){
+                                detail += "停用";
+                            }
+                            if(2 == student.getState()){
+                                detail += "休学";
+                            }
+                            if(0 == student.getState()){
+                                detail += "在籍";
+                            }
+                            detail += " 改为 在籍、 ";
                             student.setState(4);
                             isUpdate = true;
+                            detail += "毕业、";
                         }
                         //入学年
                         if (!student.getStudyEnterYear().equals(studentTemp.getStudyEnterYear())) {
+                            detail += "入学年由 "+student.getStudyEnterYear()+" 改为 "+studentTemp.getStudyEnterYear()+"、";
                             student.setStudyEnterYear(studentTemp.getStudyEnterYear());
-                            isUpdate = true;
-                        }
-                        //入学季
-                        if (!student.getStudyQuarter().equals(studentTemp.getStudyQuarter())) {
-                            student.setStudyQuarter(studentTemp.getStudyQuarter());
                             isUpdate = true;
                         }
 
                         if (isUpdate) {
+                            detail += "信息发生变更。\r\n";
+                            if(isChangeSpot){
+                                this.updateStudentSpotExpense(oldSpotCode, student.getSpotCode(), student.getCode());
+                            }
+                            Timestamp operateTime = DateTools.getLongNowTime();
+                            String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
+                            student.setChangeSpotDetail((null == student.getChangeSpotDetail() ? "" : student.getChangeSpotDetail())+changeSpotDetail);
                             findStudentByCodeDAO.update(student);
-                        }
-                        if(isChangeSpot){
-                            this.updateStudentSpotExpense(oldSpotCode, student.getSpotCode(), student.getCode());
                         }
                     } else {
                         //说明不存在该学生信息，新增该学生信息
@@ -314,7 +558,10 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         }
                         student.setOperateTime(DateTools.getLongNowTime());
                         findStudentByCodeDAO.save(student);
+                        detail += "学号："+studentCode+", 为新增学生。\r\n";
                     }
+                    //检查学生的选课
+                    this.syncSelectedCourse(student.getCode(), student.getSpotCode());
                 }
                 tempNum++;
             }
@@ -326,6 +573,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             msg.append("异常信息：" + sw.toString() + "\r\n");
         }
         finally {
+            msg.append("\r\n"+detail+"\r\n");
             msg.append("执行了"+tempNum+"条数据\r\n");
             msg.append(DateTools.getLongNowTime()+": 学生信息同步结束");
 
@@ -338,7 +586,13 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         }
     }
 
-
+    /**
+     * 修改学生的学习中心
+     * @param oldSpotCode
+     * @param newSpotCode
+     * @param studentCode
+     * @throws Exception
+     */
     protected void updateStudentSpotExpense(String oldSpotCode, String newSpotCode, String studentCode)throws Exception{
         //查询学生财务信息
         List<StudentExpense> studentExpenseList = findByStudentCodeDAO.findByStudentCode(studentCode);
@@ -429,6 +683,12 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         }
     }
 
+    /**
+     * 同步选课，如果有新的课程，就要生成订单
+     * @param studentCode
+     * @param spotCode
+     * @throws Exception
+     */
     protected void syncSelectedCourse(String studentCode, String spotCode)throws Exception{
         //查询学生当前选课
         List<SelectedCourse> selectedCourseList = selectedCourseDAO.findByStudentCode(studentCode);
@@ -459,7 +719,34 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             //查询学生当前学期有没有未确认的订单， 如果有，就把新课程的教材加进去，如果没得就新生成一个订单
             List<StudentBookOrder> studentBookOrderList = studentBookOrderDAO.findByStudentCodeAndSemesterIdForUnconfirmed(studentCode, semester.getId());
             if(null != studentBookOrderList && 0 < studentBookOrderList.size()){
+                StudentBookOrder studentBookOrder = studentBookOrderList.get(0);
 
+                //添加订单教材明细
+                for(SelectedCourseTemp selectedCourseTemp : newSelectedCourseTempList) {
+                    String courseCode = selectedCourseTemp.getCourseCode();
+                    //通过课程查询课程关联的教材
+                    List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                    if (null != teachMaterialList && 0 < teachMaterialList.size()) {
+                        for (TeachMaterial teachMaterial : teachMaterialList) {
+                            StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                            studentBookOrderTM.setOrderCode(studentBookOrder.getOrderCode());
+                            studentBookOrderTM.setCourseCode(courseCode);
+                            studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
+                            studentBookOrderTM.setPrice(teachMaterial.getPrice());
+                            studentBookOrderTM.setCount(1);
+                            studentBookOrderTM.setOperator("管理员");
+                            studentBookOrderTmDAO.save(studentBookOrderTM);
+                        }
+                    }
+                    //把新选的课程添加进表
+                    SelectedCourse selectedCourse = new SelectedCourse();
+                    selectedCourse.setSemesterId(semester.getId());
+                    selectedCourse.setStudentCode(studentCode);
+                    selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
+                    selectedCourse.setOperateTime(DateTools.getLongNowTime());
+                    selectedCourseDAO.save(selectedCourse);
+                    detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
+                }
             }else{
                 //根据学生的学习中心查询关联的发行渠道
                 IssueRange issueRange = findIssueRangeBySpotCodeService.getIssueRangeBySpotCode(spotCode);
@@ -498,43 +785,52 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                 studentBookOrderLog.setOperator("管理员");
                 studentBookOrderLogDAO.save(studentBookOrderLog);
 
-
                 //添加订单教材明细
                 for(SelectedCourseTemp selectedCourseTemp : newSelectedCourseTempList){
                     String courseCode = selectedCourseTemp.getCourseCode();
-                    //查询课程对应的教材
-                    List<TeachMaterialCourse> teachMaterialCourseList = findTeachMaterialCourseByCourseCodeDAO.getTeachMaterialCourseByCourseCode(courseCode);
-
-                    long tmId = Long.parseLong(idAndCount.split("_")[0]);
-                    int count = Integer.parseInt(idAndCount.split("_")[1]);
-                    //获取教材信息
-                    TeachMaterial teachMaterial = findTeachMaterialService.get(tmId);
-                    if(null == teachMaterial || teachMaterial.getId() != tmId){
-                        throw new BusinessException("教材信息没有找到");
-                    }
-
-                    //查询教材关联的课程,这里是套教材，就去查购买课程；不是套教材，查关联课程
-                    String courseCode = "";
-                    if(teachMaterial.getIsSet() == TeachMaterial.ISSET_YES){
-                        SetTeachMaterial setTeachMaterial = findSetTeachMaterialByTMIdDAO.findSetTeachMaterialByTMId(tmId);
-                        courseCode = setTeachMaterial.getBuyCourseCode();
-                    }else{
-                        List<TeachMaterialCourse> teachMaterialCourseList = findTeachMaterialCourseByTMIdDAO.findTeachMaterialCourseByTMId(tmId);
-                        if(null != teachMaterialCourseList && 0 < teachMaterialCourseList.size()){
-                            courseCode = teachMaterialCourseList.get(0).getCourseCode();
+                    //通过课程查询课程关联的教材
+                    List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                    if(null != teachMaterialList && 0 < teachMaterialList.size()) {
+                        for(TeachMaterial teachMaterial : teachMaterialList) {
+                            StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                            studentBookOrderTM.setOrderCode(orderCode);
+                            studentBookOrderTM.setCourseCode(courseCode);
+                            studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
+                            studentBookOrderTM.setPrice(teachMaterial.getPrice());
+                            studentBookOrderTM.setCount(1);
+                            studentBookOrderTM.setOperator("管理员");
+                            studentBookOrderTmDAO.save(studentBookOrderTM);
                         }
                     }
-
-                    StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                    studentBookOrderTM.setOrderCode(orderCode);
-                    studentBookOrderTM.setCourseCode(courseCode);
-                    studentBookOrderTM.setTeachMaterialId(tmId);
-                    studentBookOrderTM.setPrice(teachMaterial.getPrice());
-                    studentBookOrderTM.setCount(count);
-                    studentBookOrderTM.setOperator(loginName);
-                    studentBookOrderTmDAO.save(studentBookOrderTM);
+                    //把新选的课程添加进表
+                    SelectedCourse selectedCourse = new SelectedCourse();
+                    selectedCourse.setSemesterId(semester.getId());
+                    selectedCourse.setStudentCode(studentCode);
+                    selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
+                    selectedCourse.setOperateTime(DateTools.getLongNowTime());
+                    selectedCourseDAO.save(selectedCourse);
+                    detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
                 }
             }
         }
+    }
+
+    /**
+     * 通过课程查询课程关联的教材
+     * @param courseCode
+     * @return
+     * @throws Exception
+     */
+    protected List<TeachMaterial> getTeachMaterialByCourseCode(String courseCode)throws Exception{
+        List<TeachMaterial> teachMaterialList = new ArrayList<TeachMaterial>();
+        List<TeachMaterial> teachMaterialList2 = findTeachMaterialByCourseCodeDAO.getTeachMaterialByCourseCode(courseCode);
+        List<TeachMaterial> teachMaterialList3 = findTeachMaterialFromSetTMByCourseCodeDAO.getTeachMaterialFromSetTMByCourseCode(courseCode);
+        if(null != teachMaterialList2 && 0 < teachMaterialList2.size()){
+            teachMaterialList.addAll(teachMaterialList2);
+        }
+        if(null != teachMaterialList3 && 0 < teachMaterialList3.size()){
+            teachMaterialList.addAll(teachMaterialList3);
+        }
+        return teachMaterialList;
     }
 }

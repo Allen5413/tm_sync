@@ -16,6 +16,6 @@ public interface SelectedCourseTempDAO extends EntityJpaDao<SelectedCourseTemp,L
      * @return
      * @throws Exception
      */
-    @Query("FROM SelectedCourse WHERE studentCode = ?1")
+    @Query("FROM SelectedCourseTemp WHERE studentCode = ?1")
     public List<SelectedCourseTemp> findByStudentCode(String studentCode)throws Exception;
 }

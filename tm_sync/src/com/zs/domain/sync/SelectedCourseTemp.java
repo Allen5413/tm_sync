@@ -13,10 +13,8 @@ import java.util.Date;
 @Table(name = "sync_selected_course_temp")
 public class SelectedCourseTemp extends AbstractEntity {
     private Long id;                //主键
-    private Long semesterId;        //学期id
     private String studentCode;     //学号
     private String courseCode;      //课程编号
-    private Date operateTime;       //操作时间
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,21 +40,5 @@ public class SelectedCourseTemp extends AbstractEntity {
 
     public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
-    }
-
-    public Date getOperateTime() {
-        return operateTime;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Long getSemesterId() {
-        return semesterId;
-    }
-
-    public void setSemesterId(Long semesterId) {
-        this.semesterId = semesterId;
     }
 }

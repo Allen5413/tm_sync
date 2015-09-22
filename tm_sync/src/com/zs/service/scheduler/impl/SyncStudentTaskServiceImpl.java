@@ -484,9 +484,12 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
                             student.setChangeSpotDetail((null == student.getChangeSpotDetail() ? "" : student.getChangeSpotDetail())+changeSpotDetail);
                             findStudentByCodeDAO.update(student);
+                        }else{
+                            detail = "";
                         }
                     } else {
                         //说明不存在该学生信息，新增该学生信息
+                        student = new Student();
                         student.setCode(studentTemp.getCode());
                         student.setName(studentTemp.getName());
                         if (studentTemp.getSex() == StudentTemp.SEX_MAN) {
@@ -562,8 +565,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     }
                     //检查学生的选课
                     this.syncSelectedCourse(student.getCode(), student.getSpotCode());
+                    tempNum++;
                 }
-                tempNum++;
             }
         }catch (Exception e){
             StringWriter sw = new StringWriter();

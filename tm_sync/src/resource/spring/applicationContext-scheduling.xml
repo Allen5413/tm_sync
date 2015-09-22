@@ -5,27 +5,15 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd"
 	default-lazy-init="true">
-	
-	<!--&lt;!&ndash; 向快递100同步订单的快递状态定时器  每天0:10分执行&ndash;&gt;-->
-	<!--<task:scheduler id="orderKuaidiTaskScheduler" pool-size="1"/>-->
-	<!--<task:scheduled-tasks scheduler="orderKuaidiTaskScheduler">-->
-	    <!--<task:scheduled ref="orderKuaidiTaskService" method="orderKuaidiState" cron="0 55 21 * * ?"/>-->
-	<!--</task:scheduled-tasks>-->
-	<!--&lt;!&ndash; 向快递100同步订单的快递状态定时器 END&ndash;&gt;-->
-	<!--&lt;!&ndash; 向快递100同步订单的快递状态业务接口 &ndash;&gt;-->
-	<!--<bean id="orderKuaidiTaskService" class="com.zs.service.scheduler.impl.OrderKuaidiTaskServiceImpl">-->
-	<!--</bean>-->
-	<!--&lt;!&ndash; 向快递100同步订单的快递状态业务接口END &ndash;&gt;-->
 
-
-	<!-- 向快递100同步订单的快递状态定时器  每天0:10分执行-->
+	<!-- 同步网院学生信息和选课信息  每天0:10分执行-->
 	<task:scheduler id="syncStudentScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="syncStudentScheduler">
-		<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 27 17 * * ?"/>
+		<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 00 09 * * ?"/>
 	</task:scheduled-tasks>
-	<!-- 向快递100同步订单的快递状态定时器 END-->
-	<!-- 向快递100同步订单的快递状态业务接口 -->
+	<!-- 同步网院学生信息和选课信息定时器 END-->
+	<!-- 同步网院学生信息和选课信息业务接口 -->
 	<bean id="syncStudentTaskService" class="com.zs.service.scheduler.impl.SyncStudentTaskServiceImpl">
 	</bean>
-	<!-- 向快递100同步订单的快递状态业务接口END -->
+	<!-- 同步网院学生信息和选课信息业务接口END -->
 </beans>

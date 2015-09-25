@@ -231,40 +231,112 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             isUpdate = true;
                         }
                         //邮编
-                        if (!student.getPostalCode().equals(studentTemp.getPostalCode())) {
-                            detail += "邮编由 "+student.getIdcardNo()+" 改为 "+studentTemp.getIdcardNo()+"、";
-                            student.setIdcardNo(studentTemp.getPostalCode());
+                        if(null == student.getPostalCode() && null != studentTemp.getPostalCode()){
+                            detail += "邮编由 Null 改为 "+studentTemp.getPostalCode()+"、";
+                            student.setPostalCode(studentTemp.getPostalCode());
                             isUpdate = true;
                         }
+                        if(null != student.getPostalCode() && null == studentTemp.getPostalCode()){
+                            detail += "邮编由 "+student.getPostalCode()+" 改为 Null、";
+                            student.setPostalCode(studentTemp.getPostalCode());
+                            isUpdate = true;
+                        }
+                        if(null != student.getPostalCode() && null != studentTemp.getPostalCode()) {
+                            if (!student.getPostalCode().equals(studentTemp.getPostalCode())) {
+                                detail += "邮编由 " + student.getIdcardNo() + " 改为 " + studentTemp.getIdcardNo() + "、";
+                                student.setIdcardNo(studentTemp.getPostalCode());
+                                isUpdate = true;
+                            }
+                        }
                         //地址
-                        if (!student.getAddress().equals(studentTemp.getAddress())) {
-                            detail += "地址由 "+student.getAddress()+" 改为 "+studentTemp.getAddress()+"、";
+                        if(null == student.getAddress() && null != studentTemp.getAddress()){
+                            detail += "地址由 Null 改为 "+studentTemp.getAddress()+"、";
                             student.setAddress(studentTemp.getAddress());
                             isUpdate = true;
                         }
+                        if(null != student.getAddress() && null == studentTemp.getAddress()){
+                            detail += "地址由 "+student.getAddress()+" 改为 Null、";
+                            student.setAddress(studentTemp.getAddress());
+                            isUpdate = true;
+                        }
+                        if(null != student.getAddress() && null != studentTemp.getAddress()) {
+                            if (!student.getAddress().equals(studentTemp.getAddress())) {
+                                detail += "地址由 " + student.getAddress() + " 改为 " + studentTemp.getAddress() + "、";
+                                student.setAddress(studentTemp.getAddress());
+                                isUpdate = true;
+                            }
+                        }
                         //手机
-                        if (!student.getMobile().equals(studentTemp.getMobile())) {
-                            detail += "手机由 "+student.getMobile()+" 改为 "+studentTemp.getMobile()+"、";
+                        if(null == student.getMobile() && null != studentTemp.getMobile()){
+                            detail += "手机由 Null 改为 "+studentTemp.getMobile()+"、";
                             student.setMobile(studentTemp.getMobile());
                             isUpdate = true;
                         }
+                        if(null != student.getMobile() && null == studentTemp.getMobile()){
+                            detail += "手机由 "+student.getMobile()+" 改为 Null、";
+                            student.setMobile(studentTemp.getMobile());
+                            isUpdate = true;
+                        }
+                        if(null != student.getMobile() && null != studentTemp.getMobile()) {
+                            if (!student.getMobile().equals(studentTemp.getMobile())) {
+                                detail += "手机由 " + student.getMobile() + " 改为 " + studentTemp.getMobile() + "、";
+                                student.setMobile(studentTemp.getMobile());
+                                isUpdate = true;
+                            }
+                        }
                         //家庭电话
-                        if (!student.getHomeTel().equals(studentTemp.getHomeTel())) {
-                            detail += "家庭电话由 "+student.getHomeTel()+" 改为 "+studentTemp.getHomeTel()+"、";
+                        if(null == student.getHomeTel() && null != studentTemp.getHomeTel()){
+                            detail += "家庭电话由 Null 改为 "+studentTemp.getHomeTel()+"、";
                             student.setHomeTel(studentTemp.getHomeTel());
                             isUpdate = true;
                         }
+                        if(null != student.getHomeTel() && null == studentTemp.getHomeTel()){
+                            detail += "家庭电话由 "+student.getHomeTel()+" 改为 Null、";
+                            student.setHomeTel(studentTemp.getHomeTel());
+                            isUpdate = true;
+                        }
+                        if(null != student.getHomeTel() && null != studentTemp.getHomeTel()) {
+                            if (!student.getHomeTel().equals(studentTemp.getHomeTel())) {
+                                detail += "家庭电话由 " + student.getHomeTel() + " 改为 " + studentTemp.getHomeTel() + "、";
+                                student.setHomeTel(studentTemp.getHomeTel());
+                                isUpdate = true;
+                            }
+                        }
                         //公司电话
-                        if (!student.getCompanyTel().equals(studentTemp.getCompanyTel())) {
-                            detail += "公司电话由 "+student.getCompanyTel()+" 改为 "+studentTemp.getCompanyTel()+"、";
+                        if(null == student.getCompanyTel() && null != studentTemp.getCompanyTel()){
+                            detail += "公司电话由 Null 改为 "+studentTemp.getCompanyTel()+"、";
                             student.setCompanyTel(studentTemp.getCompanyTel());
                             isUpdate = true;
                         }
+                        if(null != student.getCompanyTel() && null == studentTemp.getCompanyTel()){
+                            detail += "公司电话由 "+student.getCompanyTel()+" 改为 Null、";
+                            student.setCompanyTel(studentTemp.getCompanyTel());
+                            isUpdate = true;
+                        }
+                        if(null != student.getCompanyTel() && null != studentTemp.getCompanyTel()) {
+                            if (!student.getCompanyTel().equals(studentTemp.getCompanyTel())) {
+                                detail += "公司电话由 " + student.getCompanyTel() + " 改为 " + studentTemp.getCompanyTel() + "、";
+                                student.setCompanyTel(studentTemp.getCompanyTel());
+                                isUpdate = true;
+                            }
+                        }
                         //邮箱
-                        if (!student.getEmail().equals(studentTemp.getEmail())) {
-                            detail += "邮箱由 "+student.getEmail()+" 改为 "+studentTemp.getEmail()+"、";
+                        if(null == student.getEmail() && null != studentTemp.getEmail()){
+                            detail += "邮箱由 Null 改为 "+studentTemp.getEmail()+"、";
                             student.setEmail(studentTemp.getEmail());
                             isUpdate = true;
+                        }
+                        if(null != student.getEmail() && null == studentTemp.getEmail()){
+                            detail += "邮箱由 "+student.getEmail()+" 改为 Null、";
+                            student.setEmail(studentTemp.getEmail());
+                            isUpdate = true;
+                        }
+                        if(null != student.getEmail() && null != studentTemp.getEmail()) {
+                            if (!student.getEmail().equals(studentTemp.getEmail())) {
+                                detail += "邮箱由 " + student.getEmail() + " 改为 " + studentTemp.getEmail() + "、";
+                                student.setEmail(studentTemp.getEmail());
+                                isUpdate = true;
+                            }
                         }
                         //学习中心
                         if (!student.getSpotCode().equals(studentTemp.getSpotCode())) {

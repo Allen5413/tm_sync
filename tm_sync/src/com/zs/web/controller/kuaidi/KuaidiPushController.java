@@ -28,16 +28,12 @@ public class KuaidiPushController extends LoggerController {
     @Resource
     private AddPushService addPushService;
 
-    @RequestMapping(value = "open")
-    public String open(){
-        return "kuaidi/kuaidiPush";
-    }
-
     @RequestMapping(value = "push")
     @ResponseBody
     public JSONObject index(@RequestParam(value = "param", required = false, defaultValue = "") String param){
         JSONObject jsonObject = new JSONObject();
         try{
+            System.out.println("param:  "+param);
             KuaidiPush kuaidiPush = addPushService.add(param);
             if(null != kuaidiPush){
                 if(3 == kuaidiPush.getState()){
@@ -54,6 +50,11 @@ public class KuaidiPushController extends LoggerController {
             jsonObject.put("message", "成功");
         }
         return jsonObject;
+    }
+
+    @RequestMapping(value = "open")
+    public String open(){
+        return "kuaidi/kuaidiPush";
     }
 
     @RequestMapping(value = "find")

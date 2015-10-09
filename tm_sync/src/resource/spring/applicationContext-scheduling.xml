@@ -16,4 +16,15 @@
 	<bean id="syncStudentTaskService" class="com.zs.service.scheduler.impl.SyncStudentTaskServiceImpl">
 	</bean>
 	<!-- 同步网院学生信息和选课信息业务接口END -->
+
+	<!-- 同步还没有签收的快递信息  每天0:10分执行-->
+	<task:scheduler id="syncKuaidiScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="syncKuaidiScheduler">
+		<task:scheduled ref="syncNotSignKuaidiTaskService" method="syncKuaidi" cron="0 33 22 * * ?"/>
+	</task:scheduled-tasks>
+	<!-- 同步还没有签收的快递信息定时器 END-->
+	<!-- 同步还没有签收的快递信息业务接口 -->
+	<bean id="syncNotSignKuaidiTaskService" class="com.zs.service.scheduler.impl.SyncNotSignKuaidiTaskServiceImpl">
+	</bean>
+	<!-- 同步还没有签收的快递信息业务接口END -->
 </beans>

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginInterceptor extends HandlerInterceptorAdapter{
     //不需要拦截的路径
-    private static final String[] IGNORE_URI = {"/login", "/css", "kuaidi"};
+    private static final String[] IGNORE_URI = {"/login", "/css", "/kuaidiReq/req", "/kuaidiPush/push"};
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

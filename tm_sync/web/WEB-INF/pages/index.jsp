@@ -12,5 +12,7 @@
 <a href="${pageContext.request.contextPath}/kuaidiPush/open.htm">模拟快递100推送</a>
 <br /><br />
 <a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
+<br /><br />
+<a href="${pageContext.request.contextPath}/kuaidiReq/findByNumber.htm">查询快递100请求结果</a>
 </body>
 </html>

@@ -68,7 +68,6 @@
 </script>
 <body style="background:#f8f8f8">
   <div class="login_admin">
-    <h4>欢迎登录教材系统管理后台</h4>
     <div class="form_login">
       <span id="msg" style="padding-left: 40px; color: red;"></span>
       <form name="loginForm" id="loginForm" action="/loginUser/login.htm" method="post">

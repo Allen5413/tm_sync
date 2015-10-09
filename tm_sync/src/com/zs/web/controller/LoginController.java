@@ -53,6 +53,8 @@ public class LoginController extends LoggerController<User, ValidateLoginService
     protected String loginUser(HttpServletRequest request, String loginName, String pwd)throws Exception{
         User user = validateLoginService.validateLogin(loginName, pwd);
         if(null != user && !StringUtils.isEmpty(user.getLoginName())){
+            request.getSession().setAttribute("loginName", loginName);
+            request.getSession().setAttribute("loginType", user.getType());
             return "success";
         }else {
             return "用户名密码错误";

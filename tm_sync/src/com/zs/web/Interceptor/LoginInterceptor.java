@@ -1,5 +1,6 @@
 package com.zs.web.Interceptor;
 
+import com.zs.domain.basic.User;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginInterceptor extends HandlerInterceptorAdapter{
     //不需要拦截的路径
-    private static final String[] IGNORE_URI = {"/login", "/css"};
+    private static final String[] IGNORE_URI = {"/login", "/css", "kuaidi"};
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -28,7 +29,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter{
         if (!flag) {
             String loginName = null == request.getSession().getAttribute("loginName") ? "" : request.getSession().getAttribute("loginName").toString();
             String loginType = null == request.getSession().getAttribute("loginType") ? "" : request.getSession().getAttribute("loginType").toString();
-            if (!StringUtils.isEmpty(loginName) && !StringUtils.isEmpty(loginType)) {
+            if (!StringUtils.isEmpty(loginName) && !StringUtils.isEmpty(loginType) && User.TYPE_ADMIN == Integer.parseInt(loginType)) {
                 flag = true;
             }else{
                 response.sendRedirect("/login.jsp");

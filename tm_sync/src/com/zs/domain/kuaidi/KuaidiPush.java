@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by Allen on 2015/9/30.
  */
 @Entity
-@Table(name = "kuaidi_request")
+@Table(name = "kuaidi_push")
 public class KuaidiPush extends AbstractEntity {
 
     private Long id;                            //主键
@@ -27,7 +27,7 @@ public class KuaidiPush extends AbstractEntity {
      * 0在途中、1已揽收、2疑难、3已签收、4退签、5同城派送中、6退回、7转单等7个状态，
      * 其中4-7需要另外开通才有效，详见章3.3
      */
-    private int state;
+    private Integer state;
     private String com;                     //快递公司
     private String nu;                      //快递单号
     private String data;                    //返回快递结果
@@ -63,7 +63,7 @@ public class KuaidiPush extends AbstractEntity {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(Integer state) {
         this.state = state;
     }
 

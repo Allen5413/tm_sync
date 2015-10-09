@@ -7,9 +7,10 @@
   <%@ include file="/common/taglibs.jsp"%>
 </head>
 <body>
-<c:forEach var="data" items="${result}">
-<a href="/index/main.htm?path=${data.path}&name=${data.fileName}">${data.fileName}</a><br />
-</c:forEach>
-${content}
+<a href="${pageContext.request.contextPath}/findSyncTxt/find.htm">查看同步日志</a>
+<br /><br />
+<a href="${pageContext.request.contextPath}/kuaidiPush/open.htm">模拟快递100推送</a>
+<br /><br />
+<a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
 </body>
 </html>

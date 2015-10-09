@@ -18,29 +18,7 @@ import java.io.File;
 @RequestMapping(value = "/index")
 public class IndexController extends LoggerController {
     @RequestMapping(value = "main")
-    public String index(@RequestParam(value = "path", required = false, defaultValue = "") String path,
-                        @RequestParam(value = "name", required = false, defaultValue = "") String name,
-                        HttpServletRequest request){
-        //获取文件夹下面的内容
-        if(!StringUtils.isEmpty(path) && !StringUtils.isEmpty(name)){
-            File file = new File(path+"/"+name);
-            if(file.isDirectory()) {
-                JSONArray jsonArray = FileTools.getPathFile(path + "/" + name);
-                request.setAttribute("result", jsonArray);
-            }else{
-                try {
-                    String content = FileTools.readTxtFile(file);
-                    request.setAttribute("content", content.replaceAll("\r\n", "<br />"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }else {
-            PropertiesTools propertiesTools =  new PropertiesTools("resource/commons.properties");
-            String rootPath = propertiesTools.getProperty("sync.log.file.path");
-            JSONArray jsonArray = FileTools.getPathFile(rootPath);
-            request.setAttribute("result", jsonArray);
-        }
+    public String index(){
         return "index";
     }
 }

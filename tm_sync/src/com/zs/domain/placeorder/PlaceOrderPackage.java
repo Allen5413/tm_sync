@@ -15,9 +15,6 @@ import com.feinno.framework.common.domain.AbstractEntity;
 public class PlaceOrderPackage extends AbstractEntity{
 	public static int IS_SIGN_YES = 0;
     public static int IS_SIGN_NOT = 1;
-    public static int IS_SIGN_DIFFICULT = 2;
-    public static int IS_SIGN_RETURNSIGN = 3;
-    public static int IS_SIGN_RETURN = 4;
 
     private Long id;                            //主键
     private Long semesterId;                    //学期id
@@ -25,7 +22,7 @@ public class PlaceOrderPackage extends AbstractEntity{
     private String code;                        //编号
     private int sort;                           //顺序号
     private String logisticCode;                //快递单号
-    private Integer isSign;                     //是否签收[0:是；1：否; 2：疑难；3：退签；4：退回]
+    private Integer isSign;                     //是否签收[0:是；1：否;]
     private Date sendTime;                      //发货时间
     private String creator;                     //创建人
     private Date createTime = new Date();       //创建时间

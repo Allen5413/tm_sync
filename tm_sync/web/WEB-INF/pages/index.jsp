@@ -14,5 +14,7 @@
 <a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
 <br /><br />
 <a href="${pageContext.request.contextPath}/kuaidiReq/findByNumber.htm">查询快递100请求结果</a>
+<br /><br />
+<a href="${pageContext.request.contextPath}/kuaidiReq/openRep.htm">请求快递100</a>
 </body>
 </html>

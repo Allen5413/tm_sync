@@ -1,5 +1,6 @@
 package com.zs.web.controller.kuaidi;
 
+import com.zs.domain.kuaidi.KuaidiRequest;
 import com.zs.service.kuaidi.request.AddReqService;
 import com.zs.service.kuaidi.request.FindKuaidiReqByNumberService;
 import com.zs.web.controller.LoggerController;
@@ -30,13 +31,19 @@ public class KuaidiReqController extends LoggerController {
     public JSONObject index(@RequestParam("com") String com, @RequestParam("nu") String nu){
         JSONObject json = new JSONObject();
         try{
-            addReqService.add(com, nu);
+            KuaidiRequest kuaidiRequest = addReqService.add(com, nu);
             json.put("state", 0);
+            json.put("kuaidiRequest", kuaidiRequest);
         }catch (Exception e){
             e.printStackTrace();
             json.put("state", 1);
         }
         return json;
+    }
+
+    @RequestMapping(value = "openRep")
+    public String openRep(){
+        return "kuaidi/kuaidiReq";
     }
 
     @RequestMapping(value = "findByNumber")

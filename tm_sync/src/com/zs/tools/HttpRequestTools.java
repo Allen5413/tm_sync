@@ -2,11 +2,11 @@ package com.zs.tools;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -17,6 +17,8 @@ import java.util.Map;
  * Created by Allen on 2015/6/25.
  */
 public class HttpRequestTools {
+
+    private static Logger logger = LoggerFactory.getLogger(new HttpRequestTools().getClass());
 
     //快递100Http请求url
     private static String kuaidiReqUrl;
@@ -37,7 +39,7 @@ public class HttpRequestTools {
     }
 
     /**
-     * 请求快递100
+     * 请求快递100  该方法已过时。求情快递已经调用kuaidi-PostOrder类
      * @return
      * @throws Exception
      */
@@ -51,7 +53,7 @@ public class HttpRequestTools {
         jsonObject.put("key", key);
         jsonObject.put("parameters", parametersJSON);
         System.out.println("paramJSON:     "+jsonObject.toString());
-        String result = sendPost(urlStr.toString(), jsonObject.toString());
+        String result = sendHttpPost(urlStr.toString(), jsonObject.toString());
         System.out.println("result:     "+result);
         JSONObject callbackJSON = new JSONObject();
         callbackJSON = callbackJSON.fromObject(result);
@@ -171,5 +173,73 @@ public class HttpRequestTools {
             }
         }
         return result;
+    }
+
+    /**
+     * 模拟form表单提交
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String sendHttpPost(String url, String param) {
+        String responseMessage = "";
+        StringBuffer resposne = new StringBuffer();
+        HttpURLConnection httpConnection = null;
+        DataOutputStream out = null;
+        BufferedReader reader = null;
+        try {
+            URL urlPost = new URL(url);
+            httpConnection = (HttpURLConnection) urlPost.openConnection();
+            httpConnection.setDoOutput(true);
+            httpConnection.setDoInput(true);
+            // 参数长度太大，不能用get方式
+            httpConnection.setRequestMethod("POST");
+            // 不使用缓存
+            httpConnection.setUseCaches(false);
+            // URLConnection.setInstanceFollowRedirects是成员函数，仅作用于当前函数
+            httpConnection.setInstanceFollowRedirects(true);
+            // 配置本次连接的Content-type，配置为application/x-www-form-urlencoded的
+            // 意思是正文是urlencoded编码过的form参数
+            httpConnection.setRequestProperty("Content-Type",
+                            "application/x-www-form-urlencoded");
+            // 连接，从postUrl.openConnection()至此的配置必须要在connect之前完成，
+            // 要注意的是connection.getOutputStream会隐含的进行connect。
+            httpConnection.connect();
+            out = new DataOutputStream(httpConnection.getOutputStream());
+            //写入参数,DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写道流里面
+            out.writeBytes(param);
+            // flush and close
+            out.flush();
+            reader = new BufferedReader(new InputStreamReader(
+                    httpConnection.getInputStream(), "utf-8"));
+            while ((responseMessage = reader.readLine()) != null) {
+                resposne.append(responseMessage);
+            }
+
+            if (!"failure".equals(resposne.toString())) {
+                logger.info("success send to JMX");
+            } else {
+                logger.debug("failure send to JMX");
+            }
+            // 将该url的配置信息缓存起来
+            return resposne.toString();
+        } catch (IOException e) {
+            logger.error("连接失败,url={}" , url);
+            return "failed";
+        } finally {
+            try {
+                if (null != out) {
+                    out.close();
+                }
+                if (null != reader) {
+                    reader.close();
+                }
+                if (null != httpConnection) {
+                    httpConnection.disconnect();
+                }
+            } catch (Exception e2) {
+                logger.error("http connection close error:{}", e2);
+            }
+        }
     }
 }

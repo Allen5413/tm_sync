@@ -89,7 +89,7 @@ public class AddPushServiceImpl extends EntityServiceImpl<KuaidiPush, KuaidiPush
     @Transactional
     public void editOrderState(String nu) throws Exception {
         Timestamp operateTime = DateTools.getLongNowTime();
-        //查询该订单号的学生订单包
+        //查询该快递号的学生订单包
         Long count = findStudentBookOrderPackageByNuDAO.findStudentBookOrderPackageByNu(nu);
         if(null != count && 0 < count) {
             //修改该快递单号下的学生订单包信息

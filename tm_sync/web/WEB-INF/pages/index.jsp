@@ -7,6 +7,8 @@
   <%@ include file="/common/taglibs.jsp"%>
 </head>
 <body>
+<a href="${pageContext.request.contextPath}/syncStudent/sync.htm">开始同步学生信息包括选课</a>
+<br /><br />
 <a href="${pageContext.request.contextPath}/findSyncTxt/find.htm">查看同步日志</a>
 <br /><br />
 <a href="${pageContext.request.contextPath}/kuaidiPush/open.htm">模拟快递100推送</a>

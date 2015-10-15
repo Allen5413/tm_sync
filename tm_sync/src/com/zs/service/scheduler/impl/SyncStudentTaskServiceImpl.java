@@ -535,10 +535,9 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             if(0 == student.getState()){
                                 detail += "在籍";
                             }
-                            detail += " 改为 在籍、 ";
+                            detail += " 改为 毕业、";
                             student.setState(4);
                             isUpdate = true;
-                            detail += "毕业、";
                         }
                         //入学年
                         if (!student.getStudyEnterYear().equals(studentTemp.getStudyEnterYear())) {
@@ -635,8 +634,10 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         findStudentByCodeDAO.save(student);
                         detail += "学号："+studentCode+", 为新增学生。\r\n";
                     }
-                    //检查学生的选课
-                    this.syncSelectedCourse(student.getCode(), student.getSpotCode());
+                    //如果学生状态为在籍，检查学生的选课
+                    if(student.getState() == 0) {
+                        this.syncSelectedCourse(student.getCode(), student.getSpotCode());
+                    }
                     tempNum++;
                 }
             }

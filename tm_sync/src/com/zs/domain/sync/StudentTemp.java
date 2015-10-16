@@ -43,6 +43,8 @@ public class StudentTemp extends AbstractEntity {
     private String levelCode;           //报考层次
     private Integer type;               //学生类型[网院(StudentType): 1--函授 2--业余 26--普通学生 27--免试生 67--课程学习生。  教材：0--普通学生 1--免试生 2--程学习生 3--函授 4--业余]
     private Integer state;              //学生状态[网院(StudyState)：53--停生 77--休学 78--退学 54--在籍学生  55--已毕业学.  教材：0--在籍学生 1--停生 2--休学 3--退学 4--已毕业学.]
+    private Integer enterYear;          //入学年
+    private Integer quarter;            //入学季
     private Integer studyEnterYear;     //学籍入学年
     private Integer studyQuarter;       //学籍入学季
     private Date operateTime = new Date();  //操作时间
@@ -67,6 +69,22 @@ public class StudentTemp extends AbstractEntity {
 
     public String getName() {
         return name;
+    }
+
+    public Integer getEnterYear() {
+        return enterYear;
+    }
+
+    public void setEnterYear(Integer enterYear) {
+        this.enterYear = enterYear;
+    }
+
+    public Integer getQuarter() {
+        return quarter;
+    }
+
+    public void setQuarter(Integer quarter) {
+        this.quarter = quarter;
     }
 
     public void setName(String name) {

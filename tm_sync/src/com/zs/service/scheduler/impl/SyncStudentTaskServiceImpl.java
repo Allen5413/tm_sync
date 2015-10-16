@@ -1,19 +1,19 @@
 package com.zs.service.scheduler.impl;
 
 import com.feinno.framework.common.exception.BusinessException;
+import com.zs.dao.basic.finance.spotexpenseoth.BatchSpotExpenseOthDAO;
 import com.zs.dao.basic.finance.spotexpenseoth.FindBySpotCodeAndSemesterDAO;
 import com.zs.dao.basic.finance.studentexpense.FindByStudentCodeDAO;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
+import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForMaxCodeDAO;
 import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
-import com.zs.dao.sale.studentbookorderlog.StudentBookOrderLogDAO;
+import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
+import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
 import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
-import com.zs.dao.sync.FindStudentByCodeDAO;
-import com.zs.dao.sync.SelectedCourseDAO;
-import com.zs.dao.sync.SelectedCourseTempDAO;
-import com.zs.dao.sync.StudentTempDAO;
+import com.zs.dao.sync.*;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
 import com.zs.domain.basic.TeachMaterial;
@@ -41,6 +41,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,9 +52,7 @@ import java.util.List;
 public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
 
     @Resource
-    private StudentTempDAO studentTempDAO;
-    @Resource
-    private FindStudentByCodeDAO findStudentByCodeDAO;
+    private FindStudentForChangeDAO findStudentForChangeDAO;
     @Resource
     private FindByStudentCodeDAO findByStudentCodeDAO;
     @Resource
@@ -71,16 +70,35 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     @Resource
     private FindIssueRangeBySpotCodeService findIssueRangeBySpotCodeService;
     @Resource
-    private StudentBookOrderLogDAO studentBookOrderLogDAO;
-    @Resource
     private StudentBookOrderTmDAO studentBookOrderTmDAO;
     @Resource
     private FindTeachMaterialByCourseCodeDAO findTeachMaterialByCourseCodeDAO;
     @Resource
     private FindTeachMaterialFromSetTMByCourseCodeDAO findTeachMaterialFromSetTMByCourseCodeDAO;
+    @Resource
+    private BatchStudentDAO batchStudentDAO;
+    @Resource
+    private BatchSelectedCourseDAO batchSelectedCourseDAO;
+    @Resource
+    private BatchStudentBookOrderDAO batchStudentBookOrderDAO;
+    @Resource
+    private BatchStudentBookOrderTMDAO batchStudentBookOrderTMDAO;
+    @Resource
+    private BatchStudentBookOrderLogDAO batchStudentBookOrderLogDAO;
+    @Resource
+    private BatchSpotExpenseOthDAO batchSpotExpenseOthDAO;
 
     //变更信息描述
     private String detail = "";
+
+    private List<Student> addStudentList = new ArrayList<Student>();
+    private List<Student> editStudentList = new ArrayList<Student>();
+    private List<SelectedCourse> addSelectCourseList = new ArrayList<SelectedCourse>();
+    private List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
+    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
+    private List<StudentBookOrderLog> addStudentBookOrderLogList = new ArrayList<StudentBookOrderLog>();
+    private List<SpotExpenseOth> addSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
+    private List<SpotExpenseOth> editSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
 
     /**
      * 同步学生信息
@@ -92,29 +110,60 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         String studentCode = "";
         int tempNum = 0;
         try {
-            //查询临时表里面的数据
-            List<StudentTemp> studentTempList = studentTempDAO.getAll();
-            if (null != studentTempList) {
-                for (StudentTemp studentTemp : studentTempList) {
-                    studentCode = studentTemp.getCode();
-                    //查询我们已有数据中，是否存在该学号
-                    Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
+            //查询有变化的学生数据
+            List<Object[]> resultList = findStudentForChangeDAO.find();
+            if (null != resultList) {
+                int i=0;
+                for (Object[] obj : resultList) {
+                    System.out.println("i:  "+i);
+                    i++;
+                    //得到学生原有信息和学生新的信息
+                    Student student = this.getStudent(obj);
+                    StudentTemp studentTemp = this.getStudentTemp(obj);
+                    studentCode = student.getCode();
                     if (null != student && null != student.getId()) {
                         //说明存在该学生信息，逐个数据比较，如果有差异，就更改
                         boolean isUpdate = false;
                         boolean isChangeSpot = false;
                         String oldSpotCode = "";
                         detail += "学号["+studentCode+"]: ";
-                        //入学季
-                        if (1 == studentTemp.getStudyQuarter() && 0 != student.getStudyQuarter()) {
-                            student.setStudyQuarter(0);
-                            isUpdate = true;
-                            detail += "入学季由 秋季 改为 春季 、";
+                        //入学年,如果有学籍入学年，优先使用学籍入学年
+                        if(null != studentTemp.getStudyEnterYear()) {
+                            if (!student.getStudyEnterYear().equals(studentTemp.getStudyEnterYear())) {
+                                detail += "入学年由 " + student.getStudyEnterYear() + " 改为 " + studentTemp.getStudyEnterYear() + "、";
+                                student.setStudyEnterYear(studentTemp.getStudyEnterYear());
+                                isUpdate = true;
+                            }
+                        }else{
+                            if (!student.getStudyEnterYear().equals(studentTemp.getEnterYear())) {
+                                detail += "入学年由 " + student.getStudyEnterYear() + " 改为 " + studentTemp.getEnterYear() + "、";
+                                student.setStudyEnterYear(studentTemp.getEnterYear());
+                                isUpdate = true;
+                            }
                         }
-                        if (2 == studentTemp.getStudyQuarter() && 1 != student.getStudyQuarter()) {
-                            student.setStudyQuarter(1);
-                            isUpdate = true;
-                            detail += "入学季由 春季 改为 秋季 、";
+                        //入学季, 如果有学籍入学季，优先使用学籍入学季
+                        if(null != student.getStudyQuarter()) {
+                            if (1 == studentTemp.getStudyQuarter() && 0 != student.getStudyQuarter()) {
+                                student.setStudyQuarter(0);
+                                isUpdate = true;
+                                detail += "入学季由 秋季 改为 春季 、";
+                            }
+                            if (2 == studentTemp.getStudyQuarter() && 1 != student.getStudyQuarter()) {
+                                student.setStudyQuarter(1);
+                                isUpdate = true;
+                                detail += "入学季由 春季 改为 秋季 、";
+                            }
+                        }else{
+                            if (1 == studentTemp.getQuarter() && 0 != student.getStudyQuarter()) {
+                                student.setStudyQuarter(0);
+                                isUpdate = true;
+                                detail += "入学季由 秋季 改为 春季 、";
+                            }
+                            if (2 == studentTemp.getQuarter() && 1 != student.getStudyQuarter()) {
+                                student.setStudyQuarter(1);
+                                isUpdate = true;
+                                detail += "入学季由 春季 改为 秋季 、";
+                            }
                         }
                         //姓名
                         if (!student.getName().equals(studentTemp.getName())) {
@@ -340,6 +389,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         }
                         //学习中心
                         if (!student.getSpotCode().equals(studentTemp.getSpotCode())) {
+                            oldSpotCode = student.getSpotCode();
                             detail += "学习中心由 "+student.getSpotCode()+" 改为 "+studentTemp.getSpotCode()+"、";
                             student.setSpotCode(studentTemp.getSpotCode());
                             isUpdate = true;
@@ -539,12 +589,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             student.setState(4);
                             isUpdate = true;
                         }
-                        //入学年
-                        if (!student.getStudyEnterYear().equals(studentTemp.getStudyEnterYear())) {
-                            detail += "入学年由 "+student.getStudyEnterYear()+" 改为 "+studentTemp.getStudyEnterYear()+"、";
-                            student.setStudyEnterYear(studentTemp.getStudyEnterYear());
-                            isUpdate = true;
-                        }
 
                         if (isUpdate) {
                             detail += "信息发生变更。\r\n";
@@ -554,7 +598,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             Timestamp operateTime = DateTools.getLongNowTime();
                             String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
                             student.setChangeSpotDetail((null == student.getChangeSpotDetail() ? "" : student.getChangeSpotDetail())+changeSpotDetail);
-                            findStudentByCodeDAO.update(student);
+                            //findStudentByCodeDAO.update(student);
+                            editStudentList.add(student);
                         }else{
                             detail = "";
                         }
@@ -631,8 +676,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             student.setStudyQuarter(1);
                         }
                         student.setOperateTime(DateTools.getLongNowTime());
-                        findStudentByCodeDAO.save(student);
                         detail += "学号："+studentCode+", 为新增学生。\r\n";
+                        addStudentList.add(student);
                     }
                     //如果学生状态为在籍，检查学生的选课
                     if(student.getState() == 0) {
@@ -641,6 +686,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     tempNum++;
                 }
             }
+            //执行要操作的数据
+            this.doDataOperate();
         }catch (Exception e){
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -703,7 +750,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     }
                     spotExpenseOth.setOperator("管理员");
                     spotExpenseOth.setOperateTime(DateTools.getLongNowTime());
-                    findBySpotCodeAndSemesterDAO.update(spotExpenseOth);
+                    editSpotExpenseOthList.add(spotExpenseOth);
                 }
                 //查询新中心的费用信息
                 SpotExpenseOth newSpotExpenseOth = findBySpotCodeAndSemesterDAO.findBySpotCodeAndSemester(newSpotCode, studentExpense.getSemesterId());
@@ -717,10 +764,10 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     newSpotExpenseOth.setBuy(new BigDecimal(spotBuy).add(new BigDecimal(studentBuy)).floatValue());
                     //学生没有欠款
                     if(studentPay >= studentBuy){
-                        spotExpenseOth.setStuAccTot(new BigDecimal(stuAccTot).add(new BigDecimal(studentPay).add(new BigDecimal(studentBuy))).floatValue());
+                        newSpotExpenseOth.setStuAccTot(new BigDecimal(stuAccTot).add(new BigDecimal(studentPay).add(new BigDecimal(studentBuy))).floatValue());
                     }else{
                         //学生有欠款
-                        spotExpenseOth.setStuOwnTot(new BigDecimal(stuOwnTot).add(new BigDecimal(studentBuy).subtract(new BigDecimal(studentPay))).floatValue());
+                        newSpotExpenseOth.setStuOwnTot(new BigDecimal(stuOwnTot).add(new BigDecimal(studentBuy).subtract(new BigDecimal(studentPay))).floatValue());
                     }
                     //算学习中心是否结清
                     if(0 < newSpotExpenseOth.getStuOwnTot()){
@@ -732,7 +779,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     }
                     newSpotExpenseOth.setOperator("管理员");
                     newSpotExpenseOth.setOperateTime(DateTools.getLongNowTime());
-                    findBySpotCodeAndSemesterDAO.update(newSpotExpenseOth);
+                    editSpotExpenseOthList.add(newSpotExpenseOth);
                 }else{
                     newSpotExpenseOth = new SpotExpenseOth();
                     newSpotExpenseOth.setSemesterId(studentExpense.getSemesterId());
@@ -749,11 +796,12 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         newSpotExpenseOth.setState(0);
                         newSpotExpenseOth.setClearTime(DateTools.getLongNowTime());
                     }
+                    newSpotExpenseOth.setSpotCode(newSpotCode);
                     newSpotExpenseOth.setCreator("管理员");
                     newSpotExpenseOth.setOperator("管理员");
                     newSpotExpenseOth.setCreateTime(DateTools.getLongNowTime());
                     newSpotExpenseOth.setOperateTime(DateTools.getLongNowTime());
-                    findBySpotCodeAndSemesterDAO.save(newSpotExpenseOth);
+                    addSpotExpenseOthList.add(newSpotExpenseOth);
                 }
             }
         }
@@ -786,7 +834,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         newSelectedCourseTempList.add(selectedCourseTemp);
                     }
                 }else{
-                    newSelectedCourseTempList = selectedCourseTempList;
+                    newSelectedCourseTempList.addAll(selectedCourseTempList);
                 }
             }
         }
@@ -811,7 +859,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             studentBookOrderTM.setPrice(teachMaterial.getPrice());
                             studentBookOrderTM.setCount(1);
                             studentBookOrderTM.setOperator("管理员");
-                            studentBookOrderTmDAO.save(studentBookOrderTM);
+                            addStudentBookOrderTMList.add(studentBookOrderTM);
                         }
                     }
                     //把新选的课程添加进表
@@ -820,8 +868,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     selectedCourse.setStudentCode(studentCode);
                     selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
                     selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                    selectedCourseDAO.save(selectedCourse);
                     detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
+                    addSelectCourseList.add(selectedCourse);
                 }
             }else{
                 //根据学生的学习中心查询关联的发行渠道
@@ -852,14 +900,15 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                 studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
                 studentBookOrder.setCreator("管理员");
                 studentBookOrder.setOperator("管理员");
-                studentBookOrderDAO.save(studentBookOrder);
+                addStudentBookOrderList.add(studentBookOrder);
 
                 //添加订单日志信息
                 StudentBookOrderLog studentBookOrderLog = new StudentBookOrderLog();
                 studentBookOrderLog.setOrderCode(orderCode);
                 studentBookOrderLog.setState(StudentBookOrder.STATE_UNCONFIRMED);
                 studentBookOrderLog.setOperator("管理员");
-                studentBookOrderLogDAO.save(studentBookOrderLog);
+                //studentBookOrderLogDAO.save(studentBookOrderLog);
+                addStudentBookOrderLogList.add(studentBookOrderLog);
 
                 //添加订单教材明细
                 for(SelectedCourseTemp selectedCourseTemp : newSelectedCourseTempList){
@@ -876,6 +925,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             studentBookOrderTM.setCount(1);
                             studentBookOrderTM.setOperator("管理员");
                             studentBookOrderTmDAO.save(studentBookOrderTM);
+                            addStudentBookOrderTMList.add(studentBookOrderTM);
                         }
                     }
                     //把新选的课程添加进表
@@ -884,8 +934,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     selectedCourse.setStudentCode(studentCode);
                     selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
                     selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                    selectedCourseDAO.save(selectedCourse);
                     detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
+                    addSelectCourseList.add(selectedCourse);
                 }
             }
         }
@@ -908,5 +958,88 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             teachMaterialList.addAll(teachMaterialList3);
         }
         return teachMaterialList;
+    }
+
+    protected Student getStudent(Object[] obj){
+        Student student = new Student();
+        student.setId(null != obj[0] ? Long.parseLong(obj[0].toString()) : null);
+        student.setCode(null != obj[1] ? obj[1].toString() : null);
+        student.setName(null != obj[2] ? obj[2].toString() : null);
+        student.setSex(null != obj[3] ? Integer.parseInt(obj[3].toString()) : null);
+        student.setIdcardType(null != obj[4] ? Integer.parseInt(obj[4].toString()) : null);
+        student.setIdcardNo(null != obj[5] ? obj[5].toString() : null);
+        student.setPostalCode(null != obj[6] ? obj[6].toString() : null);
+        student.setAddress(null != obj[7] ? obj[7].toString() : null);
+        student.setMobile(null != obj[8] ? obj[8].toString() : null);
+        student.setHomeTel(null != obj[9] ? obj[9].toString() : null);
+        student.setCompanyTel(null != obj[10] ? obj[10].toString() : null);
+        student.setEmail(null != obj[11] ? obj[11].toString() : null);
+        student.setSpotCode(null != obj[12] ? obj[12].toString() : null);
+        student.setSpecCode(null != obj[13] ? obj[13].toString() : null);
+        student.setLevelCode(null != obj[14] ? obj[14].toString() : null);
+        student.setType(null != obj[15] ? Integer.parseInt(obj[15].toString()) : null);
+        student.setState(null != obj[16] ? Integer.parseInt(obj[16].toString()) : null);
+        student.setStudyEnterYear(null != obj[17] ? Integer.parseInt(obj[17].toString()) : null);
+        student.setStudyQuarter(null != obj[18] ? Integer.parseInt(obj[18].toString()) : null);
+        student.setOperateTime(null != obj[19] ? (Date)obj[19] : null);
+        student.setChangeSpotDetail(null != obj[20] ? obj[20].toString() : null);
+        return student;
+    }
+
+    protected StudentTemp getStudentTemp(Object[] obj){
+        StudentTemp student = new StudentTemp();
+        student.setId(null != obj[21] ? Long.parseLong(obj[21].toString()) : null);
+        student.setCode(null != obj[22] ? obj[22].toString() : null);
+        student.setName(null != obj[23] ? obj[23].toString() : null);
+        student.setSex(null != obj[24] ? Integer.parseInt(obj[24].toString()) : null);
+        student.setIdcardType(null != obj[25] ? Integer.parseInt(obj[25].toString()) : null);
+        student.setIdcardNo(null != obj[26] ? obj[26].toString() : null);
+        student.setPostalCode(null != obj[27] ? obj[27].toString() : null);
+        student.setAddress(null != obj[28] ? obj[28].toString() : null);
+        student.setMobile(null != obj[29] ? obj[29].toString() : null);
+        student.setHomeTel(null != obj[30] ? obj[30].toString() : null);
+        student.setCompanyTel(null != obj[31] ? obj[31].toString() : null);
+        student.setEmail(null != obj[32] ? obj[32].toString() : null);
+        student.setSpotCode(null != obj[33] ? obj[33].toString() : null);
+        student.setSpecCode(null != obj[34] ? obj[34].toString() : null);
+        student.setLevelCode(null != obj[35] ? obj[35].toString() : null);
+        student.setType(null != obj[36] ? Integer.parseInt(obj[36].toString()) : null);
+        student.setState(null != obj[37] ? Integer.parseInt(obj[37].toString()) : null);
+        student.setEnterYear(null != obj[38] ? Integer.parseInt(obj[38].toString()) : null);
+        student.setQuarter(null != obj[39] ? Integer.parseInt(obj[39].toString()) : null);
+        student.setStudyEnterYear(null != obj[40] ? Integer.parseInt(obj[40].toString()) : null);
+        student.setStudyQuarter(null != obj[41] ? Integer.parseInt(obj[41].toString()) : null);
+        student.setOperateTime(null != obj[42] ? (Date)obj[42] : null);
+        return student;
+    }
+
+
+    protected void doDataOperate() throws Exception {
+        if(null != addStudentList && 0 < addStudentList.size()){
+            batchStudentDAO.batchAdd(addStudentList, 1000);
+        }
+        if(null != editStudentList && 0 < editStudentList.size()){
+            batchStudentDAO.batchEdit(editStudentList, 1000);
+        }
+
+        if(null != addSelectCourseList && 0 < addSelectCourseList.size()){
+            batchSelectedCourseDAO.batchAdd(addSelectCourseList, 1000);
+        }
+        if(null != addStudentBookOrderList && 0 < addStudentBookOrderList.size()){
+            batchStudentBookOrderDAO.batchAdd(addStudentBookOrderList, 1000);
+        }
+        if(null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()){
+            batchStudentBookOrderTMDAO.batchAdd(addStudentBookOrderTMList, 1000);
+        }
+        if(null != addStudentBookOrderLogList && 0 < addStudentBookOrderLogList.size()){
+            batchStudentBookOrderLogDAO.batchAdd(addStudentBookOrderLogList, 1000);
+        }
+
+        if(null != addSpotExpenseOthList && 0 < addSpotExpenseOthList.size()){
+            batchSpotExpenseOthDAO.batchAdd(addSpotExpenseOthList, 1000);
+        }
+        if(null != editSpotExpenseOthList && 0 < editSpotExpenseOthList.size()){
+            batchSpotExpenseOthDAO.batchEdit(editSpotExpenseOthList, 1000);
+        }
     }
 }

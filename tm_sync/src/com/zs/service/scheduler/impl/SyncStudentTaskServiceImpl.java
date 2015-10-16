@@ -292,8 +292,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         }
                         if(null != student.getPostalCode() && null != studentTemp.getPostalCode()) {
                             if (!student.getPostalCode().equals(studentTemp.getPostalCode())) {
-                                detail += "邮编由 " + student.getIdcardNo() + " 改为 " + studentTemp.getIdcardNo() + "、";
-                                student.setIdcardNo(studentTemp.getPostalCode());
+                                detail += "邮编由 " + student.getPostalCode() + " 改为 " + studentTemp.getPostalCode() + "、";
+                                student.setPostalCode(studentTemp.getPostalCode());
                                 isUpdate = true;
                             }
                         }

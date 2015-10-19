@@ -9,7 +9,7 @@
 	<!-- 同步网院学生信息和选课信息  每天0:10分执行-->
 	<task:scheduler id="syncStudentScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="syncStudentScheduler">
-		<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 00 09 * * ?"/>
+		<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 10 00 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 同步网院学生信息和选课信息定时器 END-->
 	<!-- 同步网院学生信息和选课信息业务接口 -->
@@ -20,7 +20,7 @@
 	<!-- 同步还没有签收的快递信息  每天1:00分执行-->
 	<task:scheduler id="syncKuaidiScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="syncKuaidiScheduler">
-		<task:scheduled ref="syncNotSignKuaidiTaskService" method="syncKuaidi" cron="0 33 22 * * ?"/>
+		<task:scheduled ref="syncNotSignKuaidiTaskService" method="syncKuaidi" cron="0 00 01 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 同步还没有签收的快递信息定时器 END-->
 	<!-- 同步还没有签收的快递信息业务接口 -->
@@ -31,11 +31,22 @@
 	<!-- 检查还没有签收的订单的快递信息  每天2:00分执行-->
 	<task:scheduler id="checkNotSignOrderScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="checkNotSignOrderScheduler">
-		<task:scheduled ref="checkNotSignOrderTaskService" method="CheckNotSignOrder" cron="0 57 11 * * ?"/>
+		<task:scheduled ref="checkNotSignOrderTaskService" method="CheckNotSignOrder" cron="0 00 02 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 检查还没有签收的订单的快递信息定时器 END-->
 	<!-- 检查还没有签收的订单的快递信息信息业务接口 -->
 	<bean id="checkNotSignOrderTaskService" class="com.zs.service.scheduler.impl.CheckNotSignOrderTaskServiceImpl">
 	</bean>
 	<!-- 检查还没有签收的订单的快递信息信息业务接口END -->
+
+	<!-- 同步网院学习中心信息  每天3:00分执行-->
+	<task:scheduler id="syncSpotScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="syncSpotScheduler">
+		<task:scheduled ref="SyncSpotTaskService" method="syncSpot" cron="0 00 03 * * ?"/>
+	</task:scheduled-tasks>
+	<!-- 同步网院学生信息和选课信息定时器 END-->
+	<!-- 同步网院学生信息和选课信息业务接口 -->
+	<bean id="SyncSpotTaskService" class="com.zs.service.scheduler.impl.SyncSpotTaskServiceImpl">
+	</bean>
+	<!-- 同步网院学生信息和选课信息业务接口END -->
 </beans>

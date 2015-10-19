@@ -22,7 +22,7 @@ public class AddReqServiceImpl extends EntityServiceImpl<KuaidiRequest, KuaidiRe
 
     @Override
     public KuaidiRequest add(String com, String nu) throws Exception {
-        TaskResponse taskResponse = PostOrder.reqKuaidi100(com, nu);
+        TaskResponse taskResponse = PostOrder.reqKuaidi100(com, nu.trim());
 
         KuaidiRequest kuaidiRequest = new KuaidiRequest();
         kuaidiRequest.setCompany(com);

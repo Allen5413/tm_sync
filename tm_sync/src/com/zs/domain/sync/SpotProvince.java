@@ -7,8 +7,8 @@ import javax.persistence.*;
  * Created by Allen on 2015/5/6.
  */
 @Entity
-@Table(name = "sync_province_spot")
-public class ProvinceSpot {
+@Table(name = "sync_spot_province")
+public class SpotProvince {
     private Long id;                //主键
     private String provinceCode;   //省中心编号
     private String spotCode;       //学习中心编号

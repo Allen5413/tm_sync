@@ -142,7 +142,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             }
                         }
                         //入学季, 如果有学籍入学季，优先使用学籍入学季
-                        if(null != student.getStudyQuarter()) {
+                        if(null != studentTemp.getStudyQuarter()) {
                             if (1 == studentTemp.getStudyQuarter() && 0 != student.getStudyQuarter()) {
                                 student.setStudyQuarter(0);
                                 isUpdate = true;

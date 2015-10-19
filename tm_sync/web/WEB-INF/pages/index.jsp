@@ -7,16 +7,41 @@
   <%@ include file="/common/taglibs.jsp"%>
 </head>
 <body>
-<a href="${pageContext.request.contextPath}/syncStudent/sync.htm">开始同步学生信息包括选课</a>
-<br /><br />
-<a href="${pageContext.request.contextPath}/findSyncTxt/find.htm">查看同步日志</a>
-<br /><br />
-<a href="${pageContext.request.contextPath}/kuaidiPush/open.htm">模拟快递100推送</a>
-<br /><br />
-<a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
-<br /><br />
-<a href="${pageContext.request.contextPath}/kuaidiReq/findByNumber.htm">查询快递100请求结果</a>
-<br /><br />
-<a href="${pageContext.request.contextPath}/kuaidiReq/openRep.htm">请求快递100</a>
+<table>
+    <tr>
+        <th>同步</th>
+        <th>快递</th>
+    </tr>
+    <tr>
+        <td>
+            <a href="${pageContext.request.contextPath}/findSyncTxt/find.htm">查看同步日志</a>
+        </td>
+        <td>
+            <a href="${pageContext.request.contextPath}/kuaidiPush/open.htm">模拟快递100推送</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="${pageContext.request.contextPath}/syncStudent/sync.htm">开始同步学生信息包括选课</a>
+        </td>
+        <td>
+            <a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="${pageContext.request.contextPath}/syncSpot/sync.htm">开始同步学习中心信息</a>
+        </td>
+        <td>
+            <a href="${pageContext.request.contextPath}/kuaidiReq/findByNumber.htm">查询快递100请求结果</a>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>
+            <a href="${pageContext.request.contextPath}/kuaidiReq/openRep.htm">请求快递100</a>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

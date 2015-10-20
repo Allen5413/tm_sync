@@ -1,7 +1,7 @@
-package com.zs.dao.basic.finance.spotexpenseoth.impl;
+package com.zs.dao.finance.spotexpenseoth.impl;
 
 import com.zs.dao.BaseQueryDao;
-import com.zs.dao.basic.finance.spotexpenseoth.BatchSpotExpenseOthDAO;
+import com.zs.dao.finance.spotexpenseoth.BatchSpotExpenseOthDAO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

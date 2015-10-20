@@ -1,4 +1,4 @@
-package com.zs.dao.basic.finance.spotexpenseoth;
+package com.zs.dao.finance.spotexpenseoth;
 
 import java.util.List;
 

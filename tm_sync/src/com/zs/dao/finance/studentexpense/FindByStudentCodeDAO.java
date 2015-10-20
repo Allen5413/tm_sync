@@ -1,4 +1,4 @@
-package com.zs.dao.basic.finance.studentexpense;
+package com.zs.dao.finance.studentexpense;
 
 import com.feinno.framework.common.dao.jpa.EntityJpaDao;
 import com.zs.domain.finance.StudentExpense;

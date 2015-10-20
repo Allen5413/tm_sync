@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by Allen on 2015/10/19.
  */
-@Service("SyncSpotTaskService")
+@Service("syncSpotTaskService")
 public class SyncSpotTaskServiceImpl implements SyncSpotTaskService {
 
     @Resource

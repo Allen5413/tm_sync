@@ -121,6 +121,7 @@ public class SyncSpotTaskServiceImpl implements SyncSpotTaskService {
                         spot.setPhone(spotTemp.getPhone());
                         spot.setSex(spotTemp.getSex());
                         spot.setTel(spotTemp.getTel());
+                        spot.setIsStudentLogin(Spot.IS_STUDENT_LOGIN_NOT);
                         spotDAO.save(spot);
                         //新增中心与省中心关联
                         SpotProvince spotProvince = new SpotProvince();

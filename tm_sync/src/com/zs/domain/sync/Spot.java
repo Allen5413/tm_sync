@@ -16,6 +16,9 @@ public class Spot extends AbstractEntity {
     public static final int SEX_MAN = 0;    //男
     public static final int SEX_FEMALE = 1; //女
 
+    public static final int IS_STUDENT_LOGIN_YES = 0;
+    public static final int IS_STUDENT_LOGIN_NOT = 1;
+
     private Long id;            //主键
     private String code;        //编号
     private String name;        //名称
@@ -26,6 +29,7 @@ public class Spot extends AbstractEntity {
     private String tel;         //管理员固定电话
     private String address;     //管理员地址
     private String postalCode;  //管理员邮编
+    private Integer isStudentLogin;     //是否允许学生登录
     private Date operateTime = new Date();  //操作时间
 
 
@@ -117,5 +121,13 @@ public class Spot extends AbstractEntity {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    public Integer getIsStudentLogin() {
+        return isStudentLogin;
+    }
+
+    public void setIsStudentLogin(Integer isStudentLogin) {
+        this.isStudentLogin = isStudentLogin;
     }
 }

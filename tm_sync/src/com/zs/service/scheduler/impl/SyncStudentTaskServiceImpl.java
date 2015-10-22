@@ -113,8 +113,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             //查询有变化的学生数据
             List<Object[]> resultList = findStudentForChangeDAO.find();
             List<Object[]> newResultList = findStudentForChangeDAO.findNewStudent();
-            int i=0;
             if (null != resultList) {
+                int i=0;
                 for (Object[] obj : resultList) {
                     System.out.println("i:  "+i);
                     i++;
@@ -609,9 +609,10 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             }
 
             if(null != newResultList){
+                int j=0;
                 for (Object[] obj : newResultList) {
-                    System.out.println("i:  "+i);
-                    i++;
+                    System.out.println("j:  "+j);
+                    j++;
                     Student student = new Student();
                     StudentTemp studentTemp = this.getStudentTemp(obj, 1);
                     student.setCode(studentTemp.getCode());
@@ -686,13 +687,14 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         }
                     }
                     student.setOperateTime(DateTools.getLongNowTime());
-                    detail += "学号："+studentCode+", 为新增学生。\r\n";
+                    detail += "学号："+studentTemp.getCode()+", 为新增学生。\r\n";
                     addStudentList.add(student);
 
                     //如果学生状态为在籍，检查学生的选课
                     if(student.getState() == 0) {
                         this.syncSelectedCourse(student.getCode(), student.getSpotCode());
                     }
+                    tempNum++;
                 }
             }
             //执行要操作的数据
@@ -896,7 +898,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     num = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length()-6, maxOrderCode.length()));
                 }
                 //生成学生订单号
-                String orderCode = OrderCodeTools.createStudentOrderCodeManual(semester.getYear(), semester.getQuarter(), num + 1);
+                String orderCode = OrderCodeTools.createStudentOrderCodeAuto(semester.getYear(), semester.getQuarter(), num + addStudentBookOrderList.size() + 1);
                 //添加订单信息
                 StudentBookOrder studentBookOrder = new StudentBookOrder();
                 studentBookOrder.setSemesterId(semester.getId());
@@ -932,7 +934,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             studentBookOrderTM.setPrice(teachMaterial.getPrice());
                             studentBookOrderTM.setCount(1);
                             studentBookOrderTM.setOperator("管理员");
-                            studentBookOrderTmDAO.save(studentBookOrderTM);
                             addStudentBookOrderTMList.add(studentBookOrderTM);
                         }
                     }

@@ -112,14 +112,15 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         try {
             //查询有变化的学生数据
             List<Object[]> resultList = findStudentForChangeDAO.find();
+            List<Object[]> newResultList = findStudentForChangeDAO.findNewStudent();
+            int i=0;
             if (null != resultList) {
-                int i=0;
                 for (Object[] obj : resultList) {
                     System.out.println("i:  "+i);
                     i++;
                     //得到学生原有信息和学生新的信息
                     Student student = this.getStudent(obj);
-                    StudentTemp studentTemp = this.getStudentTemp(obj);
+                    StudentTemp studentTemp = this.getStudentTemp(obj, 0);
                     studentCode = student.getCode();
                     if (null != student && null != student.getId()) {
                         //说明存在该学生信息，逐个数据比较，如果有差异，就更改
@@ -598,92 +599,100 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             Timestamp operateTime = DateTools.getLongNowTime();
                             String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
                             student.setChangeSpotDetail((null == student.getChangeSpotDetail() ? "" : student.getChangeSpotDetail())+changeSpotDetail);
-                            //findStudentByCodeDAO.update(student);
                             editStudentList.add(student);
                         }else{
                             detail = "";
                         }
-                    } else {
-                        //说明不存在该学生信息，新增该学生信息
-                        student = new Student();
-                        student.setCode(studentTemp.getCode());
-                        student.setName(studentTemp.getName());
-                        if (studentTemp.getSex() == StudentTemp.SEX_MAN) {
-                            student.setSex(Student.SEX_MAN);
-                        }
-                        if (studentTemp.getSex() == StudentTemp.SEX_FEMALE) {
-                            student.setSex(Student.SEX_FEMALE);
-                        }
-                        if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_IDCARD) {
-                            student.setIdcardType(Student.IDCARD_TYPE_IDCARD);
-                        }
-                        if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_MILITARY_OFFICER) {
-                            student.setIdcardType(Student.IDCARD_TYPE_MILITARY_OFFICER);
-                        }
-                        if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_HK_MACAO_TAIWAN) {
-                            student.setIdcardType(Student.IDCARD_TYPE_HK_MACAO_TAIWAN);
-                        }
-                        if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_PASSPORT) {
-                            student.setIdcardType(Student.IDCARD_TYPE_PASSPORT);
-                        }
-                        if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_OTHER) {
-                            student.setIdcardType(Student.IDCARD_TYPE_OTHER);
-                        }
-                        student.setIdcardNo(studentTemp.getIdcardNo());
-                        student.setPostalCode(studentTemp.getPostalCode());
-                        student.setAddress(studentTemp.getAddress());
-                        student.setMobile(studentTemp.getMobile());
-                        student.setHomeTel(studentTemp.getHomeTel());
-                        student.setEmail(studentTemp.getEmail());
-                        student.setSpotCode(studentTemp.getSpotCode());
-                        student.setSpecCode(studentTemp.getSpecCode());
-                        student.setLevelCode(studentTemp.getLevelCode());
-                        if (1 == studentTemp.getType()) {
-                            student.setType(3);
-                        }
-                        if (2 == studentTemp.getType()) {
-                            student.setType(4);
-                        }
-                        if (26 == studentTemp.getType()) {
-                            student.setType(0);
-                        }
-                        if (27 == studentTemp.getType()) {
-                            student.setType(1);
-                        }
-                        if (67 == studentTemp.getType()) {
-                            student.setType(2);
-                        }
-                        if (53 == studentTemp.getState()) {
-                            student.setState(1);
-                        }
-                        if (77 == studentTemp.getState()) {
-                            student.setState(2);
-                        }
-                        if (78 == studentTemp.getState()) {
-                            student.setState(3);
-                        }
-                        if (54 == studentTemp.getState()) {
-                            student.setState(0);
-                        }
-                        if (55 == studentTemp.getState()) {
-                            student.setState(4);
-                        }
-                        student.setStudyEnterYear(studentTemp.getStudyEnterYear());
+                    }
+                    tempNum++;
+                }
+            }
+
+            if(null != newResultList){
+                for (Object[] obj : newResultList) {
+                    System.out.println("i:  "+i);
+                    i++;
+                    Student student = new Student();
+                    StudentTemp studentTemp = this.getStudentTemp(obj, 1);
+                    student.setCode(studentTemp.getCode());
+                    student.setName(studentTemp.getName());
+                    if (studentTemp.getSex() == StudentTemp.SEX_MAN) {
+                        student.setSex(Student.SEX_MAN);
+                    }
+                    if (studentTemp.getSex() == StudentTemp.SEX_FEMALE) {
+                        student.setSex(Student.SEX_FEMALE);
+                    }
+                    if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_IDCARD) {
+                        student.setIdcardType(Student.IDCARD_TYPE_IDCARD);
+                    }
+                    if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_MILITARY_OFFICER) {
+                        student.setIdcardType(Student.IDCARD_TYPE_MILITARY_OFFICER);
+                    }
+                    if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_HK_MACAO_TAIWAN) {
+                        student.setIdcardType(Student.IDCARD_TYPE_HK_MACAO_TAIWAN);
+                    }
+                    if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_PASSPORT) {
+                        student.setIdcardType(Student.IDCARD_TYPE_PASSPORT);
+                    }
+                    if (studentTemp.getIdcardType() == StudentTemp.IDCARD_TYPE_OTHER) {
+                        student.setIdcardType(Student.IDCARD_TYPE_OTHER);
+                    }
+                    student.setIdcardNo(studentTemp.getIdcardNo());
+                    student.setPostalCode(studentTemp.getPostalCode());
+                    student.setAddress(studentTemp.getAddress());
+                    student.setMobile(studentTemp.getMobile());
+                    student.setHomeTel(studentTemp.getHomeTel());
+                    student.setEmail(studentTemp.getEmail());
+                    student.setSpotCode(studentTemp.getSpotCode());
+                    student.setSpecCode(studentTemp.getSpecCode());
+                    student.setLevelCode(studentTemp.getLevelCode());
+                    if (1 == studentTemp.getType()) {
+                        student.setType(3);
+                    }
+                    if (2 == studentTemp.getType()) {
+                        student.setType(4);
+                    }
+                    if (26 == studentTemp.getType()) {
+                        student.setType(0);
+                    }
+                    if (27 == studentTemp.getType()) {
+                        student.setType(1);
+                    }
+                    if (67 == studentTemp.getType()) {
+                        student.setType(2);
+                    }
+                    if (53 == studentTemp.getState()) {
+                        student.setState(1);
+                    }
+                    if (77 == studentTemp.getState()) {
+                        student.setState(2);
+                    }
+                    if (78 == studentTemp.getState()) {
+                        student.setState(3);
+                    }
+                    if (54 == studentTemp.getState()) {
+                        student.setState(0);
+                    }
+                    if (55 == studentTemp.getState()) {
+                        student.setState(4);
+                    }
+                    student.setStudyEnterYear(studentTemp.getStudyEnterYear());
+                    if(null != studentTemp.getStudyQuarter()) {
                         if (1 == studentTemp.getStudyQuarter()) {
                             student.setStudyQuarter(0);
                         }
                         if (2 == studentTemp.getStudyQuarter()) {
                             student.setStudyQuarter(1);
                         }
-                        student.setOperateTime(DateTools.getLongNowTime());
-                        detail += "学号："+studentCode+", 为新增学生。\r\n";
-                        addStudentList.add(student);
                     }
+                    student.setOperateTime(DateTools.getLongNowTime());
+                    detail += "学号："+studentCode+", 为新增学生。\r\n";
+                    addStudentList.add(student);
+
                     //如果学生状态为在籍，检查学生的选课
                     if(student.getState() == 0) {
                         this.syncSelectedCourse(student.getCode(), student.getSpotCode());
                     }
-                    tempNum++;
                 }
             }
             //执行要操作的数据
@@ -907,7 +916,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                 studentBookOrderLog.setOrderCode(orderCode);
                 studentBookOrderLog.setState(StudentBookOrder.STATE_UNCONFIRMED);
                 studentBookOrderLog.setOperator("管理员");
-                //studentBookOrderLogDAO.save(studentBookOrderLog);
                 addStudentBookOrderLogList.add(studentBookOrderLog);
 
                 //添加订单教材明细
@@ -986,30 +994,55 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         return student;
     }
 
-    protected StudentTemp getStudentTemp(Object[] obj){
+    protected StudentTemp getStudentTemp(Object[] obj, int flag){
         StudentTemp student = new StudentTemp();
-        student.setId(null != obj[21] ? Long.parseLong(obj[21].toString()) : null);
-        student.setCode(null != obj[22] ? obj[22].toString() : null);
-        student.setName(null != obj[23] ? obj[23].toString() : null);
-        student.setSex(null != obj[24] ? Integer.parseInt(obj[24].toString()) : null);
-        student.setIdcardType(null != obj[25] ? Integer.parseInt(obj[25].toString()) : null);
-        student.setIdcardNo(null != obj[26] ? obj[26].toString() : null);
-        student.setPostalCode(null != obj[27] ? obj[27].toString() : null);
-        student.setAddress(null != obj[28] ? obj[28].toString() : null);
-        student.setMobile(null != obj[29] ? obj[29].toString() : null);
-        student.setHomeTel(null != obj[30] ? obj[30].toString() : null);
-        student.setCompanyTel(null != obj[31] ? obj[31].toString() : null);
-        student.setEmail(null != obj[32] ? obj[32].toString() : null);
-        student.setSpotCode(null != obj[33] ? obj[33].toString() : null);
-        student.setSpecCode(null != obj[34] ? obj[34].toString() : null);
-        student.setLevelCode(null != obj[35] ? obj[35].toString() : null);
-        student.setType(null != obj[36] ? Integer.parseInt(obj[36].toString()) : null);
-        student.setState(null != obj[37] ? Integer.parseInt(obj[37].toString()) : null);
-        student.setEnterYear(null != obj[38] ? Integer.parseInt(obj[38].toString()) : null);
-        student.setQuarter(null != obj[39] ? Integer.parseInt(obj[39].toString()) : null);
-        student.setStudyEnterYear(null != obj[40] ? Integer.parseInt(obj[40].toString()) : null);
-        student.setStudyQuarter(null != obj[41] ? Integer.parseInt(obj[41].toString()) : null);
-        student.setOperateTime(null != obj[42] ? (Date)obj[42] : null);
+        if(flag == 0) {
+            student.setId(null != obj[21] ? Long.parseLong(obj[21].toString()) : null);
+            student.setCode(null != obj[22] ? obj[22].toString() : null);
+            student.setName(null != obj[23] ? obj[23].toString() : null);
+            student.setSex(null != obj[24] ? Integer.parseInt(obj[24].toString()) : null);
+            student.setIdcardType(null != obj[25] ? Integer.parseInt(obj[25].toString()) : null);
+            student.setIdcardNo(null != obj[26] ? obj[26].toString() : null);
+            student.setPostalCode(null != obj[27] ? obj[27].toString() : null);
+            student.setAddress(null != obj[28] ? obj[28].toString() : null);
+            student.setMobile(null != obj[29] ? obj[29].toString() : null);
+            student.setHomeTel(null != obj[30] ? obj[30].toString() : null);
+            student.setCompanyTel(null != obj[31] ? obj[31].toString() : null);
+            student.setEmail(null != obj[32] ? obj[32].toString() : null);
+            student.setSpotCode(null != obj[33] ? obj[33].toString() : null);
+            student.setSpecCode(null != obj[34] ? obj[34].toString() : null);
+            student.setLevelCode(null != obj[35] ? obj[35].toString() : null);
+            student.setType(null != obj[36] ? Integer.parseInt(obj[36].toString()) : null);
+            student.setState(null != obj[37] ? Integer.parseInt(obj[37].toString()) : null);
+            student.setEnterYear(null != obj[38] ? Integer.parseInt(obj[38].toString()) : null);
+            student.setQuarter(null != obj[39] ? Integer.parseInt(obj[39].toString()) : null);
+            student.setStudyEnterYear(null != obj[40] ? Integer.parseInt(obj[40].toString()) : null);
+            student.setStudyQuarter(null != obj[41] ? Integer.parseInt(obj[41].toString()) : null);
+            student.setOperateTime(null != obj[42] ? (Date) obj[42] : null);
+        }else {
+            student.setId(null != obj[0] ? Long.parseLong(obj[0].toString()) : null);
+            student.setCode(null != obj[1] ? obj[1].toString() : null);
+            student.setName(null != obj[2] ? obj[2].toString() : null);
+            student.setSex(null != obj[3] ? Integer.parseInt(obj[3].toString()) : null);
+            student.setIdcardType(null != obj[4] ? Integer.parseInt(obj[4].toString()) : null);
+            student.setIdcardNo(null != obj[5] ? obj[5].toString() : null);
+            student.setPostalCode(null != obj[6] ? obj[6].toString() : null);
+            student.setAddress(null != obj[7] ? obj[7].toString() : null);
+            student.setMobile(null != obj[8] ? obj[8].toString() : null);
+            student.setHomeTel(null != obj[9] ? obj[9].toString() : null);
+            student.setCompanyTel(null != obj[10] ? obj[10].toString() : null);
+            student.setEmail(null != obj[11] ? obj[11].toString() : null);
+            student.setSpotCode(null != obj[12] ? obj[12].toString() : null);
+            student.setSpecCode(null != obj[13] ? obj[13].toString() : null);
+            student.setLevelCode(null != obj[14] ? obj[14].toString() : null);
+            student.setType(null != obj[15] ? Integer.parseInt(obj[15].toString()) : null);
+            student.setState(null != obj[16] ? Integer.parseInt(obj[16].toString()) : null);
+            student.setEnterYear(null != obj[17] ? Integer.parseInt(obj[17].toString()) : null);
+            student.setQuarter(null != obj[18] ? Integer.parseInt(obj[18].toString()) : null);
+            student.setStudyEnterYear(null != obj[19] ? Integer.parseInt(obj[19].toString()) : null);
+            student.setStudyQuarter(null != obj[20] ? Integer.parseInt(obj[20].toString()) : null);
+            student.setOperateTime(null != obj[21] ? (Date) obj[21] : null);
+        }
         return student;
     }
 

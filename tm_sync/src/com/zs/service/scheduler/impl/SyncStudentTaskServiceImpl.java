@@ -70,8 +70,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     @Resource
     private FindIssueRangeBySpotCodeService findIssueRangeBySpotCodeService;
     @Resource
-    private StudentBookOrderTmDAO studentBookOrderTmDAO;
-    @Resource
     private FindTeachMaterialByCourseCodeDAO findTeachMaterialByCourseCodeDAO;
     @Resource
     private FindTeachMaterialFromSetTMByCourseCodeDAO findTeachMaterialFromSetTMByCourseCodeDAO;
@@ -677,12 +675,19 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     if (55 == studentTemp.getState()) {
                         student.setState(4);
                     }
-                    student.setStudyEnterYear(studentTemp.getStudyEnterYear());
+                    student.setStudyEnterYear(null == studentTemp.getStudyEnterYear() ? studentTemp.getEnterYear() : studentTemp.getStudyEnterYear());
                     if(null != studentTemp.getStudyQuarter()) {
                         if (1 == studentTemp.getStudyQuarter()) {
                             student.setStudyQuarter(0);
                         }
                         if (2 == studentTemp.getStudyQuarter()) {
+                            student.setStudyQuarter(1);
+                        }
+                    }else{
+                        if (1 == studentTemp.getQuarter()) {
+                            student.setStudyQuarter(0);
+                        }
+                        if (2 == studentTemp.getQuarter()) {
                             student.setStudyQuarter(1);
                         }
                     }

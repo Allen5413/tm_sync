@@ -1,5 +1,7 @@
 package com.zs.dao.sale.studentbookordertm;
 
+import com.zs.domain.sale.StudentBookOrderTM;
+
 import java.util.List;
 
 /**
@@ -7,4 +9,6 @@ import java.util.List;
  */
 public interface BatchStudentBookOrderTMDAO {
     public void batchAdd(List list, int num) throws Exception;
+
+    public void batchDelete(List<StudentBookOrderTM> list) throws Exception;
 }

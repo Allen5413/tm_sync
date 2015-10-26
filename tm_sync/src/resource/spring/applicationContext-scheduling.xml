@@ -6,16 +6,16 @@
 	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd"
 	default-lazy-init="true">
 
-	<!-- 同步网院学生信息和选课信息  每天0:10分执行-->
-	<task:scheduler id="syncStudentScheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="syncStudentScheduler">
-		<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 10 00 * * ?"/>
-	</task:scheduled-tasks>
-	<!-- 同步网院学生信息和选课信息定时器 END-->
-	<!-- 同步网院学生信息和选课信息业务接口 -->
-	<bean id="syncStudentTaskService" class="com.zs.service.scheduler.impl.SyncStudentTaskServiceImpl">
-	</bean>
-	<!-- 同步网院学生信息和选课信息业务接口END -->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息  每天0:10分执行&ndash;&gt;-->
+	<!--<task:scheduler id="syncStudentScheduler" pool-size="1"/>-->
+	<!--<task:scheduled-tasks scheduler="syncStudentScheduler">-->
+		<!--<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 10 00 * * ?"/>-->
+	<!--</task:scheduled-tasks>-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息定时器 END&ndash;&gt;-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口 &ndash;&gt;-->
+	<!--<bean id="syncStudentTaskService" class="com.zs.service.scheduler.impl.SyncStudentTaskServiceImpl">-->
+	<!--</bean>-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口END &ndash;&gt;-->
 
 	<!-- 同步还没有签收的快递信息  每天1:00分执行-->
 	<task:scheduler id="syncKuaidiScheduler" pool-size="1"/>
@@ -39,24 +39,24 @@
 	</bean>
 	<!-- 检查还没有签收的订单的快递信息信息业务接口END -->
 
-	<!-- 同步网院学习中心信息  每天3:00分执行-->
-	<task:scheduler id="syncSpotScheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="syncSpotScheduler">
-		<task:scheduled ref="syncSpotTaskService" method="syncSpot" cron="0 00 03 * * ?"/>
-	</task:scheduled-tasks>
-	<!-- 同步网院学生信息和选课信息定时器 END-->
-	<!-- 同步网院学生信息和选课信息业务接口 -->
-	<bean id="syncSpotTaskService" class="com.zs.service.scheduler.impl.SyncSpotTaskServiceImpl">
-	</bean>
-	<!-- 同步网院学生信息和选课信息业务接口END -->
+	<!--&lt;!&ndash; 同步网院学习中心信息  每天3:00分执行&ndash;&gt;-->
+	<!--<task:scheduler id="syncSpotScheduler" pool-size="1"/>-->
+	<!--<task:scheduled-tasks scheduler="syncSpotScheduler">-->
+		<!--<task:scheduled ref="syncSpotTaskService" method="syncSpot" cron="0 00 03 * * ?"/>-->
+	<!--</task:scheduled-tasks>-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息定时器 END&ndash;&gt;-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口 &ndash;&gt;-->
+	<!--<bean id="syncSpotTaskService" class="com.zs.service.scheduler.impl.SyncSpotTaskServiceImpl">-->
+	<!--</bean>-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口END &ndash;&gt;-->
 
 
-	<task:scheduler id="createStudentOrderFor15Scheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="createStudentOrderFor15Scheduler">
-		<task:scheduled ref="createStudentOrderFor15Service" method="create" cron="0 47 15 * * ?"/>
-	</task:scheduled-tasks>
-	<!-- 同步网院学生信息和选课信息定时器 END-->
-	<!-- 同步网院学生信息和选课信息业务接口 -->
-	<bean id="createStudentOrderFor15Service" class="com.zs.service.scheduler.impl.CreateStudentOrderFor15ServiceImpl">
-	</bean>
+	<!--<task:scheduler id="createStudentOrderFor15Scheduler" pool-size="1"/>-->
+	<!--<task:scheduled-tasks scheduler="createStudentOrderFor15Scheduler">-->
+		<!--<task:scheduled ref="createStudentOrderFor15Service" method="create" cron="0 47 15 * * ?"/>-->
+	<!--</task:scheduled-tasks>-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息定时器 END&ndash;&gt;-->
+	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口 &ndash;&gt;-->
+	<!--<bean id="createStudentOrderFor15Service" class="com.zs.service.scheduler.impl.CreateStudentOrderFor15ServiceImpl">-->
+	<!--</bean>-->
 </beans>

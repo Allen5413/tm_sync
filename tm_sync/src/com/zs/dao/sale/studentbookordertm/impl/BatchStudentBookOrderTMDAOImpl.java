@@ -2,6 +2,7 @@ package com.zs.dao.sale.studentbookordertm.impl;
 
 import com.zs.dao.BaseQueryDao;
 import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
+import com.zs.domain.sale.StudentBookOrderTM;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,5 +15,10 @@ public class BatchStudentBookOrderTMDAOImpl extends BaseQueryDao implements Batc
     @Override
     public void batchAdd(List list, int num) throws Exception {
         super.batchInsert(list, num);
+    }
+
+    @Override
+    public void batchDelete(List<StudentBookOrderTM> list) throws Exception {
+        super.batchDelete(list);
     }
 }

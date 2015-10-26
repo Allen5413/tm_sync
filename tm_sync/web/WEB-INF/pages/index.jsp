@@ -22,7 +22,7 @@
     </tr>
     <tr>
         <td>
-            <a href="${pageContext.request.contextPath}/syncStudent/sync.htm">开始同步学生信息包括选课</a>
+            <a href="${pageContext.request.contextPath}/syncSpot/sync.htm">开始同步学习中心信息</a>
         </td>
         <td>
             <a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
@@ -30,18 +30,21 @@
     </tr>
     <tr>
         <td>
-            <a href="${pageContext.request.contextPath}/syncSpot/sync.htm">开始同步学习中心信息</a>
+            <a href="${pageContext.request.contextPath}/syncStudent/sync.htm">开始同步学生信息</a>
         </td>
         <td>
             <a href="${pageContext.request.contextPath}/kuaidiReq/findByNumber.htm">查询快递100请求结果</a>
         </td>
     </tr>
     <tr>
-        <td></td>
+        <td>
+            <a href="${pageContext.request.contextPath}/syncSelectedCourse/sync.htm">开始同步选课信息</a>
+        </td>
         <td>
             <a href="${pageContext.request.contextPath}/kuaidiReq/openRep.htm">请求快递100</a>
         </td>
     </tr>
 </table>
+<a href="${pageContext.request.contextPath}/delOrderTM/sync.htm">del</a>
 </body>
 </html>

@@ -1,21 +1,14 @@
 package com.zs.service.scheduler.impl;
 
-import com.feinno.framework.common.exception.BusinessException;
 import com.zs.dao.finance.spotexpenseoth.BatchSpotExpenseOthDAO;
 import com.zs.dao.finance.spotexpenseoth.FindBySpotCodeAndSemesterDAO;
 import com.zs.dao.finance.studentexpense.FindByStudentCodeDAO;
-import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
-import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForMaxCodeDAO;
-import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
-import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
 import com.zs.dao.sync.*;
-import com.zs.domain.basic.IssueRange;
-import com.zs.domain.basic.Semester;
 import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.finance.SpotExpenseOth;
 import com.zs.domain.finance.StudentExpense;
@@ -23,14 +16,11 @@ import com.zs.domain.sale.StudentBookOrder;
 import com.zs.domain.sale.StudentBookOrderLog;
 import com.zs.domain.sale.StudentBookOrderTM;
 import com.zs.domain.sync.SelectedCourse;
-import com.zs.domain.sync.SelectedCourseTemp;
 import com.zs.domain.sync.Student;
 import com.zs.domain.sync.StudentTemp;
-import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
 import com.zs.service.scheduler.SyncStudentTaskService;
 import com.zs.tools.DateTools;
 import com.zs.tools.FileTools;
-import com.zs.tools.OrderCodeTools;
 import com.zs.tools.PropertiesTools;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,18 +47,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     private FindByStudentCodeDAO findByStudentCodeDAO;
     @Resource
     private FindBySpotCodeAndSemesterDAO findBySpotCodeAndSemesterDAO;
-    @Resource
-    private SelectedCourseDAO selectedCourseDAO;
-    @Resource
-    private SelectedCourseTempDAO selectedCourseTempDAO;
-    @Resource
-    private StudentBookOrderDAO studentBookOrderDAO;
-    @Resource
-    private FindNowSemesterDAO findNowSemesterDAO;
-    @Resource
-    private FindStudentBookOrderForMaxCodeDAO findStudentBookOrderForMaxCodeDAO;
-    @Resource
-    private FindIssueRangeBySpotCodeService findIssueRangeBySpotCodeService;
     @Resource
     private FindTeachMaterialByCourseCodeDAO findTeachMaterialByCourseCodeDAO;
     @Resource
@@ -695,10 +673,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     detail += "学号："+studentTemp.getCode()+", 为新增学生。\r\n";
                     addStudentList.add(student);
 
-                    //如果学生状态为在籍，检查学生的选课
-                    if(student.getState() == 0) {
-                        this.syncSelectedCourse(student.getCode(), student.getSpotCode());
-                    }
                     tempNum++;
                 }
             }
@@ -823,137 +797,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         }
     }
 
-    /**
-     * 同步选课，如果有新的课程，就要生成订单
-     * @param studentCode
-     * @param spotCode
-     * @throws Exception
-     */
-    protected void syncSelectedCourse(String studentCode, String spotCode)throws Exception{
-        //查询学生当前选课
-        List<SelectedCourse> selectedCourseList = selectedCourseDAO.findByStudentCode(studentCode);
-        //查询学生最新选课
-        List<SelectedCourseTemp> selectedCourseTempList = selectedCourseTempDAO.findByStudentCode(studentCode);
-        //查找最新的选课里面有没有新增的选课，如果有新增的选课，生成学生订单。
-        List<SelectedCourseTemp> newSelectedCourseTempList = new ArrayList<SelectedCourseTemp>();
-        if(null != selectedCourseTempList){
-            for(SelectedCourseTemp selectedCourseTemp : selectedCourseTempList){
-                if(null != selectedCourseList){
-                    boolean isNewCourse = true;
-                    for(SelectedCourse selectedCourse : selectedCourseList){
-                        if(selectedCourseTemp.getCourseCode().equals(selectedCourse.getCourseCode())){
-                            isNewCourse = false;
-                            break;
-                        }
-                    }
-                    if(isNewCourse){
-                        newSelectedCourseTempList.add(selectedCourseTemp);
-                    }
-                }else{
-                    newSelectedCourseTempList.addAll(selectedCourseTempList);
-                }
-            }
-        }
-        if(null != newSelectedCourseTempList && 0 < newSelectedCourseTempList.size()){
-            Semester semester = findNowSemesterDAO.getNowSemester();
-            //查询学生当前学期有没有未确认的订单， 如果有，就把新课程的教材加进去，如果没得就新生成一个订单
-            List<StudentBookOrder> studentBookOrderList = studentBookOrderDAO.findByStudentCodeAndSemesterIdForUnconfirmed(studentCode, semester.getId());
-            if(null != studentBookOrderList && 0 < studentBookOrderList.size()){
-                StudentBookOrder studentBookOrder = studentBookOrderList.get(0);
-
-                //添加订单教材明细
-                for(SelectedCourseTemp selectedCourseTemp : newSelectedCourseTempList) {
-                    String courseCode = selectedCourseTemp.getCourseCode();
-                    //通过课程查询课程关联的教材
-                    List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
-                    if (null != teachMaterialList && 0 < teachMaterialList.size()) {
-                        for (TeachMaterial teachMaterial : teachMaterialList) {
-                            StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                            studentBookOrderTM.setOrderCode(studentBookOrder.getOrderCode());
-                            studentBookOrderTM.setCourseCode(courseCode);
-                            studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
-                            studentBookOrderTM.setPrice(teachMaterial.getPrice());
-                            studentBookOrderTM.setCount(1);
-                            studentBookOrderTM.setOperator("管理员");
-                            addStudentBookOrderTMList.add(studentBookOrderTM);
-                        }
-                    }
-                    //把新选的课程添加进表
-                    SelectedCourse selectedCourse = new SelectedCourse();
-                    selectedCourse.setSemesterId(semester.getId());
-                    selectedCourse.setStudentCode(studentCode);
-                    selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
-                    selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                    detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
-                    addSelectCourseList.add(selectedCourse);
-                }
-            }else{
-                //根据学生的学习中心查询关联的发行渠道
-                IssueRange issueRange = findIssueRangeBySpotCodeService.getIssueRangeBySpotCode(spotCode);
-                Long issueChannelId = 0l;
-                if(null == issueRange || !issueRange.getSpotCode().equals(spotCode)){
-                    throw new BusinessException("没有找到该学号: "+studentCode+" 所属学习中心关联的渠道信息");
-                }
-                issueChannelId = issueRange.getIssueChannelId();
-                //得到当前学期最大的订单号
-                int num = 0;
-                StudentBookOrder maxCodeStudentBookOrder = findStudentBookOrderForMaxCodeDAO.getStudentBookOrderForMaxCode(semester.getId());
-                if(null != maxCodeStudentBookOrder){
-                    String maxOrderCode = maxCodeStudentBookOrder.getOrderCode();
-                    num = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length()-6, maxOrderCode.length()));
-                }
-                //生成学生订单号
-                String orderCode = OrderCodeTools.createStudentOrderCodeAuto(semester.getYear(), semester.getQuarter(), num + addStudentBookOrderList.size() + 1);
-                //添加订单信息
-                StudentBookOrder studentBookOrder = new StudentBookOrder();
-                studentBookOrder.setSemesterId(semester.getId());
-                studentBookOrder.setIssueChannelId(issueChannelId);
-                studentBookOrder.setOrderCode(orderCode);
-                studentBookOrder.setStudentCode(studentCode);
-                studentBookOrder.setState(StudentBookOrder.STATE_UNCONFIRMED);
-                studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
-                studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
-                studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
-                studentBookOrder.setCreator("管理员");
-                studentBookOrder.setOperator("管理员");
-                addStudentBookOrderList.add(studentBookOrder);
-
-                //添加订单日志信息
-                StudentBookOrderLog studentBookOrderLog = new StudentBookOrderLog();
-                studentBookOrderLog.setOrderCode(orderCode);
-                studentBookOrderLog.setState(StudentBookOrder.STATE_UNCONFIRMED);
-                studentBookOrderLog.setOperator("管理员");
-                addStudentBookOrderLogList.add(studentBookOrderLog);
-
-                //添加订单教材明细
-                for(SelectedCourseTemp selectedCourseTemp : newSelectedCourseTempList){
-                    String courseCode = selectedCourseTemp.getCourseCode();
-                    //通过课程查询课程关联的教材
-                    List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
-                    if(null != teachMaterialList && 0 < teachMaterialList.size()) {
-                        for(TeachMaterial teachMaterial : teachMaterialList) {
-                            StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                            studentBookOrderTM.setOrderCode(orderCode);
-                            studentBookOrderTM.setCourseCode(courseCode);
-                            studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
-                            studentBookOrderTM.setPrice(teachMaterial.getPrice());
-                            studentBookOrderTM.setCount(1);
-                            studentBookOrderTM.setOperator("管理员");
-                            addStudentBookOrderTMList.add(studentBookOrderTM);
-                        }
-                    }
-                    //把新选的课程添加进表
-                    SelectedCourse selectedCourse = new SelectedCourse();
-                    selectedCourse.setSemesterId(semester.getId());
-                    selectedCourse.setStudentCode(studentCode);
-                    selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
-                    selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                    detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
-                    addSelectCourseList.add(selectedCourse);
-                }
-            }
-        }
-    }
 
     /**
      * 通过课程查询课程关联的教材

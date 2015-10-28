@@ -904,19 +904,18 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             batchStudentDAO.batchEdit(editStudentList, 1000);
         }
 
-        if(null != addSelectCourseList && 0 < addSelectCourseList.size()){
-            batchSelectedCourseDAO.batchAdd(addSelectCourseList, 1000);
-        }
-        if(null != addStudentBookOrderList && 0 < addStudentBookOrderList.size()){
-            batchStudentBookOrderDAO.batchAdd(addStudentBookOrderList, 1000);
-        }
-        if(null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()){
-            batchStudentBookOrderTMDAO.batchAdd(addStudentBookOrderTMList, 1000);
-        }
-        if(null != addStudentBookOrderLogList && 0 < addStudentBookOrderLogList.size()){
-            batchStudentBookOrderLogDAO.batchAdd(addStudentBookOrderLogList, 1000);
-        }
-
+//        if(null != addSelectCourseList && 0 < addSelectCourseList.size()){
+//            batchSelectedCourseDAO.batchAdd(addSelectCourseList, 1000);
+//        }
+//        if(null != addStudentBookOrderList && 0 < addStudentBookOrderList.size()){
+//            batchStudentBookOrderDAO.batchAdd(addStudentBookOrderList, 1000);
+//        }
+//        if(null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()){
+//            batchStudentBookOrderTMDAO.batchAdd(addStudentBookOrderTMList, 1000);
+//        }
+//        if(null != addStudentBookOrderLogList && 0 < addStudentBookOrderLogList.size()){
+//            batchStudentBookOrderLogDAO.batchAdd(addStudentBookOrderLogList, 1000);
+//        }
         if(null != addSpotExpenseOthList && 0 < addSpotExpenseOthList.size()){
             batchSpotExpenseOthDAO.batchAdd(addSpotExpenseOthList, 1000);
         }

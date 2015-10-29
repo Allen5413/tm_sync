@@ -4,6 +4,7 @@ import com.zs.service.scheduler.TempService;
 import com.zs.web.controller.LoggerController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -21,5 +22,10 @@ public class DelOrderTMController extends LoggerController {
     @RequestMapping(value = "sync")
     public void sync(HttpServletRequest request){
         tempService.doSync();
+    }
+
+    @RequestMapping(value = "sync2")
+    public void sync2(@RequestParam("code") String code, HttpServletRequest request){
+        tempService.doSync2(code);
     }
 }

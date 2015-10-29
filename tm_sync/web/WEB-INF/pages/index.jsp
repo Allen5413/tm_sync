@@ -46,5 +46,14 @@
     </tr>
 </table>
 <a href="${pageContext.request.contextPath}/delOrderTM/sync.htm">del</a>
+
+<input type="text" id="code" />
+<a href="#" onclick="spring()">15春新生</a>
 </body>
 </html>
+<script>
+    function spring(){
+        var code = $("#code").val();
+        location.href = "${pageContext.request.contextPath}/delOrderTM/sync2.htm?code="+code
+    }
+</script>

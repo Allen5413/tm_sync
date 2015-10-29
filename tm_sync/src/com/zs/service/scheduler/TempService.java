@@ -5,4 +5,6 @@ package com.zs.service.scheduler;
  */
 public interface TempService {
     public void doSync();
+
+    public void doSync2(String spotCode);
 }

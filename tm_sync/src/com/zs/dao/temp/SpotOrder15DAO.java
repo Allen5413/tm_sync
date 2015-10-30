@@ -3,6 +3,7 @@ package com.zs.dao.temp;
 import com.feinno.framework.common.dao.jpa.EntityJpaDao;
 import com.zs.domain.sync.Student;
 import com.zs.domain.temp.SpotOrder15;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -19,4 +20,12 @@ public interface SpotOrder15DAO extends EntityJpaDao<Student, Long> {
             "LEFT JOIN student_expense_pay sp on sso.student_code = sp.student_code " +
             "order by money desc, student_code")
     public List<Object[]> findStudent(String code);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "delete sso from student_order15 sso INNER JOIN (select t.* from " +
+            "(select sso.* from student_order15 sso, sync_student s where sso.student_code = s.code and s.spot_code = ?1) t " +
+            "where not exists(select * from spot_order15 soo where t.name = soo.name and soo.spot_code = ?1) ) ttt " +
+            "on sso.student_code = ttt.student_code and sso.enter_year = ttt.enter_year and sso.quarter = ttt.quarter and sso.name = ttt.name and sso.isbn = ttt.isbn and sso.author = ttt.author " +
+            "and sso.price = ttt.price")
+    public void delNotExists(String code);
 }

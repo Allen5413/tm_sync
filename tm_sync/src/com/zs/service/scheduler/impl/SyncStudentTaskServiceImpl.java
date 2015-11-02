@@ -64,17 +64,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     @Resource
     private BatchSpotExpenseOthDAO batchSpotExpenseOthDAO;
 
-    //变更信息描述
-    private String detail = "";
-
-    private List<Student> addStudentList = new ArrayList<Student>();
-    private List<Student> editStudentList = new ArrayList<Student>();
-    private List<SelectedCourse> addSelectCourseList = new ArrayList<SelectedCourse>();
-    private List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
-    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
-    private List<StudentBookOrderLog> addStudentBookOrderLogList = new ArrayList<StudentBookOrderLog>();
-    private List<SpotExpenseOth> addSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
-    private List<SpotExpenseOth> editSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
 
     /**
      * 同步学生信息
@@ -82,6 +71,18 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     @Override
     @Transactional
     public void syncStudent() {
+        //变更信息描述
+        String detail = "";
+
+        List<Student> addStudentList = new ArrayList<Student>();
+        List<Student> editStudentList = new ArrayList<Student>();
+        List<SelectedCourse> addSelectCourseList = new ArrayList<SelectedCourse>();
+        List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
+        List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
+        List<StudentBookOrderLog> addStudentBookOrderLogList = new ArrayList<StudentBookOrderLog>();
+        List<SpotExpenseOth> addSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
+        List<SpotExpenseOth> editSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
+
         StringBuilder msg = new StringBuilder(DateTools.getLongNowTime()+": 开始执行学生信息同步\r\n");
         String studentCode = "";
         int tempNum = 0;
@@ -570,7 +571,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                         if (isUpdate) {
                             detail += "信息发生变更。\r\n";
                             if(isChangeSpot){
-                                this.updateStudentSpotExpense(oldSpotCode, student.getSpotCode(), student.getCode());
+                                this.updateStudentSpotExpense(oldSpotCode, student.getSpotCode(), student.getCode(), addSpotExpenseOthList, editSpotExpenseOthList);
                             }
                             Timestamp operateTime = DateTools.getLongNowTime();
                             String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
@@ -677,7 +678,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                 }
             }
             //执行要操作的数据
-            this.doDataOperate();
+            this.doDataOperate(addStudentList, editStudentList, addSpotExpenseOthList, editSpotExpenseOthList);
         }catch (Exception e){
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -706,7 +707,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
      * @param studentCode
      * @throws Exception
      */
-    protected void updateStudentSpotExpense(String oldSpotCode, String newSpotCode, String studentCode)throws Exception{
+    protected void updateStudentSpotExpense(String oldSpotCode, String newSpotCode, String studentCode,
+                                            List<SpotExpenseOth> addSpotExpenseOthList, List<SpotExpenseOth> editSpotExpenseOthList)throws Exception{
         //查询学生财务信息
         List<StudentExpense> studentExpenseList = findByStudentCodeDAO.findByStudentCode(studentCode);
         if(null != studentExpenseList && 0 < studentExpenseList.size()){
@@ -896,7 +898,8 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     }
 
 
-    protected void doDataOperate() throws Exception {
+    protected void doDataOperate(List<Student> addStudentList, List<Student> editStudentList,
+                                 List<SpotExpenseOth> addSpotExpenseOthList, List<SpotExpenseOth> editSpotExpenseOthList) throws Exception {
         if(null != addStudentList && 0 < addStudentList.size()){
             batchStudentDAO.batchAdd(addStudentList, 1000);
         }

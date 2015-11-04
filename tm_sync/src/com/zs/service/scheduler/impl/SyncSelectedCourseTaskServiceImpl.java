@@ -70,14 +70,16 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
     //变更信息描述
     private String detail = "";
 
-    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
-    private List<SelectedCourse> addSelectCourseList = new ArrayList<SelectedCourse>();
-    private List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
-    private List<StudentBookOrderLog> addStudentBookOrderLogList = new ArrayList<StudentBookOrderLog>();
+
 
     @Override
     @Transactional
     public void syncSelectedCourse() {
+        List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
+        List<SelectedCourse> addSelectCourseList = new ArrayList<SelectedCourse>();
+        List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
+        List<StudentBookOrderLog> addStudentBookOrderLogList = new ArrayList<StudentBookOrderLog>();
+
         StringBuilder msg = new StringBuilder(DateTools.getLongNowTime()+": 开始执行学生选课信息同步\r\n");
         String studentCode = "", courseCode = "";
         int tempNum = 0;

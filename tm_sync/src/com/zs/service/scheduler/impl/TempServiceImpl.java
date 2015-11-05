@@ -587,17 +587,22 @@ public class TempServiceImpl implements TempService {
             for(Object[] objs : list){
                 String spotCode = objs[0].toString();
                 String courseCode = objs[1].toString();
-                long tmId = Long.parseLong(objs[2].toString());
-                double price = Double.parseDouble(objs[3].toString());
-                int count = Integer.parseInt(objs[4].toString());
-                String name = objs[5].toString();
+                double price = Double.parseDouble(objs[2].toString());
+                String name = objs[3].toString();
+                String author = objs[4].toString();
+                int count = Integer.parseInt(objs[5].toString());
+
+                List<TeachMaterial> teachMaterialList = findTeachMaterialByNameAndAuthorDAO.find(name, author);
+
 
                 double totalPrice = 0;
 
-                if(!beforeSpotCode.equals(spotCode)){
+                if (!beforeSpotCode.equals(spotCode)) {
                     TeachMaterialPlaceOrder teachMaterialPlaceOrder = new TeachMaterialPlaceOrder();
                     teachMaterialPlaceOrder.setCreator("管理员");
                     teachMaterialPlaceOrder.setOperator("管理员");
+                    teachMaterialPlaceOrder.setCreateTime(DateTools.getLongNowTime());
+                    teachMaterialPlaceOrder.setOperateTime(DateTools.getLongNowTime());
                     teachMaterialPlaceOrder.setSemesterId(1l);
                     teachMaterialPlaceOrder.setSpotCode(spotCode);
 
@@ -616,24 +621,32 @@ public class TempServiceImpl implements TempService {
                     teachMaterialPlaceOrderList.add(teachMaterialPlaceOrder);
 
                     PlaceOrderTeachMaterial placeOrderTeachMaterial = new PlaceOrderTeachMaterial();
+                    placeOrderTeachMaterial.setOrderId(teachMaterialPlaceOrder.getId());
                     placeOrderTeachMaterial.setTmPrice(new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                     placeOrderTeachMaterial.setOperator("管理员");
+                    placeOrderTeachMaterial.setCreateTime(DateTools.getLongNowTime());
+                    placeOrderTeachMaterial.setOperateTime(DateTools.getLongNowTime());
                     placeOrderTeachMaterial.setCreator("管理员");
                     placeOrderTeachMaterial.setCount(Long.parseLong(count + ""));
                     placeOrderTeachMaterial.setCourseCode(courseCode);
-                    placeOrderTeachMaterial.setTeachMaterialId(teachMaterialPlaceOrder.getId());
+                    placeOrderTeachMaterial.setTeachMaterialId(teachMaterialList.get(0).getId());
                     placeOrderTeachMaterialList.add(placeOrderTeachMaterial);
                     totalPrice = new BigDecimal(count).multiply(new BigDecimal(price)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                }else{
+                    placeOrderTeachMatiralDAO.save(placeOrderTeachMaterial);
+                } else {
                     PlaceOrderTeachMaterial placeOrderTeachMaterial = new PlaceOrderTeachMaterial();
+                    placeOrderTeachMaterial.setOrderId(teachMaterialPlaceOrderList.get(teachMaterialPlaceOrderList.size() - 1).getId());
                     placeOrderTeachMaterial.setTmPrice(new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                     placeOrderTeachMaterial.setOperator("管理员");
+                    placeOrderTeachMaterial.setCreateTime(DateTools.getLongNowTime());
+                    placeOrderTeachMaterial.setOperateTime(DateTools.getLongNowTime());
                     placeOrderTeachMaterial.setCreator("管理员");
                     placeOrderTeachMaterial.setCount(Long.parseLong(count + ""));
                     placeOrderTeachMaterial.setCourseCode(courseCode);
-                    placeOrderTeachMaterial.setTeachMaterialId(teachMaterialPlaceOrderList.get(teachMaterialPlaceOrderList.size()-1).getId());
+                    placeOrderTeachMaterial.setTeachMaterialId(teachMaterialList.get(0).getId());
                     placeOrderTeachMaterialList.add(placeOrderTeachMaterial);
                     totalPrice = new BigDecimal(count).multiply(new BigDecimal(price)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    placeOrderTeachMatiralDAO.save(placeOrderTeachMaterial);
                 }
                 //记录中心消费
                 SpotExpenseBuy spotExpenseBuy = new SpotExpenseBuy();
@@ -668,6 +681,7 @@ public class TempServiceImpl implements TempService {
                     //执行修改
                     findSpotRecordBySpotCodeDao.update(spotExpense);
                 }
+
                 beforeSpotCode = spotCode;
             }
         }catch(Exception e){

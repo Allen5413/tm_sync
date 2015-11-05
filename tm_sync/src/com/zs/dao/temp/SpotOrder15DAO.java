@@ -21,9 +21,9 @@ public interface SpotOrder15DAO extends EntityJpaDao<Student, Long> {
             "order by money desc, student_code")
     public List<Object[]> findStudent(String code);
 
-    @Query(nativeQuery = true, value = "select so.spot_code, so.course_code, tm.id, so.price, sum(so.count), so.`name` from spot_order15_2 so, teach_material tm " +
-            "where so.`name` = tm.`name` and so.author = tm.author " +
-            "group by so.spot_code, so.course_code, tm.id, so.price, so.`name` order by spot_code")
+    @Query(nativeQuery = true, value = "select so.spot_code, so.course_code, so.price, so.name, so.author, " +
+            "sum(so.count) from spot_order15_2 so " +
+            "group by so.spot_code, so.course_code, so.price, so.name, so.author order by spot_code")
     public List<Object[]> findSpotOrderForHANSHOU();
 
     @Modifying

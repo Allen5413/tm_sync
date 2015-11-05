@@ -573,4 +573,106 @@ public class TempServiceImpl implements TempService {
         }
         return courseCode;
     }
+
+
+
+    @Override
+    @Transactional
+    public void doSync3() {
+        List<TeachMaterialPlaceOrder> teachMaterialPlaceOrderList = new ArrayList<TeachMaterialPlaceOrder>();
+        List<PlaceOrderTeachMaterial> placeOrderTeachMaterialList = new ArrayList<PlaceOrderTeachMaterial>();
+        try{
+            List<Object[]> list = spotOrder15DAO.findSpotOrderForHANSHOU();
+            String beforeSpotCode = "";
+            for(Object[] objs : list){
+                String spotCode = objs[0].toString();
+                String courseCode = objs[1].toString();
+                long tmId = Long.parseLong(objs[2].toString());
+                double price = Double.parseDouble(objs[3].toString());
+                int count = Integer.parseInt(objs[4].toString());
+                String name = objs[5].toString();
+
+                double totalPrice = 0;
+
+                if(!beforeSpotCode.equals(spotCode)){
+                    TeachMaterialPlaceOrder teachMaterialPlaceOrder = new TeachMaterialPlaceOrder();
+                    teachMaterialPlaceOrder.setCreator("管理员");
+                    teachMaterialPlaceOrder.setOperator("管理员");
+                    teachMaterialPlaceOrder.setSemesterId(1l);
+                    teachMaterialPlaceOrder.setSpotCode(spotCode);
+
+                    //创建订单号
+                    String maxOrderCode = placeOrderDAO.queryMaxOrderNumber(spotCode, 1l);
+                    if (null == maxOrderCode) {
+                        maxOrderCode = "0";
+                    } else {
+                        maxOrderCode = maxOrderCode.substring(maxOrderCode.length() - 6, maxOrderCode.length());
+                    }
+                    String orderCode = OrderCodeTools.createSpotOrderCode(2015, 0, spotCode, Integer.parseInt(maxOrderCode) + 1);
+                    teachMaterialPlaceOrder.setOrderCode(orderCode);
+                    teachMaterialPlaceOrder.setIsStock(TeachMaterialPlaceOrder.ISSTOCK_YES);
+                    teachMaterialPlaceOrder.setOrderStatus(TeachMaterialPlaceOrder.STATE_SIGN);
+                    editPlaceOrderStateByNuDAO.save(teachMaterialPlaceOrder);
+                    teachMaterialPlaceOrderList.add(teachMaterialPlaceOrder);
+
+                    PlaceOrderTeachMaterial placeOrderTeachMaterial = new PlaceOrderTeachMaterial();
+                    placeOrderTeachMaterial.setTmPrice(new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                    placeOrderTeachMaterial.setOperator("管理员");
+                    placeOrderTeachMaterial.setCreator("管理员");
+                    placeOrderTeachMaterial.setCount(Long.parseLong(count + ""));
+                    placeOrderTeachMaterial.setCourseCode(courseCode);
+                    placeOrderTeachMaterial.setTeachMaterialId(teachMaterialPlaceOrder.getId());
+                    placeOrderTeachMaterialList.add(placeOrderTeachMaterial);
+                    totalPrice = new BigDecimal(count).multiply(new BigDecimal(price)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                }else{
+                    PlaceOrderTeachMaterial placeOrderTeachMaterial = new PlaceOrderTeachMaterial();
+                    placeOrderTeachMaterial.setTmPrice(new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                    placeOrderTeachMaterial.setOperator("管理员");
+                    placeOrderTeachMaterial.setCreator("管理员");
+                    placeOrderTeachMaterial.setCount(Long.parseLong(count + ""));
+                    placeOrderTeachMaterial.setCourseCode(courseCode);
+                    placeOrderTeachMaterial.setTeachMaterialId(teachMaterialPlaceOrderList.get(teachMaterialPlaceOrderList.size()-1).getId());
+                    placeOrderTeachMaterialList.add(placeOrderTeachMaterial);
+                    totalPrice = new BigDecimal(count).multiply(new BigDecimal(price)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                }
+                //记录中心消费
+                SpotExpenseBuy spotExpenseBuy = new SpotExpenseBuy();
+                spotExpenseBuy.setSpotCode(spotCode);
+                spotExpenseBuy.setSemesterId(1l);
+                spotExpenseBuy.setType(SpotExpenseBuy.TYPE_BUY_TM);
+                spotExpenseBuy.setDetail("购买了" + count + "本，[" + name + "] 教材");
+                spotExpenseBuy.setMoney(new BigDecimal(totalPrice).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                spotExpenseBuy.setCreator("管理员");
+                //新增入账记录
+                spotExpenseBuyDao.save(spotExpenseBuy);
+
+                //查询是否存在该中心的费用信息，不存在就新增，存在就修改
+                SpotExpense spotExpense = findSpotRecordBySpotCodeDao.getSpotEBySpotCode(spotCode, 1l);
+                if (null == spotExpense) {
+                    spotExpense = new SpotExpense();
+                    spotExpense.setSemesterId(1l);
+                    spotExpense.setSpotCode(spotCode);
+                    spotExpense.setPay(0f);
+                    spotExpense.setBuy(new BigDecimal(totalPrice).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                    //添加创建人和操作人
+                    spotExpense.setCreator("管理员");
+                    spotExpense.setOperator("管理员");
+                    //执行添加
+                    findSpotRecordBySpotCodeDao.save(spotExpense);
+                } else {
+                    float buy = null == spotExpense.getBuy() ? 0 : spotExpense.getBuy();
+                    //修改金额
+                    spotExpense.setBuy(new BigDecimal(buy).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                    //写入操作人
+                    spotExpense.setOperator("管理员");
+                    //执行修改
+                    findSpotRecordBySpotCodeDao.update(spotExpense);
+                }
+                beforeSpotCode = spotCode;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }

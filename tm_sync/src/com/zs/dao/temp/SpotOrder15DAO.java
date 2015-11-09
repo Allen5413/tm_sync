@@ -33,4 +33,10 @@ public interface SpotOrder15DAO extends EntityJpaDao<Student, Long> {
             "on sso.student_code = ttt.student_code and sso.enter_year = ttt.enter_year and sso.quarter = ttt.quarter and sso.name = ttt.name and sso.isbn = ttt.isbn and sso.author = ttt.author " +
             "and sso.price = ttt.price")
     public void delNotExists(String code);
+
+    @Query(nativeQuery = true, value = "SELECT student_code, course_code, name, author, price " +
+            "FROM student_order15_2 so order by student_code")
+    public List<Object[]> findStudent2();
+
+
 }

@@ -15,9 +15,11 @@ import com.zs.dao.placeorder.placeorder.PlaceOrderDAO;
 import com.zs.dao.placeorder.placeorderteachmatiral.PlaceOrderTeachMatiralDAO;
 import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForMaxCodeDAO;
+import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.TempDAO;
 import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
+import com.zs.dao.sync.FindStudentByCodeDAO;
 import com.zs.dao.temp.SpotOrder15DAO;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
@@ -86,6 +88,11 @@ public class TempServiceImpl implements TempService {
     private SpotExpenseBuyDao spotExpenseBuyDao;
     @Resource
     private FindSpotRecordBySpotCodeDao findSpotRecordBySpotCodeDao;
+
+    @Resource
+    private StudentBookOrderDAO studentBookOrderDao;
+    @Resource
+    private FindStudentByCodeDAO findStudentByCodeDAO;
 
     //private Map<String, List<String>> map = new HashMap<String, List<String>>();
 //    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
@@ -683,6 +690,138 @@ public class TempServiceImpl implements TempService {
                 }
 
                 beforeSpotCode = spotCode;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public void doSync4() {
+        List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
+        List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
+        try{
+            List<Object[]> list = spotOrder15DAO.findStudent2();
+            String beforeStudentCode = "";
+            for(Object[] objs : list){
+                String studentCode = objs[0].toString();
+                String courseCode = objs[1].toString();
+                String name = objs[2].toString();
+                String author = objs[3].toString();
+                double price = Double.parseDouble(objs[4].toString());
+                int count = Integer.parseInt(objs[5].toString());
+
+                //查询学生
+                Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
+                if(null == student){
+                    throw new BusinessException(studentCode+" 没找到学生");
+                }
+
+                //查询学生上学期是否有订单
+                List<StudentBookOrder> studentBookOrderList = studentBookOrderDao.findByStudentCodeAndSemesterId(studentCode, 1l);
+
+                List<TeachMaterial> teachMaterialList = findTeachMaterialByNameAndAuthorDAO.find(name, author);
+
+
+                double totalPrice = 0;
+
+                if (!beforeStudentCode.equals(studentCode)) {
+                    //得到当前学期最大的订单号
+                    int num = 0;
+                    StudentBookOrder maxCodeStudentBookOrder = findStudentBookOrderForMaxCodeDAO.getStudentBookOrderForMaxCode(1l);
+                    if (null != maxCodeStudentBookOrder) {
+                        String maxOrderCode = maxCodeStudentBookOrder.getOrderCode();
+                        num = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length() - 6, maxOrderCode.length()));
+                    }
+                    //生成学生订单号
+                    String orderCode = OrderCodeTools.createStudentOrderCodeAuto(2015, 0, num + addStudentBookOrderList.size() + 1);
+                    //添加订单信息
+                    StudentBookOrder studentBookOrder = new StudentBookOrder();
+                    studentBookOrder.setSemesterId(1l);
+                    studentBookOrder.setIssueChannelId(1l);
+                    studentBookOrder.setOrderCode(orderCode);
+                    studentBookOrder.setStudentCode(studentCode);
+                    studentBookOrder.setState(StudentBookOrder.STATE_SIGN);
+                    studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
+                    studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
+                    studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
+                    studentBookOrder.setCreator("管理员");
+                    studentBookOrder.setOperator("管理员");
+                    addStudentBookOrderList.add(studentBookOrder);
+
+
+                    StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                    studentBookOrderTM.setOrderCode(orderCode);
+                    studentBookOrderTM.setCourseCode(courseCode);
+                    studentBookOrderTM.setTeachMaterialId(teachMaterialList.get(0).getId());
+                    studentBookOrderTM.setPrice(Float.parseFloat(price + ""));
+                    studentBookOrderTM.setCount(1);
+                    studentBookOrderTM.setOperator("管理员");
+                    addStudentBookOrderTMList.add(studentBookOrderTM);
+                } else {
+
+                    StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                    studentBookOrderTM.setOrderCode(addStudentBookOrderList.get(addStudentBookOrderList.size() - 1).getOrderCode());
+                    studentBookOrderTM.setCourseCode(courseCode);
+                    studentBookOrderTM.setTeachMaterialId(teachMaterialList.get(0).getId());
+                    studentBookOrderTM.setPrice(Float.parseFloat(price+""));
+                    studentBookOrderTM.setCount(1);
+                    studentBookOrderTM.setOperator("管理员");
+                    addStudentBookOrderTMList.add(studentBookOrderTM);
+
+                }
+
+
+                //记录学生消费
+                Semester semester = findNowSemesterDAO.get(1l);
+                StudentExpenseBuy studentExpenseBuy = new StudentExpenseBuy();
+                studentExpenseBuy.setStudentCode(studentCode);
+                studentExpenseBuy.setSemester(semester);
+                studentExpenseBuy.setType(StudentExpenseBuy.TYPE_BUY_TM);
+                studentExpenseBuy.setDetail("购买了1本，[" + name + "] 教材");
+                studentExpenseBuy.setMoney(Float.parseFloat(price+""));
+                studentExpenseBuy.setCreator("管理员");
+                studentExpenseBuyDao.save(studentExpenseBuy);
+
+
+                //查询是否存在该学生的费用信息，不存在就新增，存在就修改
+                StudentExpense studentExpense = findRecordStudentCodeDao.getRecordByStuCode(studentCode, semester.getId());
+                float pay = 0;
+                float buy = 0;
+                if (null == studentExpense) {
+                    studentExpense = new StudentExpense();
+                    studentExpense.setSemesterId(semester.getId());
+                    studentExpense.setStudentCode(studentCode);
+                    studentExpense.setPay(0f);
+                    studentExpense.setBuy(price);
+                    //添加状态
+                    studentExpense.setState(StudentExpense.STATE_NO);
+                    //添加创建人和操作人
+                    studentExpense.setCreator("管理员");
+                    studentExpense.setOperator("管理员");
+                    //执行添加
+                    findRecordStudentCodeDao.save(studentExpense);
+                } else {
+                    buy = null == studentExpense.getBuy() ? 0 : studentExpense.getBuy();
+                    //修改金额
+                    studentExpense.setBuy(buy + price);
+                    //写入操作人
+                    studentExpense.setOperator("管理员");
+                    //创建人和创建时间不能变
+                    studentExpense.setCreator(studentExpense.getCreator());
+                    studentExpense.setCreateTime(studentExpense.getCreateTime());
+                    //版本号设置
+                    studentExpense.setVersion(studentExpense.getVersion());
+                    //执行修改
+                    findRecordStudentCodeDao.update(studentExpense);
+                }
+
+
+
+
+                beforeStudentCode = studentCode;
             }
         }catch(Exception e){
             e.printStackTrace();

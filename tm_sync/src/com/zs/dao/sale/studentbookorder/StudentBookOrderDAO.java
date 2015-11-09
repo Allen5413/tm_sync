@@ -20,4 +20,14 @@ public interface StudentBookOrderDAO extends EntityJpaDao<StudentBookOrder, Long
      */
     @Query("FROM StudentBookOrder WHERE studentCode = ?1 AND semesterId = ?2 AND state = 0")
     public List<StudentBookOrder> findByStudentCodeAndSemesterIdForUnconfirmed(String studentCode, Long semesterId)throws Exception;
+
+    /**
+     * 查询学生一个学期的订单
+     * @param studentCode
+     * @param semesterId
+     * @return
+     * @throws Exception
+     */
+    @Query("FROM StudentBookOrder WHERE studentCode = ?1 AND semesterId = ?2")
+    public List<StudentBookOrder> findByStudentCodeAndSemesterId(String studentCode, Long semesterId)throws Exception;
 }

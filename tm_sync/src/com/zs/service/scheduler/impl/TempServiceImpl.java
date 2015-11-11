@@ -749,10 +749,10 @@ public class TempServiceImpl implements TempService {
                     List<Object[]> list2 = spotOrder15DAO.findStudent2ByStudentCode(studentCode);
                     double totalPrice = 0;
                     for(Object[] objs2 : list2){
-                        String courseCode = objs[0].toString();
-                        String name = objs[1].toString();
-                        String author = objs[2].toString();
-                        double price = Double.parseDouble(objs[3].toString());
+                        String courseCode = objs2[0].toString();
+                        String name = objs2[1].toString();
+                        String author = objs2[2].toString();
+                        double price = Double.parseDouble(objs2[3].toString());
 
                         List<TeachMaterial> teachMaterialList = findTeachMaterialByNameAndAuthorDAO.find(name, author);
 
@@ -778,8 +778,9 @@ public class TempServiceImpl implements TempService {
 
                         totalPrice = new BigDecimal(totalPrice).add(new BigDecimal(price)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     }
-                    if(null == studentExpense2){
-                        studentExpense.setBuy(new BigDecimal(studentExpense.getBuy()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                    if(null == studentExpense2 || null == studentExpense2.getPay() || 0 >= studentExpense2.getPay()){
+                        float buy = null == studentExpense.getBuy() ? 0 : studentExpense.getBuy();
+                        studentExpense.setBuy(new BigDecimal(buy).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                         //写入操作人
                         studentExpense.setOperator("管理员");
                         if (studentExpense.getBuy() > studentExpense.getPay()) {
@@ -788,16 +789,149 @@ public class TempServiceImpl implements TempService {
                         }
                         //执行修改
                         findRecordStudentCodeDao.update(studentExpense);
-                        //以前有欠款
-                        if(oldStudentExpense.getBuy() >= oldStudentExpense.getPay()){
 
+                        //修改中心交费信息
+                        List<SpotExpenseOth> spotExpenseOthList = spotExpenseOthDAO.querySpotExpenseOthBySemeter(1l, spotCode);
+                        SpotExpenseOth spotExpenseOth = spotExpenseOthList.get(0);
+                        spotExpenseOth.setBuy(new BigDecimal(spotExpenseOth.getBuy()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                        float oldBuy = null == oldStudentExpense.getBuy() ? 0 : oldStudentExpense.getBuy();
+                        float oldPay = null == oldStudentExpense.getPay() ? 0 : oldStudentExpense.getPay();
+                        //以前有欠款
+                        if(oldBuy >= oldPay){
+                            spotExpenseOth.setStuOwnTot(new BigDecimal(spotExpenseOth.getStuOwnTot()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                        }else{
+                            double temp = new BigDecimal(oldPay).subtract(new BigDecimal(oldBuy)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                            //如果这次消费大于等于之前余额
+                            if(totalPrice >= temp){
+                                spotExpenseOth.setStuAccTot(new BigDecimal(spotExpenseOth.getStuAccTot()).subtract(new BigDecimal(temp)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                                spotExpenseOth.setStuOwnTot(new BigDecimal(spotExpenseOth.getStuOwnTot()).add(new BigDecimal(totalPrice)).subtract(new BigDecimal(temp)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            }else{
+                                spotExpenseOth.setStuAccTot(new BigDecimal(spotExpenseOth.getStuAccTot()).subtract(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            }
                         }
+                        if(spotExpenseOth.getStuOwnTot() > 0){
+                            spotExpenseOth.setClearTime(null);
+                            spotExpenseOth.setState(1);
+                        }
+                        spotExpenseOthDAO.update(spotExpenseOth);
                     }else{
+                        float pay = null == oldStudentExpense.getPay() ? 0 : oldStudentExpense.getPay();
+                        float buy = null == oldStudentExpense.getBuy() ? 0 : oldStudentExpense.getBuy();
+                        float pay2 = null == oldStudentExpense2.getPay() ? 0 : oldStudentExpense2.getPay();
+                        float buy2 = null == oldStudentExpense2.getBuy() ? 0 : oldStudentExpense2.getBuy();
+                        if(totalPrice >= pay2){
+                            studentExpense.setBuy(new BigDecimal(buy).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            studentExpense.setPay(new BigDecimal(pay).add(new BigDecimal(pay2)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            //写入操作人
+                            studentExpense.setOperator("管理员");
+                            if (studentExpense.getBuy() > studentExpense.getPay()) {
+                                studentExpense.setClearTime(null);
+                                studentExpense.setState(1);
+                            }
+                            //执行修改
+                            findRecordStudentCodeDao.update(studentExpense);
+
+                            studentExpense2.setPay(0f);
+                            studentExpense2.setOperator("管理员");
+                            if (studentExpense2.getBuy() > studentExpense2.getPay()) {
+                                studentExpense2.setClearTime(null);
+                                studentExpense2.setState(1);
+                            }
+                            //执行修改
+                            findRecordStudentCodeDao.update(studentExpense2);
+
+                            //修改中心交费信息
+                            List<SpotExpenseOth> spotExpenseOthList = spotExpenseOthDAO.querySpotExpenseOthBySemeter(1l, spotCode);
+                            List<SpotExpenseOth> spotExpenseOthList2 = spotExpenseOthDAO.querySpotExpenseOthBySemeter(2l, spotCode);
+                            SpotExpenseOth spotExpenseOth = spotExpenseOthList.get(0);
+                            SpotExpenseOth spotExpenseOth2 = spotExpenseOthList2.get(0);
+
+                            spotExpenseOth2.setPay(new BigDecimal(spotExpenseOth2.getPay()).subtract(new BigDecimal(pay2)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            spotExpenseOth.setPay(new BigDecimal(spotExpenseOth.getPay()).add(new BigDecimal(pay2)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            spotExpenseOth.setBuy(new BigDecimal(spotExpenseOth.getBuy()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            //15秋
+                            if(pay2 >= buy2){
+                                //说明以前是有余额
+                                double temp = new BigDecimal(pay2).subtract(new BigDecimal(buy2)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                                spotExpenseOth2.setStuAccTot(new BigDecimal(spotExpenseOth2.getStuAccTot()).subtract(new BigDecimal(temp)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            }else{
+                                //说明以前是有欠款
+                                spotExpenseOth2.setStuOwnTot(new BigDecimal(spotExpenseOth2.getStuOwnTot()).add(new BigDecimal(pay2)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            }
+                            if(spotExpenseOth2.getStuOwnTot() > 0){
+                                spotExpenseOth2.setClearTime(null);
+                                spotExpenseOth2.setState(1);
+                            }
+                            spotExpenseOthDAO.update(spotExpenseOth2);
+
+                            //15春
+                            if(pay != buy){
+                                throw new BusinessException(studentCode+" 15春账不平");
+                            }else{
+                                double temp = new BigDecimal(totalPrice).subtract(new BigDecimal(pay2)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                                spotExpenseOth.setStuOwnTot(new BigDecimal(spotExpenseOth.getStuOwnTot()).add(new BigDecimal(temp)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            }
+                            if(spotExpenseOth.getStuOwnTot() > 0){
+                                spotExpenseOth.setClearTime(null);
+                                spotExpenseOth.setState(1);
+                            }
+                            spotExpenseOthDAO.update(spotExpenseOth);
+                        }else{
+                            studentExpense.setBuy(new BigDecimal(buy).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            studentExpense.setPay(new BigDecimal(pay).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            //写入操作人
+                            studentExpense.setOperator("管理员");
+                            if (studentExpense.getBuy() > studentExpense.getPay()) {
+                                studentExpense.setClearTime(null);
+                                studentExpense.setState(1);
+                            }
+                            //执行修改
+                            findRecordStudentCodeDao.update(studentExpense);
+
+                            studentExpense2.setPay(new BigDecimal(pay2).subtract(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            studentExpense2.setOperator("管理员");
+                            if (studentExpense2.getBuy() > studentExpense2.getPay()) {
+                                studentExpense2.setClearTime(null);
+                                studentExpense2.setState(1);
+                            }
+                            //执行修改
+                            findRecordStudentCodeDao.update(studentExpense2);
+
+                            //修改中心交费信息
+                            List<SpotExpenseOth> spotExpenseOthList = spotExpenseOthDAO.querySpotExpenseOthBySemeter(1l, spotCode);
+                            List<SpotExpenseOth> spotExpenseOthList2 = spotExpenseOthDAO.querySpotExpenseOthBySemeter(2l, spotCode);
+                            SpotExpenseOth spotExpenseOth = spotExpenseOthList.get(0);
+                            SpotExpenseOth spotExpenseOth2 = spotExpenseOthList2.get(0);
+
+                            spotExpenseOth2.setPay(new BigDecimal(spotExpenseOth2.getPay()).subtract(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            spotExpenseOth.setPay(new BigDecimal(spotExpenseOth.getPay()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            spotExpenseOth.setBuy(new BigDecimal(spotExpenseOth.getBuy()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            //15秋 以前有余额
+                            if(pay2 >= buy2){
+                                double temp = new BigDecimal(pay2).subtract(new BigDecimal(totalPrice)).subtract(new BigDecimal(buy2)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                                //减去一部分15春的消费后 还有余额
+                                if(temp >= 0){
+                                    spotExpenseOth2.setStuAccTot(new BigDecimal(spotExpenseOth2.getStuAccTot()).subtract(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                                }else{
+                                    double temp2 = new BigDecimal(pay2).subtract(new BigDecimal(buy2)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                                    spotExpenseOth2.setStuAccTot(new BigDecimal(spotExpenseOth2.getStuAccTot()).subtract(new BigDecimal(temp2)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                                    spotExpenseOth2.setStuOwnTot(new BigDecimal(spotExpenseOth2.getStuOwnTot()).add(new BigDecimal(temp)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                                }
+                            }else{
+                                //说明以前是有欠款
+                                spotExpenseOth2.setStuOwnTot(new BigDecimal(spotExpenseOth2.getStuOwnTot()).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                            }
+                            if(spotExpenseOth2.getStuOwnTot() > 0){
+                                spotExpenseOth2.setClearTime(null);
+                                spotExpenseOth2.setState(1);
+                            }
+                            spotExpenseOthDAO.update(spotExpenseOth2);
+
+                            //15春
+                            spotExpenseOthDAO.update(spotExpenseOth);
+                        }
 
                     }
-
-
-
                 }
             }
         }catch(Exception e){

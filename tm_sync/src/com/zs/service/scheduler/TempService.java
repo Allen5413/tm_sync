@@ -10,5 +10,5 @@ public interface TempService {
 
     public void doSync3();
 
-    public void doSync4();
+    public void doSync4(String spotCode);
 }

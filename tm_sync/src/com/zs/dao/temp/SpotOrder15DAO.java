@@ -34,11 +34,11 @@ public interface SpotOrder15DAO extends EntityJpaDao<Student, Long> {
             "and sso.price = ttt.price")
     public void delNotExists(String code);
 
-    @Query(nativeQuery = true, value = "SELECT so.student_code, so.course_code, so.name, so.author, so.price " +
-            "FROM student_order15_2 so, sync_student s " +
-            "where so.student_code = s.`code` and s.spot_code = ?1 " +
-            "order by student_code")
+    @Query(nativeQuery = true, value = "SELECT DISTINCT so.student_code FROM student_order15_2 so, sync_student s where so.student_code = s.`code` and s.spot_code = ?1 ")
     public List<Object[]> findStudent2(String spotCode);
+
+    @Query(nativeQuery = true, value = "SELECT course_code, name, author, price FROM student_order15_2 where student_code = ?1")
+    public List<Object[]> findStudent2ByStudentCode(String studentCode);
 
 
 }

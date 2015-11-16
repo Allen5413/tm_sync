@@ -49,11 +49,17 @@
 
 <input type="text" id="code" />
 <a href="#" onclick="spring()">15春新生</a>
+<a href="#" onclick="spring2()">15春剩余新生</a>
 </body>
 </html>
 <script>
     function spring(){
         var code = $("#code").val();
         location.href = "${pageContext.request.contextPath}/delOrderTM/sync2.htm?code="+code
+    }
+
+    function spring2(){
+        var code = $("#code").val();
+        location.href = "${pageContext.request.contextPath}/delOrderTM/sync4.htm?code="+code
     }
 </script>

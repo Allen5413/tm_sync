@@ -4,6 +4,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Allen on 2015/9/1.
@@ -99,8 +102,14 @@ public class FileTools {
         File file = new File(path);
         if(file.isDirectory()){
             String[] childFiles = file.list();
+
             if(null != childFiles && 0 < childFiles.length) {
+                List<String> list = new ArrayList<String>();
                 for (String childFile : childFiles) {
+                    list.add(childFile);
+                }
+                Collections.sort(list);
+                for (String childFile : list) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("path", path);
                     jsonObject.put("fileName", childFile);

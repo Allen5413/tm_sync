@@ -33,4 +33,9 @@ public class DelOrderTMController extends LoggerController {
     public void sync3(HttpServletRequest request){
         tempService.doSync3();
     }
+
+    @RequestMapping(value = "sync4")
+    public void sync4(@RequestParam("code") String code){
+        tempService.doSync4(code);
+    }
 }

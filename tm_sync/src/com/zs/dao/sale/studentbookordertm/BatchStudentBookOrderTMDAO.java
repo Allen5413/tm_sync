@@ -10,5 +10,7 @@ import java.util.List;
 public interface BatchStudentBookOrderTMDAO {
     public void batchAdd(List list, int num) throws Exception;
 
+    public void batchUpdate(List list, int num) throws Exception;
+
     public void batchDelete(List<StudentBookOrderTM> list) throws Exception;
 }

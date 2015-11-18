@@ -2,6 +2,7 @@ package com.zs.dao;
 
 import com.feinno.framework.common.dao.jpa.JapDynamicQueryDao;
 import com.feinno.framework.common.dao.support.PageInfo;
+import com.zs.domain.sale.StudentBookOrder;
 import com.zs.domain.sale.StudentBookOrderTM;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -124,7 +125,20 @@ public class BaseQueryDao extends JapDynamicQueryDao {
         }
     }
 
-    protected void batchDelete(List<StudentBookOrderTM> list)throws Exception{
+    protected void batchDeleteForStudentBookOrderTM(List<StudentBookOrderTM> list)throws Exception{
+        try {
+            if(null != list && 0 < list.size()) {
+                for (int i = 0; i < list.size(); i++) {
+                    System.out.println("i:   "+i);
+                    super.entityManager.remove(list.get(i));
+                }
+            }
+        }catch(Exception e){
+            throw e;
+        }
+    }
+
+    protected void batchDeleteForStudentBookOrder(List<StudentBookOrder> list)throws Exception{
         try {
             if(null != list && 0 < list.size()) {
                 for (int i = 0; i < list.size(); i++) {

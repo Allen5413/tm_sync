@@ -39,6 +39,4 @@ public interface SpotOrder15DAO extends EntityJpaDao<Student, Long> {
 
     @Query(nativeQuery = true, value = "SELECT course_code, name, author, price FROM student_order15_2 where student_code = ?1")
     public List<Object[]> findStudent2ByStudentCode(String studentCode);
-
-
 }

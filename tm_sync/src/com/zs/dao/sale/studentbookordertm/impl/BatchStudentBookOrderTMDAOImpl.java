@@ -18,7 +18,12 @@ public class BatchStudentBookOrderTMDAOImpl extends BaseQueryDao implements Batc
     }
 
     @Override
+    public void batchUpdate(List list, int num) throws Exception{
+        super.batchUpdate(list, num);
+    }
+
+    @Override
     public void batchDelete(List<StudentBookOrderTM> list) throws Exception {
-        super.batchDelete(list);
+        super.batchDeleteForStudentBookOrderTM(list);
     }
 }

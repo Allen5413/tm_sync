@@ -44,12 +44,22 @@
             <a href="${pageContext.request.contextPath}/kuaidiReq/openRep.htm">请求快递100</a>
         </td>
     </tr>
+    <tr>
+        <td>
+            <a href="${pageContext.request.contextPath}/delOrderTM/sync5.htm">合并还未确认的学生订单</a>
+        </td>
+        <td>
+
+        </td>
+    </tr>
 </table>
 <a href="${pageContext.request.contextPath}/delOrderTM/sync3.htm">del</a>
 
 <input type="text" id="code" />
 <a href="#" onclick="spring()">15春新生</a>
 <a href="#" onclick="spring2()">15春剩余新生</a>
+
+
 </body>
 </html>
 <script>

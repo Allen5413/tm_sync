@@ -19,6 +19,7 @@ import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.TempDAO;
 import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
+import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
 import com.zs.dao.sync.FindStudentByCodeDAO;
 import com.zs.dao.temp.SpotOrder15DAO;
 import com.zs.domain.basic.IssueRange;
@@ -93,6 +94,8 @@ public class TempServiceImpl implements TempService {
     private StudentBookOrderDAO studentBookOrderDao;
     @Resource
     private FindStudentByCodeDAO findStudentByCodeDAO;
+    @Resource
+    private StudentBookOrderTmDAO studentBookOrderTmDAO;
 
     //private Map<String, List<String>> map = new HashMap<String, List<String>>();
 //    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
@@ -935,6 +938,50 @@ public class TempServiceImpl implements TempService {
                 }
             }
         }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public void doSync5() {
+        List<StudentBookOrderTM> editStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
+        List<StudentBookOrder> delStudentBookOrderList = new ArrayList<StudentBookOrder>();
+        try{
+            List<String> studentCodeList = tempDAO.findStudentByMoreOrder(2l);
+            int j=0;
+            for(String studentCode : studentCodeList){
+                System.out.println("j:   " + j);
+                j++;
+                List<StudentBookOrder> studentBookOrderList = studentBookOrderDao.findByStudentCodeAndSemesterIdForUnconfirmed(studentCode, 2l);
+                if(null != studentBookOrderList){
+                    int i=0;
+                    String orderCode = "";
+                    for(StudentBookOrder studentBookOrder : studentBookOrderList){
+                        if(i==0){
+                            orderCode = studentBookOrder.getOrderCode();
+                        }else{
+                            //查询订单明细
+                            List<StudentBookOrderTM> studentBookOrderTMList = studentBookOrderTmDAO.findStudentBookOrderTMByOrderCode(studentBookOrder.getOrderCode());
+                            if(null != studentBookOrderTMList && 0 < studentBookOrderTMList.size()){
+                                for(StudentBookOrderTM studentBookOrderTM : studentBookOrderTMList){
+                                    studentBookOrderTM.setOrderCode(orderCode);
+                                    editStudentBookOrderTMList.add(studentBookOrderTM);
+                                }
+                            }
+                            //delStudentBookOrderList.add(studentBookOrder);
+                            studentBookOrderDao.remove(studentBookOrder);
+                        }
+                        i++;
+                    }
+                }
+            }
+
+            batchStudentBookOrderTMDAO.batchUpdate(editStudentBookOrderTMList, 1000);
+            //batchStudentBookOrderDAO.batchDelete(delStudentBookOrderList);
+
+        }catch (Exception e){
             e.printStackTrace();
         }
     }

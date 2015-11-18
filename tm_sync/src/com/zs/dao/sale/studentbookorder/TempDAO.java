@@ -25,4 +25,7 @@ public interface TempDAO extends EntityJpaDao<StudentBookOrder, Long> {
             "group by order_code HAVING (count(*) = 1)) t " +
             "where sbotm.order_code = t.order_code")
     public List<Object> findExistsCourse(String code);
+
+    @Query(nativeQuery = true, value = "select sbo.student_code from student_book_order sbo where sbo.semester_id = ?1 and sbo.state = 0 GROUP BY student_code having(count(*)>1)")
+    public List<String> findStudentByMoreOrder(long semesterId);
 }

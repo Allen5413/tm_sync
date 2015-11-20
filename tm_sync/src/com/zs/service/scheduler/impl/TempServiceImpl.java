@@ -722,6 +722,12 @@ public class TempServiceImpl implements TempService {
                     //查询学生的财务信息
                     StudentExpense studentExpense = findRecordStudentCodeDao.getRecordByStuCode(studentCode, 1l);
                     StudentExpense studentExpense2 = findRecordStudentCodeDao.getRecordByStuCode(studentCode, 2l);
+                    if(null == studentExpense){
+                        studentExpense = new StudentExpense();
+                    }
+                    if(null == studentExpense2){
+                        studentExpense2 = new StudentExpense();
+                    }
                     oldStudentExpense = studentExpense;
                     oldStudentExpense2 = studentExpense2;
 

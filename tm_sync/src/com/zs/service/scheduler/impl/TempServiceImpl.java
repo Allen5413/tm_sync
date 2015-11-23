@@ -5,6 +5,7 @@ import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByNameAndAuthorDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
+import com.zs.dao.basic.teachmaterialstock.FindTeachMaterialStockBytmIdAndChannelIdDAO;
 import com.zs.dao.finance.spotexpense.FindSpotRecordBySpotCodeDao;
 import com.zs.dao.finance.spotexpensebuy.SpotExpenseBuyDao;
 import com.zs.dao.finance.spotexpenseoth.SpotExpenseOthDAO;
@@ -25,6 +26,7 @@ import com.zs.dao.temp.SpotOrder15DAO;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
 import com.zs.domain.basic.TeachMaterial;
+import com.zs.domain.basic.TeachMaterialStock;
 import com.zs.domain.finance.*;
 import com.zs.domain.placeorder.PlaceOrderTeachMaterial;
 import com.zs.domain.placeorder.TeachMaterialPlaceOrder;
@@ -34,6 +36,9 @@ import com.zs.domain.sale.StudentBookOrderTM;
 import com.zs.domain.sync.SelectedCourse;
 import com.zs.domain.sync.Spot;
 import com.zs.domain.sync.Student;
+import com.zs.service.basic.teachmaterial.FindTeachMaterialService;
+import com.zs.service.bean.PlaceOrderDetailShow;
+import com.zs.service.finance.spotexpensebuy.AddSpotExpenseBuyService;
 import com.zs.service.scheduler.TempService;
 import com.zs.tools.DateTools;
 import com.zs.tools.OrderCodeTools;
@@ -96,6 +101,13 @@ public class TempServiceImpl implements TempService {
     private FindStudentByCodeDAO findStudentByCodeDAO;
     @Resource
     private StudentBookOrderTmDAO studentBookOrderTmDAO;
+
+    @Resource
+    private AddSpotExpenseBuyService addSpotExpenseBuyService;
+    @Resource
+    private FindTeachMaterialService findTeachMaterialService;
+    @Resource
+    private FindTeachMaterialStockBytmIdAndChannelIdDAO findTeachMaterialStockBytmIdAndChannelIdDAO;
 
     //private Map<String, List<String>> map = new HashMap<String, List<String>>();
 //    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
@@ -709,11 +721,13 @@ public class TempServiceImpl implements TempService {
         SpotExpense spotExpense = findSpotRecordBySpotCodeDao.getSpotEBySpotCode(spotCode, 1l);
         try{
             if(spotExpense != null && spotExpense.getBuy() > 0) {
-                List<Object[]> list = spotOrder15DAO.findStudent2(spotCode);
-                for (Object[] objs : list) {
+                List<String> list = spotOrder15DAO.findStudent2(spotCode);
+                int i=0;
+                for (String studentCode : list) {
+                    System.out.println("i:    "+i);
+                    i++;
                     StudentExpense oldStudentExpense = null;
                     StudentExpense oldStudentExpense2 = null;
-                    String studentCode = objs[0].toString();
                     //查询学生
                     Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
                     if (null == student) {
@@ -987,6 +1001,110 @@ public class TempServiceImpl implements TempService {
             batchStudentBookOrderTMDAO.batchUpdate(editStudentBookOrderTMList, 1000);
             //batchStudentBookOrderDAO.batchDelete(delStudentBookOrderList);
 
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void doSync6() {
+        try{
+            List<Object[]> list = spotOrder15DAO.getT();
+            for(Object[] result : list){
+                String year = result[5].toString();
+                String quarter = result[6].toString();
+                String specCode = result[3].toString();
+                String levelCode = result[4].toString();
+                String spotCode = result[1].toString();
+                long id = Long.parseLong(result[0].toString());
+                long packageId = Long.parseLong(result[11].toString());
+                boolean isAuto = true;
+                if (StringUtils.isEmpty(year) && StringUtils.isEmpty(quarter) && StringUtils.isEmpty(specCode) && StringUtils.isEmpty(levelCode)) {
+                    isAuto = false;
+                }
+                //查询订单下的明细
+                List<PlaceOrderDetailShow> placeOrderDetailShowList = null;
+                List<Object[]> resultList = spotOrder15DAO.getT2(id);
+                if(null != resultList && 0 < resultList.size()){
+                    placeOrderDetailShowList = new ArrayList<PlaceOrderDetailShow>();
+                    for(Object[] objs : resultList){
+                        PlaceOrderDetailShow placeOrderDetailShow = new PlaceOrderDetailShow();
+                        placeOrderDetailShow.setPlaceOrderDetailId(Long.parseLong(objs[0].toString()));
+                        placeOrderDetailShow.setOrderId(Long.parseLong(objs[1].toString()));
+                        placeOrderDetailShow.setCourseCode(objs[2].toString());
+                        placeOrderDetailShow.setCourseName(objs[3].toString());
+                        placeOrderDetailShow.setMaterialId(Long.parseLong(objs[4].toString()));
+                        placeOrderDetailShow.setMaterialName(objs[5].toString());
+                        placeOrderDetailShow.setMaterialPrice(Float.parseFloat(objs[6].toString()));
+                        placeOrderDetailShow.setCount(Integer.parseInt(objs[7].toString()));
+                        placeOrderDetailShow.setCreator(objs[8].toString());
+                        placeOrderDetailShow.setCreateTime((Date) objs[9]);
+                        placeOrderDetailShow.setPackageId(packageId);
+                        placeOrderDetailShowList.add(placeOrderDetailShow);
+                    }
+                }
+
+
+                if(null != placeOrderDetailShowList && 0 < placeOrderDetailShowList.size()) {
+                    String beforeCourseCode = "";
+                    String beforeCreator = "";
+                    Date beforeCreateTime = null;
+                    for(PlaceOrderDetailShow placeOrderDetailShow : placeOrderDetailShowList) {
+                        //如果是自动生成的预订单，需要把发出去的教材信息记录到预订单明细里面去
+                        if(isAuto){
+                            //这里判断如果一门课程关联了多个教材，那么后面的教材需要新增进来；这里做了课程编号排序，所以可以利用下一个课程编号是否与上一个一样
+                            if(!beforeCourseCode.equals(placeOrderDetailShow.getCourseCode())){
+                                //查询明细
+                                PlaceOrderTeachMaterial placeOrderTeachMaterial = placeOrderTeachMatiralDAO.get(placeOrderDetailShow.getPlaceOrderDetailId());
+                                if(null != placeOrderTeachMaterial){
+                                    placeOrderTeachMaterial.setTeachMaterialId(placeOrderDetailShow.getMaterialId());
+                                    placeOrderTeachMaterial.setTmPrice(placeOrderDetailShow.getMaterialPrice());
+                                    placeOrderTeachMaterial.setOperator("管理员");
+                                    placeOrderTeachMaterial.setOperateTime(DateTools.getLongNowTime());
+                                    placeOrderTeachMatiralDAO.update(placeOrderTeachMaterial);
+                                }
+                            }else {
+                                PlaceOrderTeachMaterial placeOrderTeachMaterial = new PlaceOrderTeachMaterial();
+                                placeOrderTeachMaterial.setOrderId(placeOrderDetailShow.getOrderId());
+                                placeOrderTeachMaterial.setCourseCode(placeOrderDetailShow.getCourseCode());
+                                placeOrderTeachMaterial.setTeachMaterialId(placeOrderDetailShow.getMaterialId());
+                                placeOrderTeachMaterial.setTmPrice(placeOrderDetailShow.getMaterialPrice());
+                                placeOrderTeachMaterial.setCount(Long.parseLong(String.valueOf(placeOrderDetailShow.getCount())));
+                                placeOrderTeachMaterial.setCreator(beforeCreator);
+                                placeOrderTeachMaterial.setCreateTime(beforeCreateTime);
+                                placeOrderTeachMaterial.setOperator("管理员");
+                                placeOrderTeachMaterial.setOperateTime(DateTools.getLongNowTime());
+                                placeOrderTeachMatiralDAO.save(placeOrderTeachMaterial);
+
+                            }
+                            beforeCourseCode = placeOrderDetailShow.getCourseCode();
+                            beforeCreator = placeOrderDetailShow.getCreator();
+                            beforeCreateTime = placeOrderDetailShow.getCreateTime();
+                        }
+
+                        //查询教材信息
+                        TeachMaterial teachMaterial = findTeachMaterialService.get(placeOrderDetailShow.getMaterialId());
+                        if(null != teachMaterial && teachMaterial.getState() == TeachMaterial.STATE_ENABLE && 0 < placeOrderDetailShow.getCount()) {
+                            //记录中心消费信息
+                            SpotExpenseBuy spotExpenseBuy = new SpotExpenseBuy();
+                            spotExpenseBuy.setSpotCode(spotCode);
+                            spotExpenseBuy.setSemesterId(2l);
+                            spotExpenseBuy.setType(SpotExpenseBuy.TYPE_BUY_TM);
+                            spotExpenseBuy.setDetail("购买了" + placeOrderDetailShow.getCount() + "本，[" + teachMaterial.getName() + "] 教材");
+                            spotExpenseBuy.setMoney(placeOrderDetailShow.getMaterialPrice());
+                            addSpotExpenseBuyService.addSpotExpenseBuy(spotExpenseBuy, "管理员");
+
+                                TeachMaterialStock teachMaterialStock = findTeachMaterialStockBytmIdAndChannelIdDAO.getTeachMaterialStockBytmIdAndChannelId(teachMaterial.getId(), 1l);
+                                if(null != teachMaterialStock) {
+                                    teachMaterialStock.setStock(teachMaterialStock.getStock() - placeOrderDetailShow.getCount());
+                                    findTeachMaterialStockBytmIdAndChannelIdDAO.update(teachMaterialStock);
+                                }
+
+                        }
+                    }
+                }
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

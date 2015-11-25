@@ -43,9 +43,4 @@ public class DelOrderTMController extends LoggerController {
     public void sync5(){
         tempService.doSync5();
     }
-
-    @RequestMapping(value = "sync6")
-    public void sync6(){
-        tempService.doSync6();
-    }
 }

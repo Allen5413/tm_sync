@@ -40,20 +40,4 @@ public interface SpotOrder15DAO extends EntityJpaDao<Student, Long> {
 
     @Query(nativeQuery = true, value = "SELECT course_code, name, author, price FROM student_order15_2 where student_code = ?1")
     public List<Object[]> findStudent2ByStudentCode(String studentCode);
-
-    @Query(nativeQuery = true, value ="SELECT DISTINCT tmpo.* FROM teach_material_place_order tmpo, place_order_teach_material potm where tmpo.id = potm.order_id and tmpo.semester_id = 2 and tmpo.order_status > '3' " +
-            "and (potm.count is null or potm.tm_price is null)")
-    public List<Object[]> getT();
-
-    @Query(nativeQuery = true, value = "select t.* FROM " +
-            "(SELECT potm.id, potm.order_id, c.code AS courseCode, c.name AS courseName, tm.id AS tmId, tm.name AS tmName, tm.price, potm.count, potm.creator, potm.create_time " +
-            "FROM place_order_teach_material potm, teach_material tm, teach_material_course tmc, sync_course c " +
-            "WHERE potm.course_code = tmc.course_code AND tmc.teach_material_id = tm.id AND tmc.course_code = c.code " +
-            "AND tm.state = 0 AND potm.order_id = ?1 " +
-            "UNION ALL " +
-            "SELECT potm.id, potm.order_id, c.code AS courseCode, c.name AS courseName, tm.id AS tmId, tm.name AS tmName, tm.price, potm.count, potm.creator, potm.create_time " +
-            "FROM place_order_teach_material potm, teach_material tm, set_teach_material stm, set_teach_material_tm stmtm, sync_course c " +
-            "WHERE potm.course_code = stm.buy_course_code AND stm.id = stmtm.set_teach_material_id AND stmtm.teach_material_id = tm.id " +
-            "AND stm.buy_course_code = c.code AND tm.state = 0 AND potm.order_id = ?1) t ")
-    public List<Object[]> getT2(long orderId);
 }

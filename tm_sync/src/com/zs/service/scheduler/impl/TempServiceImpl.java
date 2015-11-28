@@ -746,29 +746,36 @@ public class TempServiceImpl implements TempService {
                     List<Object[]> list2 = spotOrder15DAO.findStudent2ByStudentCode(studentCode);
 
                     if(null != list2 && list2.size() > 0){
-                        //得到当前学期最大的订单号
-                        int num = 0;
-                        StudentBookOrder maxCodeStudentBookOrder = findStudentBookOrderForMaxCodeDAO.getStudentBookOrderForMaxCode(1l);
-                        if (null != maxCodeStudentBookOrder) {
-                            String maxOrderCode = maxCodeStudentBookOrder.getOrderCode();
-                            num = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length() - 6, maxOrderCode.length()));
+                        StudentBookOrder studentBookOrder = null;
+                        //查询该学生上学期有没有订单，没有就新建一个
+                        List<StudentBookOrder> oldStudentBookOrderList = studentBookOrderDao.findByStudentCodeAndSemesterId(studentCode, 1l);
+                        if(null != oldStudentBookOrderList && 0 < oldStudentBookOrderList.size()){
+                            studentBookOrder = oldStudentBookOrderList.get(0);
                         }
-                        //生成学生订单号
-                        String orderCode = OrderCodeTools.createStudentOrderCodeAuto(2015, 0, num + addStudentBookOrderList.size() + 1);
-                        //添加订单信息
-                        StudentBookOrder studentBookOrder = new StudentBookOrder();
-                        studentBookOrder.setSemesterId(1l);
-                        studentBookOrder.setIssueChannelId(1l);
-                        studentBookOrder.setOrderCode(orderCode);
-                        studentBookOrder.setStudentCode(studentCode);
-                        studentBookOrder.setState(StudentBookOrder.STATE_SIGN);
-                        studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
-                        studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
-                        studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
-                        studentBookOrder.setCreator("管理员");
-                        studentBookOrder.setOperator("管理员");
-                        addStudentBookOrderList.add(studentBookOrder);
-
+                        if(null == studentBookOrder) {
+                            //得到当前学期最大的订单号
+                            int num = 0;
+                            StudentBookOrder maxCodeStudentBookOrder = findStudentBookOrderForMaxCodeDAO.getStudentBookOrderForMaxCode(1l);
+                            if (null != maxCodeStudentBookOrder) {
+                                String maxOrderCode = maxCodeStudentBookOrder.getOrderCode();
+                                num = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length() - 6, maxOrderCode.length()));
+                            }
+                            //生成学生订单号
+                            String orderCode = OrderCodeTools.createStudentOrderCodeAuto(2015, 0, num + addStudentBookOrderList.size() + 1);
+                            //添加订单信息
+                            studentBookOrder = new StudentBookOrder();
+                            studentBookOrder.setSemesterId(1l);
+                            studentBookOrder.setIssueChannelId(1l);
+                            studentBookOrder.setOrderCode(orderCode);
+                            studentBookOrder.setStudentCode(studentCode);
+                            studentBookOrder.setState(StudentBookOrder.STATE_SIGN);
+                            studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
+                            studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
+                            studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
+                            studentBookOrder.setCreator("管理员");
+                            studentBookOrder.setOperator("管理员");
+                            addStudentBookOrderList.add(studentBookOrder);
+                        }
 
                         double totalPrice = 0;
                         for(Object[] objs2 : list2){
@@ -780,7 +787,7 @@ public class TempServiceImpl implements TempService {
                             List<TeachMaterial> teachMaterialList = findTeachMaterialByNameAndAuthorDAO.find(name, author);
 
                             StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                            studentBookOrderTM.setOrderCode(orderCode);
+                            studentBookOrderTM.setOrderCode(studentBookOrder.getOrderCode());
                             studentBookOrderTM.setCourseCode(courseCode);
                             studentBookOrderTM.setTeachMaterialId(teachMaterialList.get(0).getId());
                             studentBookOrderTM.setPrice(Float.parseFloat(price + ""));
@@ -958,6 +965,14 @@ public class TempServiceImpl implements TempService {
                     }
                 }
             }
+
+            //批量提交数据
+            if (null != addStudentBookOrderList && 0 < addStudentBookOrderList.size()) {
+                batchStudentBookOrderDAO.batchAdd(addStudentBookOrderList, 1000);
+            }
+            if (null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()) {
+                batchStudentBookOrderTMDAO.batchAdd(addStudentBookOrderTMList, 1000);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -1005,6 +1020,12 @@ public class TempServiceImpl implements TempService {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    @Transactional
+    public void doSync6() {
+
     }
 
 }

@@ -54,7 +54,7 @@
     </tr>
 </table>
 
-<a href="${pageContext.request.contextPath}/delOrderTM/sync3.htm">del</a>
+<a href="${pageContext.request.contextPath}/delOrderTM/sync6.htm">del</a>
 
 <input type="text" id="code" />
 <a href="#" onclick="spring()">15春新生</a>

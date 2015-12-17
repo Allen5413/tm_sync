@@ -11,6 +11,7 @@
     <tr>
         <th>同步</th>
         <th>快递</th>
+        <th>重置</th>
     </tr>
     <tr>
         <td>
@@ -18,6 +19,9 @@
         </td>
         <td>
             <a href="${pageContext.request.contextPath}/kuaidiPush/open.htm">模拟快递100推送</a>
+        </td>
+        <td>
+            <a href="#" onclick="setStudentPayForSpotCode()">重置中心学生缴费</a>
         </td>
     </tr>
     <tr>
@@ -72,5 +76,10 @@
     function spring2(){
         var code = $("#code").val();
         location.href = "${pageContext.request.contextPath}/delOrderTM/sync4.htm?code="+code
+    }
+
+    function setStudentPayForSpotCode(){
+        var code = $("#code").val();
+        location.href = "${pageContext.request.contextPath}/setStudentPayForSpotCode/set.htm?spotCode="+code
     }
 </script>

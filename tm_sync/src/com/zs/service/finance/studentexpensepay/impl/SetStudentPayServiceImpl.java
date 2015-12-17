@@ -46,7 +46,7 @@ public class SetStudentPayServiceImpl extends EntityServiceImpl implements SetSt
                             }else {
                                 studentExpense.setPay(new BigDecimal(buy).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                             }
-                            if(studentExpense.getState() == StudentExpense.STATE_NO){
+                            if(null == studentExpense.getState() || studentExpense.getState() == StudentExpense.STATE_NO){
                                 studentExpense.setState(StudentExpense.STATE_YES);
                             }
                             if(studentExpense.getClearTime() == null){

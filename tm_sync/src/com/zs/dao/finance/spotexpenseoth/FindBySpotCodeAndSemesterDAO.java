@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface FindBySpotCodeAndSemesterDAO extends EntityJpaDao<SpotExpenseOth, Long> {
     @Query("from SpotExpenseOth where spotCode = ?1 and semesterId = ?2")
-    public SpotExpenseOth findBySpotCodeAndSemester(String studentCode, long semesterId);
+    public SpotExpenseOth findBySpotCodeAndSemester(String spotCode, long semesterId);
 }

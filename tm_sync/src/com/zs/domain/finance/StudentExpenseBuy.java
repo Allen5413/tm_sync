@@ -24,6 +24,7 @@ public class StudentExpenseBuy extends AbstractEntity {
     private String detail;          //消费说明
     private String creator;         //创建人
     private Date createTime = new Date();        //创建时间
+    private Long teachMaterialId;               //教材id
     private Semester semester;
 
 
@@ -95,7 +96,12 @@ public class StudentExpenseBuy extends AbstractEntity {
 		this.semester = semester;
 	}
 
-	
-    
-    
+
+    public Long getTeachMaterialId() {
+        return teachMaterialId;
+    }
+
+    public void setTeachMaterialId(Long teachMaterialId) {
+        this.teachMaterialId = teachMaterialId;
+    }
 }

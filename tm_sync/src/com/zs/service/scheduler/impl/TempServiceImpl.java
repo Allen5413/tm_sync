@@ -725,7 +725,6 @@ public class TempServiceImpl implements TempService {
                     i++;
                     StudentExpense oldStudentExpense = null;
                     StudentExpense oldStudentExpense2 = null;
-                    StudentExpense oldStudentExpense3 = null;
                     //查询学生
                     Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
                     if (null == student) {
@@ -734,19 +733,14 @@ public class TempServiceImpl implements TempService {
                     //查询学生的财务信息
                     StudentExpense studentExpense = findRecordStudentCodeDao.getRecordByStuCode(studentCode, 1l);
                     StudentExpense studentExpense2 = findRecordStudentCodeDao.getRecordByStuCode(studentCode, 2l);
-                    StudentExpense studentExpense3 = findRecordStudentCodeDao.getRecordByStuCode(studentCode, 3l);
                     if(null == studentExpense){
                         studentExpense = new StudentExpense();
                     }
                     if(null == studentExpense2){
                         studentExpense2 = new StudentExpense();
                     }
-                    if(null == studentExpense3){
-                        studentExpense3 = new StudentExpense();
-                    }
                     oldStudentExpense = studentExpense;
                     oldStudentExpense2 = studentExpense2;
-                    oldStudentExpense3 = studentExpense3;
 
                     //查学生购书信息
                     List<Object[]> list2 = spotOrder15DAO.findStudent2ByStudentCode(studentCode);

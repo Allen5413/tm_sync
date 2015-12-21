@@ -23,6 +23,7 @@ public class SpotExpenseBuy extends AbstractEntity{
     private Long semesterId;             //学期id
     private String detail;          //消费明细
     private String creator;         //创建人
+    private Long teachMaterialId;       //教材id
     private Date createTime = new Date();        //创建时间
 
     @Id
@@ -90,5 +91,13 @@ public class SpotExpenseBuy extends AbstractEntity{
 
     public void setSemesterId(Long semesterId) {
         this.semesterId = semesterId;
+    }
+
+    public Long getTeachMaterialId() {
+        return teachMaterialId;
+    }
+
+    public void setTeachMaterialId(Long teachMaterialId) {
+        this.teachMaterialId = teachMaterialId;
     }
 }

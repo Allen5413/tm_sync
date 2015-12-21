@@ -42,7 +42,7 @@
 	<!-- 检查当前学期学生订单明细没有记录到学生财务信息  每天1:30分执行-->
 	<task:scheduler id="checkLeaveOutStudentOrderTMScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="checkLeaveOutStudentOrderTMScheduler">
-		<task:scheduled ref="checkLeaveOutStudentOrderTMService" method="check" cron="0 58 10 * * ?"/>
+		<task:scheduled ref="checkLeaveOutStudentOrderTMService" method="check" cron="0 33 14 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 检查还没有签收的订单的快递信息定时器 END-->
 	<!-- 检查还没有签收的订单的快递信息信息业务接口 -->

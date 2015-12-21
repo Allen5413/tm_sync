@@ -16,6 +16,7 @@ import java.util.Date;
 public class StudentExpenseBuy extends AbstractEntity {
 
     public static final int TYPE_BUY_TM = 0;    //购买教材
+    public static final int TYPE_TM_UPDATE_PRICE = 1;   //教材改价
 
     private Long id;                //主键id
     private String studentCode;     //学生学号

@@ -39,7 +39,7 @@ public interface StudentExpenseBuyDao extends EntityJpaDao<StudentExpenseBuy,Lon
      */
     @Query(nativeQuery = true, value = "select * FROM " +
             "(" +
-            "select sbotm.teach_material_id, sbotm.price, sbotm.count from student_book_order sbo, student_book_order_tm sbotm " +
+            "select sbo.student_code, sbotm.teach_material_id, sbotm.price, sbotm.count from student_book_order sbo, student_book_order_tm sbotm " +
             "where sbo.order_code = sbotm.order_code and sbo.state > 3 and sbotm.count > 0 and sbotm.price > 0 " +
             "and sbo.student_code = ?2 and sbo.semester_id = ?1 " +
             ") t where not EXISTS(" +

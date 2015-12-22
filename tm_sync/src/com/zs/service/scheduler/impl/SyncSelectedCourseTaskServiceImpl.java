@@ -86,6 +86,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
         try {
             //学生新增的选课
             List<SelectedCourseTemp> selectedCourseTempList = selectedCourseTempDAO.findNewSelectedCourse();
+            System.out.println("selectedCourseTempList:   "+selectedCourseTempList.size());
             if (null != selectedCourseTempList && 0 < selectedCourseTempList.size()) {
                 Semester semester = findNowSemesterDAO.getNowSemester();
                 String beforeStudentCode = "";
@@ -187,13 +188,20 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
 
                         }
                     }else{
-                        StudentBookOrderTM beforeStudentBookOrderTM = addStudentBookOrderTMList.get(addStudentBookOrderTMList.size()-1);
+                        String orderCode = "";
+                        if(null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()) {
+                            StudentBookOrderTM beforeStudentBookOrderTM = addStudentBookOrderTMList.get(addStudentBookOrderTMList.size() - 1);
+                            orderCode = beforeStudentBookOrderTM.getOrderCode();
+                        }else{
+                            StudentBookOrder beforeStudentBookOrder = addStudentBookOrderList.get(addStudentBookOrderList.size() - 1);
+                            orderCode = beforeStudentBookOrder.getOrderCode();
+                        }
                         //通过课程查询课程关联的教材
                         List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
                         if(null != teachMaterialList && 0 < teachMaterialList.size()) {
                             for(TeachMaterial teachMaterial : teachMaterialList) {
                                 StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                                studentBookOrderTM.setOrderCode(beforeStudentBookOrderTM.getOrderCode());
+                                studentBookOrderTM.setOrderCode(orderCode);
                                 studentBookOrderTM.setCourseCode(courseCode);
                                 studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
                                 studentBookOrderTM.setPrice(teachMaterial.getPrice());

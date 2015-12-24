@@ -110,6 +110,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                     studentBookOrderTM.setCourseCode(courseCode);
                                     studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
                                     studentBookOrderTM.setPrice(teachMaterial.getPrice());
+                                    studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
                                     studentBookOrderTM.setCount(1);
                                     studentBookOrderTM.setOperator("管理员");
                                     addStudentBookOrderTMList.add(studentBookOrderTM);
@@ -173,6 +174,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                     studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
                                     studentBookOrderTM.setPrice(teachMaterial.getPrice());
                                     studentBookOrderTM.setCount(1);
+                                    studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
                                     studentBookOrderTM.setOperator("管理员");
                                     addStudentBookOrderTMList.add(studentBookOrderTM);
                                 }
@@ -206,6 +208,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                 studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
                                 studentBookOrderTM.setPrice(teachMaterial.getPrice());
                                 studentBookOrderTM.setCount(1);
+                                studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
                                 studentBookOrderTM.setOperator("管理员");
                                 addStudentBookOrderTMList.add(studentBookOrderTM);
                             }

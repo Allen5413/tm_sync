@@ -793,6 +793,7 @@ public class TempServiceImpl implements TempService {
                             studentBookOrderTM.setTeachMaterialId(teachMaterialList.get(0).getId());
                             studentBookOrderTM.setPrice(Float.parseFloat(price + ""));
                             studentBookOrderTM.setCount(1);
+                            studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_YES);
                             studentBookOrderTM.setOperator("管理员");
                             addStudentBookOrderTMList.add(studentBookOrderTM);
 

@@ -13,7 +13,10 @@ import com.feinno.framework.common.domain.AbstractEntity;
 @Entity
 @Table(name = "place_order_teach_material")
 public class PlaceOrderTeachMaterial extends AbstractEntity{
-	
+
+	public static final int IS_SEND_NOT = 0;
+	public static final int IS_SEND_YES = 1;
+
 	//ID
 	private Long id;
 	//预订单ID
@@ -26,6 +29,8 @@ public class PlaceOrderTeachMaterial extends AbstractEntity{
 	private Long count;
 	//教材单价
 	private Float tmPrice;
+	//是否发出
+	private Integer isSend;
 	//创建者
 	private String creator;
 	//创建时间
@@ -106,7 +111,13 @@ public class PlaceOrderTeachMaterial extends AbstractEntity{
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
-	
-	
 
+
+	public Integer getIsSend() {
+		return isSend;
+	}
+
+	public void setIsSend(Integer isSend) {
+		this.isSend = isSend;
+	}
 }

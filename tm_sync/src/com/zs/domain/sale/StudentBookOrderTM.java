@@ -13,12 +13,16 @@ import java.util.Date;
 @Table(name = "student_book_order_tm")
 public class StudentBookOrderTM extends AbstractEntity {
 
+    public static final int IS_SEND_NOT = 0;
+    public static final int IS_SEND_YES = 1;
+
     private Long id;                            //主键
     private String orderCode;                   //订单号
     private String courseCode;                  //课程编号
     private Long teachMaterialId;               //教材id
     private Float price;                        //教材单价
     private Integer count;                      //订购数量
+    private Integer isSend = 0;                 //是否发出
     private String operator;                    //操作人
     private Date operateTime = new Date();      //操作时间
     private Integer version;                    //版本号，用于乐观锁
@@ -96,5 +100,13 @@ public class StudentBookOrderTM extends AbstractEntity {
 
     public void setPrice(Float price) {
         this.price = price;
+    }
+
+    public Integer getIsSend() {
+        return isSend;
+    }
+
+    public void setIsSend(Integer isSend) {
+        this.isSend = isSend;
     }
 }

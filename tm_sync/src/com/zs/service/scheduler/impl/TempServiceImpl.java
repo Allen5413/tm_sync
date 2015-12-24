@@ -106,6 +106,7 @@ public class TempServiceImpl implements TempService {
     @Resource
     private FindByStudentCodeDAO findByStudentCodeDAO;
 
+
     //private Map<String, List<String>> map = new HashMap<String, List<String>>();
 //    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
 //    private List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
@@ -1025,7 +1026,6 @@ public class TempServiceImpl implements TempService {
     @Override
     @Transactional
     public void doSync6() {
-
     }
 
 }

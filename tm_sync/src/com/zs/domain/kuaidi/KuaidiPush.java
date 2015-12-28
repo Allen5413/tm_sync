@@ -13,6 +13,9 @@ import java.util.Date;
 @Table(name = "kuaidi_push")
 public class KuaidiPush extends AbstractEntity {
 
+    public final static int SIGN_NOT = 0;
+    public final static int SIGN_YES = 1;
+
     private Long id;                            //主键
     /**
      * 监控状态
@@ -32,6 +35,7 @@ public class KuaidiPush extends AbstractEntity {
     private String nu;                      //快递单号
     private String data;                    //返回快递结果
     private Date operateTime = new Date();      //操作时间
+    private int sign = 0;                       //标记是否系统定时验证签收[0: 不是； 1：是]
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,5 +101,13 @@ public class KuaidiPush extends AbstractEntity {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    public int getSign() {
+        return sign;
+    }
+
+    public void setSign(int sign) {
+        this.sign = sign;
     }
 }

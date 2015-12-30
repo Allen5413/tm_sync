@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Allen on 2015/10/26.
@@ -82,16 +83,30 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
 
         StringBuilder msg = new StringBuilder(DateTools.getLongNowTime()+": 开始执行学生选课信息同步\r\n");
         String studentCode = "", courseCode = "";
+
         int tempNum = 0;
         try {
             //学生新增的选课
             List<SelectedCourseTemp> selectedCourseTempList = selectedCourseTempDAO.findNewSelectedCourse();
+            List<SelectedCourseTemp> copySelectedCourseTempList = selectedCourseTempList;
             System.out.println("selectedCourseTempList:   "+selectedCourseTempList.size());
             if (null != selectedCourseTempList && 0 < selectedCourseTempList.size()) {
+
+                //去掉课程没有关联教材的数据
+                for (SelectedCourseTemp selectedCourseTemp : copySelectedCourseTempList){
+                    courseCode = selectedCourseTemp.getCourseCode();
+                    List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                    if(null == teachMaterialList || 1 > teachMaterialList.size()){
+                        copySelectedCourseTempList.remove(selectedCourseTemp);
+                    }
+                }
+
+
                 Semester semester = findNowSemesterDAO.getNowSemester();
                 String beforeStudentCode = "";
                 int i=0;
-                for (SelectedCourseTemp selectedCourseTemp : selectedCourseTempList){
+                //生成新选课的订单数据
+                for (SelectedCourseTemp selectedCourseTemp : copySelectedCourseTempList){
                     System.out.println("i: "+i);
                     i++;
                     studentCode = selectedCourseTemp.getStudentCode();
@@ -116,14 +131,6 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                     addStudentBookOrderTMList.add(studentBookOrderTM);
                                 }
                             }
-                            //把新选的课程添加进表
-                            SelectedCourse selectedCourse = new SelectedCourse();
-                            selectedCourse.setSemesterId(semester.getId());
-                            selectedCourse.setStudentCode(studentCode);
-                            selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
-                            selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                            detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
-                            addSelectCourseList.add(selectedCourse);
                         }else{
                             //查询学生信息
                             Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
@@ -179,25 +186,11 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                     addStudentBookOrderTMList.add(studentBookOrderTM);
                                 }
                             }
-                            //把新选的课程添加进表
-                            SelectedCourse selectedCourse = new SelectedCourse();
-                            selectedCourse.setSemesterId(semester.getId());
-                            selectedCourse.setStudentCode(studentCode);
-                            selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
-                            selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                            detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
-                            addSelectCourseList.add(selectedCourse);
-
                         }
                     }else{
-                        String orderCode = "";
-                        if(null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()) {
-                            StudentBookOrderTM beforeStudentBookOrderTM = addStudentBookOrderTMList.get(addStudentBookOrderTMList.size() - 1);
-                            orderCode = beforeStudentBookOrderTM.getOrderCode();
-                        }else{
-                            StudentBookOrder beforeStudentBookOrder = addStudentBookOrderList.get(addStudentBookOrderList.size() - 1);
-                            orderCode = beforeStudentBookOrder.getOrderCode();
-                        }
+                        StudentBookOrderTM beforeStudentBookOrderTM = addStudentBookOrderTMList.get(addStudentBookOrderTMList.size() - 1);
+                        String orderCode = beforeStudentBookOrderTM.getOrderCode();
+
                         //通过课程查询课程关联的教材
                         List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
                         if(null != teachMaterialList && 0 < teachMaterialList.size()) {
@@ -213,17 +206,21 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                 addStudentBookOrderTMList.add(studentBookOrderTM);
                             }
                         }
-                        //把新选的课程添加进表
-                        SelectedCourse selectedCourse = new SelectedCourse();
-                        selectedCourse.setSemesterId(semester.getId());
-                        selectedCourse.setStudentCode(studentCode);
-                        selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
-                        selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                        detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
-                        addSelectCourseList.add(selectedCourse);
                     }
                     beforeStudentCode = selectedCourseTemp.getStudentCode();
                     tempNum++;
+                }
+
+                //添加新的选课信息进选课表
+                for (SelectedCourseTemp selectedCourseTemp : selectedCourseTempList){
+                    //把新选的课程添加进表
+                    SelectedCourse selectedCourse = new SelectedCourse();
+                    selectedCourse.setSemesterId(semester.getId());
+                    selectedCourse.setStudentCode(studentCode);
+                    selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
+                    selectedCourse.setOperateTime(DateTools.getLongNowTime());
+                    detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
+                    addSelectCourseList.add(selectedCourse);
                 }
 
                 //批量提交数据

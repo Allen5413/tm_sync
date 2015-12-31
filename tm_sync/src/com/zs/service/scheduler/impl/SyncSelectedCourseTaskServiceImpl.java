@@ -34,6 +34,7 @@ import javax.annotation.Resource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,21 +85,30 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
         StringBuilder msg = new StringBuilder(DateTools.getLongNowTime()+": 开始执行学生选课信息同步\r\n");
         String studentCode = "", courseCode = "";
 
+        Map<String, List<TeachMaterial>> courseTMMap = new HashMap<String, List<TeachMaterial>>();
+
         int tempNum = 0;
         try {
             //学生新增的选课
             List<SelectedCourseTemp> selectedCourseTempList = selectedCourseTempDAO.findNewSelectedCourse();
-            List<SelectedCourseTemp> copySelectedCourseTempList = selectedCourseTempList;
+            List<SelectedCourseTemp> copySelectedCourseTempList = new ArrayList<SelectedCourseTemp>();
             System.out.println("selectedCourseTempList:   "+selectedCourseTempList.size());
             if (null != selectedCourseTempList && 0 < selectedCourseTempList.size()) {
 
                 //去掉课程没有关联教材的数据
-                for (SelectedCourseTemp selectedCourseTemp : copySelectedCourseTempList){
+                int j=0;
+                for (SelectedCourseTemp selectedCourseTemp : selectedCourseTempList){
+                    System.out.println("j:   "+j);
                     courseCode = selectedCourseTemp.getCourseCode();
-                    List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
-                    if(null == teachMaterialList || 1 > teachMaterialList.size()){
-                        copySelectedCourseTempList.remove(selectedCourseTemp);
+                    List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                    if(null == teachMaterialList){
+                        teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                        courseTMMap.put(courseCode, null == teachMaterialList ? new ArrayList<TeachMaterial>(0) : teachMaterialList);
                     }
+                    if(null != teachMaterialList && 0 < teachMaterialList.size()){
+                        copySelectedCourseTempList.add(selectedCourseTemp);
+                    }
+                    j++;
                 }
 
 
@@ -108,6 +118,9 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                 //生成新选课的订单数据
                 for (SelectedCourseTemp selectedCourseTemp : copySelectedCourseTempList){
                     System.out.println("i: "+i);
+                    if(i > 100000){
+                        break;
+                    }
                     i++;
                     studentCode = selectedCourseTemp.getStudentCode();
                     courseCode = selectedCourseTemp.getCourseCode();
@@ -117,7 +130,11 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                         if(null != studentBookOrderList && 0 < studentBookOrderList.size()){
                             StudentBookOrder studentBookOrder = studentBookOrderList.get(0);
                             //通过课程查询课程关联的教材
-                            List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                            List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                            if(null == teachMaterialList || 1 > teachMaterialList.size()){
+                                teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                                courseTMMap.put(courseCode, teachMaterialList);
+                            }
                             if (null != teachMaterialList && 0 < teachMaterialList.size()) {
                                 for (TeachMaterial teachMaterial : teachMaterialList) {
                                     StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
@@ -172,7 +189,11 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                             addStudentBookOrderLogList.add(studentBookOrderLog);
 
                             //通过课程查询课程关联的教材
-                            List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                            List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                            if(null == teachMaterialList || 1 > teachMaterialList.size()){
+                                teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                                courseTMMap.put(courseCode, teachMaterialList);
+                            }
                             if(null != teachMaterialList && 0 < teachMaterialList.size()) {
                                 for(TeachMaterial teachMaterial : teachMaterialList) {
                                     StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
@@ -192,7 +213,11 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                         String orderCode = beforeStudentBookOrderTM.getOrderCode();
 
                         //通过课程查询课程关联的教材
-                        List<TeachMaterial> teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                        List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                        if(null == teachMaterialList || 1 > teachMaterialList.size()){
+                            teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                            courseTMMap.put(courseCode, teachMaterialList);
+                        }
                         if(null != teachMaterialList && 0 < teachMaterialList.size()) {
                             for(TeachMaterial teachMaterial : teachMaterialList) {
                                 StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
@@ -212,7 +237,9 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                 }
 
                 //添加新的选课信息进选课表
+                int k=0;
                 for (SelectedCourseTemp selectedCourseTemp : selectedCourseTempList){
+                    System.out.println("k:   "+k);
                     //把新选的课程添加进表
                     SelectedCourse selectedCourse = new SelectedCourse();
                     selectedCourse.setSemesterId(semester.getId());
@@ -221,6 +248,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                     selectedCourse.setOperateTime(DateTools.getLongNowTime());
                     detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
                     addSelectCourseList.add(selectedCourse);
+                    k++;
                 }
 
                 //批量提交数据

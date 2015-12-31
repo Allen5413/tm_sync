@@ -118,9 +118,6 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                 //生成新选课的订单数据
                 for (SelectedCourseTemp selectedCourseTemp : copySelectedCourseTempList){
                     System.out.println("i: "+i);
-                    if(i > 100000){
-                        break;
-                    }
                     i++;
                     studentCode = selectedCourseTemp.getStudentCode();
                     courseCode = selectedCourseTemp.getCourseCode();

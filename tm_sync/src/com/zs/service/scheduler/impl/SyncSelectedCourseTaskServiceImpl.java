@@ -240,10 +240,10 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                     //把新选的课程添加进表
                     SelectedCourse selectedCourse = new SelectedCourse();
                     selectedCourse.setSemesterId(semester.getId());
-                    selectedCourse.setStudentCode(studentCode);
+                    selectedCourse.setStudentCode(selectedCourseTemp.getStudentCode());
                     selectedCourse.setCourseCode(selectedCourseTemp.getCourseCode());
                     selectedCourse.setOperateTime(DateTools.getLongNowTime());
-                    detail += "学号："+studentCode+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
+                    detail += "学号："+selectedCourseTemp.getStudentCode()+", 新增选课["+selectedCourseTemp.getCourseCode()+"]。\r\n";
                     addSelectCourseList.add(selectedCourse);
                     k++;
                 }

@@ -75,6 +75,7 @@ public class SyncNotSignKuaidiTaskServiceImpl implements SyncNotSignKuaidiTaskSe
                         addPushService.editOrderState(nu);
                     }
                     kuaidiPush.setSign(KuaidiPush.SIGN_YES);
+                    kuaidiPushDAO.update(kuaidiPush);
                 }
             }
         }catch (Exception e){

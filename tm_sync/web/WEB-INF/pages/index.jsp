@@ -12,6 +12,7 @@
         <th>同步</th>
         <th>快递</th>
         <th>重置</th>
+        <th>奥鹏</th>
     </tr>
     <tr>
         <td>
@@ -22,6 +23,10 @@
         </td>
         <td>
             <a href="#" onclick="setStudentPayForSpotCode()">重置中心学生缴费</a>
+        </td>
+        <td>
+            学期id：<input type="text" id="semesterId" />
+            <a href="#" onclick="addAoPengOrder()">添加订单</a>
         </td>
     </tr>
     <tr>
@@ -81,5 +86,10 @@
     function setStudentPayForSpotCode(){
         var code = $("#code").val();
         location.href = "${pageContext.request.contextPath}/setStudentPayForSpotCode/set.htm?spotCode="+code
+    }
+
+    function addAoPengOrder(){
+        var semesterId = $("#semesterId").val();
+        location.href = "${pageContext.request.contextPath}/addAoPengOrder/add.htm?semesterId="+semesterId
     }
 </script>

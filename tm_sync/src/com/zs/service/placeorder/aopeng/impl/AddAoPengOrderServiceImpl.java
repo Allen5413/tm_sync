@@ -141,6 +141,11 @@ public class AddAoPengOrderServiceImpl extends EntityServiceImpl<TeachMaterialPl
                     spotExpense.setOperator("管理员");
                     spotExpense.setSemesterId(spotExpenseBuy.getSemesterId());
                     spotExpense.setState(SpotExpense.STATE_NO);
+                    if(spotCode.equals("9989")){
+                        spotExpense.setDiscount(100);
+                    }else{
+                        spotExpense.setDiscount(95);
+                    }
                     findSpotRecordBySpotCodeDao.save(spotExpense);
                 }else {
                     SpotExpense spotExpense = spotExpenseList.get(0);

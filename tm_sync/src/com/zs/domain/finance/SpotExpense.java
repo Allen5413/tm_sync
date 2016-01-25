@@ -29,6 +29,7 @@ public class SpotExpense extends AbstractEntity {
     private Date operateTime = new Date();   //操作时间
     private Date clearTime;    //结清时间
     private Integer version;        //版本号
+    private Integer discount;       //折扣（默认是100，不打折）
 
 
     @Id
@@ -136,5 +137,13 @@ public class SpotExpense extends AbstractEntity {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
     }
 }

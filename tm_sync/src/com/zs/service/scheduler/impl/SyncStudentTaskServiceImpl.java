@@ -386,25 +386,34 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             isUpdate = true;
                         }
                         //类型
-                        if (1 == studentTemp.getType() && 3 != student.getType()) {
+                        if ("H".equals(studentTemp.getType()) && 3 != student.getType()) {
                             detail += "类型由 ";
                             if(0 == student.getType()){
                                 detail += "普通";
                             }
                             if(1 == student.getType()){
-                                detail += "免试";
+                                detail += "自考";
                             }
                             if(2 == student.getType()){
                                 detail += "课程";
                             }
                             if(4 == student.getType()){
                                 detail += "业余";
+                            }
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
                             }
                             detail += " 改为 函授、 ";
                             student.setType(3);
                             isUpdate = true;
                         }
-                        if (2 == studentTemp.getType() && 4 != student.getType()) {
+                        if ("Y".equals(studentTemp.getType()) && 4 != student.getType()) {
                             detail += "类型由 ";
                             if(0 == student.getType()){
                                 detail += "普通";
@@ -417,12 +426,21 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             }
                             if(3 == student.getType()){
                                 detail += "函授";
+                            }
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
                             }
                             detail += " 改为 业余、 ";
                             student.setType(4);
                             isUpdate = true;
                         }
-                        if (26 == studentTemp.getType() && 0 != student.getType()) {
+                        if ("W".equals(studentTemp.getType()) && 0 != student.getType()) {
                             detail += "类型由 ";
                             if(4 == student.getType()){
                                 detail += "业余";
@@ -436,11 +454,20 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             if(3 == student.getType()){
                                 detail += "函授";
                             }
-                            detail += " 改为 普通、 ";
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
+                            }
+                            detail += " 改为 网教、 ";
                             student.setType(0);
                             isUpdate = true;
                         }
-                        if (27 == studentTemp.getType() && 1 != student.getType()) {
+                        if ("Z".equals(studentTemp.getType()) && 1 != student.getType()) {
                             detail += "类型由 ";
                             if(4 == student.getType()){
                                 detail += "业余";
@@ -453,12 +480,21 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             }
                             if(3 == student.getType()){
                                 detail += "函授";
+                            }
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
                             }
                             detail += " 改为 免试、 ";
                             student.setType(1);
                             isUpdate = true;
                         }
-                        if (67 == studentTemp.getType() && 2 != student.getType()) {
+                        if ("K".equals(studentTemp.getType()) && 2 != student.getType()) {
                             detail += "类型由 ";
                             if(4 == student.getType()){
                                 detail += "业余";
@@ -472,8 +508,99 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             if(3 == student.getType()){
                                 detail += "函授";
                             }
-                            detail += " 改为 课程、 ";
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
+                            }
+                            detail += " 改为 课程进修生、 ";
                             student.setType(2);
+                            isUpdate = true;
+                        }
+
+                        if ("B".equals(studentTemp.getType()) && 5 != student.getType()) {
+                            detail += "类型由 ";
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程进修生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
+                            }
+                            detail += " 改为 本科生、 ";
+                            student.setType(5);
+                            isUpdate = true;
+                        }
+                        if ("J".equals(studentTemp.getType()) && 6 != student.getType()) {
+                            detail += "类型由 ";
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程进修生";
+                            }
+                            if(7 == student.getType()){
+                                detail += "培训生";
+                            }
+                            detail += " 改为 研究生、 ";
+                            student.setType(6);
+                            isUpdate = true;
+                        }
+                        if ("P".equals(studentTemp.getType()) && 7 != student.getType()) {
+                            detail += "类型由 ";
+                            if(4 == student.getType()){
+                                detail += "业余";
+                            }
+                            if(0 == student.getType()){
+                                detail += "普通";
+                            }
+                            if(1 == student.getType()){
+                                detail += "免试";
+                            }
+                            if(3 == student.getType()){
+                                detail += "函授";
+                            }
+                            if(5 == student.getType()){
+                                detail += "本科生";
+                            }
+                            if(6 == student.getType()){
+                                detail += "研究生";
+                            }
+                            if(2 == student.getType()){
+                                detail += "课程进修生";
+                            }
+                            detail += " 改为 培训生、 ";
+                            student.setType(7);
                             isUpdate = true;
                         }
                         //状态
@@ -567,15 +694,14 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             student.setState(4);
                             isUpdate = true;
                         }
-
                         if (isUpdate) {
                             detail += "信息发生变更。\r\n";
                             if(isChangeSpot){
                                 this.updateStudentSpotExpense(oldSpotCode, student.getSpotCode(), student.getCode(), addSpotExpenseOthList, editSpotExpenseOthList);
+                                Timestamp operateTime = DateTools.getLongNowTime();
+                                String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
+                                student.setChangeSpotDetail((null == student.getChangeSpotDetail() ? "" : student.getChangeSpotDetail())+changeSpotDetail);
                             }
-                            Timestamp operateTime = DateTools.getLongNowTime();
-                            String changeSpotDetail = operateTime.toString()+", 由"+oldSpotCode+"中心转到"+student.getSpotCode()+"中心；";
-                            student.setChangeSpotDetail((null == student.getChangeSpotDetail() ? "" : student.getChangeSpotDetail())+changeSpotDetail);
                             editStudentList.add(student);
                         }else{
                             detail = "";
@@ -624,19 +750,28 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                     student.setSpotCode(studentTemp.getSpotCode());
                     student.setSpecCode(studentTemp.getSpecCode());
                     student.setLevelCode(studentTemp.getLevelCode());
-                    if (1 == studentTemp.getType()) {
-                        student.setType(3);
-                    }
-                    if (2 == studentTemp.getType()) {
-                        student.setType(4);
-                    }
-                    if (26 == studentTemp.getType()) {
+                    if ("W".equals(studentTemp.getType())) {
                         student.setType(0);
                     }
-                    if (27 == studentTemp.getType()) {
+                    if ("H".equals(studentTemp.getType())) {
+                        student.setType(3);
+                    }
+                    if ("Y".equals(studentTemp.getType())) {
+                        student.setType(4);
+                    }
+                    if ("Z".equals(studentTemp.getType())) {
                         student.setType(1);
                     }
-                    if (67 == studentTemp.getType()) {
+                    if ("B".equals(studentTemp.getType())) {
+                        student.setType(5);
+                    }
+                    if ("J".equals(studentTemp.getType())) {
+                        student.setType(6);
+                    }
+                    if ("P".equals(studentTemp.getType())) {
+                        student.setType(7);
+                    }
+                    if ("K".equals(studentTemp.getType())) {
                         student.setType(2);
                     }
                     if (53 == studentTemp.getState()) {
@@ -863,7 +998,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             student.setSpotCode(null != obj[33] ? obj[33].toString() : null);
             student.setSpecCode(null != obj[34] ? obj[34].toString() : null);
             student.setLevelCode(null != obj[35] ? obj[35].toString() : null);
-            student.setType(null != obj[36] ? Integer.parseInt(obj[36].toString()) : null);
+            student.setType(null != obj[36] ? obj[36].toString() : null);
             student.setState(null != obj[37] ? Integer.parseInt(obj[37].toString()) : null);
             student.setEnterYear(null != obj[38] ? Integer.parseInt(obj[38].toString()) : null);
             student.setQuarter(null != obj[39] ? Integer.parseInt(obj[39].toString()) : null);
@@ -886,7 +1021,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
             student.setSpotCode(null != obj[12] ? obj[12].toString() : null);
             student.setSpecCode(null != obj[13] ? obj[13].toString() : null);
             student.setLevelCode(null != obj[14] ? obj[14].toString() : null);
-            student.setType(null != obj[15] ? Integer.parseInt(obj[15].toString()) : null);
+            student.setType(null != obj[15] ? obj[15].toString() : null);
             student.setState(null != obj[16] ? Integer.parseInt(obj[16].toString()) : null);
             student.setEnterYear(null != obj[17] ? Integer.parseInt(obj[17].toString()) : null);
             student.setQuarter(null != obj[18] ? Integer.parseInt(obj[18].toString()) : null);

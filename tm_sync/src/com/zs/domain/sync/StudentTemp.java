@@ -16,8 +16,8 @@ public class StudentTemp extends AbstractEntity {
     public static final int SPRING = 0; //春季
     public static final int AUTUMN = 1; //秋季
 
-    public static final int SEX_MAN = 12;    //男
-    public static final int SEX_FEMALE = 11; //女
+    public static final int SEX_MAN = 1;    //男
+    public static final int SEX_FEMALE = 2; //女
 
     public static final int IDCARD_TYPE_OTHER = 184;
     public static final int IDCARD_TYPE_IDCARD = 180;
@@ -29,7 +29,7 @@ public class StudentTemp extends AbstractEntity {
     private Long id;                    //主键
     private String code;                //学号
     private String name;                //姓名
-    private Integer sex;                //性别[网院：11--女 12--男。   教材：0：男；1：女]
+    private Integer sex;                //性别[网院：2--女 1--男。   教材：0：男；1：女]
     private Integer idcardType;         //证件类型[网院：180--身份证 181--军官证 182--护照 183--港、澳、台居民证件 184--其他。   教材：0--其他  1--身份证 2--军官证 3--护照 4--港、澳、台居民证件]
     private String idcardNo;            //证件号码
     private String postalCode;          //邮编
@@ -41,7 +41,7 @@ public class StudentTemp extends AbstractEntity {
     private String spotCode;            //学习中心编号
     private String specCode;            //报考专业
     private String levelCode;           //报考层次
-    private Integer type;               //学生类型[网院(StudentType): 1--函授 2--业余 26--普通学生 27--免试生 67--课程学习生。  教材：0--普通学生 1--免试生 2--程学习生 3--函授 4--业余]
+    private String type;                //学生类型[网院(StudentType): H--函授 Y--业余 W--网教 Z--自考 B--本科生 J--研究生 P--培训生 K--课程学习生。  教材：0--网教 1--自考 2--程学习生 3--函授 4--业余 5--本科生 6--研究生 7--培训生]
     private Integer state;              //学生状态[网院(StudyState)：53--停生 77--休学 78--退学 54--在籍学生  55--已毕业学.  教材：0--在籍学生 1--停生 2--休学 3--退学 4--已毕业学.]
     private Integer enterYear;          //入学年
     private Integer quarter;            //入学季
@@ -187,11 +187,11 @@ public class StudentTemp extends AbstractEntity {
         this.levelCode = levelCode;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 

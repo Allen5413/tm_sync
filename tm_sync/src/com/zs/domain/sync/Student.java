@@ -41,7 +41,7 @@ public class Student extends AbstractEntity {
     private String spotCode;            //学习中心编号
     private String specCode;            //报考专业
     private String levelCode;           //报考层次
-    private Integer type;               //学生类型[网院(StudentType): 1--函授 2--业余 26--普通学生 27--免试生 67--程学习生。  教材：0--普通学生 1--免试生 2--程学习生 3--函授 4--业余]
+    private Integer type;               //学生类型[网院(StudentType): H--函授 Y--业余 W--网教 Z--自考 B--本科生 J--研究生 P--培训生 K--课程学习生。  教材：0--网教 1--自考 2--程学习生 3--函授 4--业余 5--本科生 6--研究生 7--培训生]
     private Integer state;              //学生状态[网院(StudyState)：53--停生 77--休学 78--退学 54--在籍学生  55--已毕业学.  教材：0--在籍学生 1--停生 2--休学 3--退学 4--已毕业学.]
     private Integer studyEnterYear;     //学籍入学年
     private Integer studyQuarter;       //学籍入学季

@@ -1,10 +1,12 @@
 package com.zs.service.scheduler.impl;
 
 import com.zs.dao.basic.issuerange.FindIssueRangeBySpotCodeDAO;
+import com.zs.dao.sync.EduwestUserDAO;
 import com.zs.dao.sync.SpotDAO;
 import com.zs.dao.sync.SpotTempDAO;
 import com.zs.dao.sync.SpotProvinceDAO;
 import com.zs.domain.basic.IssueRange;
+import com.zs.domain.sync.EduwestUser;
 import com.zs.domain.sync.Spot;
 import com.zs.domain.sync.SpotProvince;
 import com.zs.domain.sync.SpotTemp;
@@ -34,6 +36,8 @@ public class SyncSpotTaskServiceImpl implements SyncSpotTaskService {
     private SpotProvinceDAO spotProvinceDAO;
     @Resource
     private FindIssueRangeBySpotCodeDAO findIssueRangeBySpotCodeDAO;
+    @Resource
+    private EduwestUserDAO eduwestUserDAO;
 
     //变更信息描述
     private String detail = "";
@@ -136,6 +140,15 @@ public class SyncSpotTaskServiceImpl implements SyncSpotTaskService {
                         issueRange.setIsIssue(IssueRange.ISISSUE_YES);
                         issueRange.setOperator("管理员");
                         findIssueRangeBySpotCodeDAO.save(issueRange);
+                        //增加中心用户
+                        EduwestUser eduwestUser = new EduwestUser();
+                        eduwestUser.setPin("spot"+spotCode);
+                        eduwestUser.setName(spot.getName());
+                        eduwestUser.setType(EduwestUser.TYPE_SPOT);
+                        eduwestUser.setState(EduwestUser.STATE_ENABLE);
+                        eduwestUser.setProvCode(spotTemp.getProvCode());
+                        eduwestUser.setSpotCode(spotCode);
+                        eduwestUserDAO.save(eduwestUser);
 
                         detail += "\r\n中心编号["+spotCode+"]: 为新增中心";
                     }

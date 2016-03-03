@@ -27,6 +27,7 @@ import com.zs.tools.DateTools;
 import com.zs.tools.FileTools;
 import com.zs.tools.OrderCodeTools;
 import com.zs.tools.PropertiesTools;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -298,6 +299,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
         if(null != teachMaterialList3 && 0 < teachMaterialList3.size()){
             teachMaterialList.addAll(teachMaterialList3);
         }
+
         return teachMaterialList;
     }
 }

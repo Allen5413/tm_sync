@@ -49,9 +49,11 @@ public class SyncNotSignKuaidiTaskServiceImpl implements SyncNotSignKuaidiTaskSe
                             boolean isReqAgain = true;
                             if (null != kuaidiRequestList && 0 < kuaidiRequestList.size()) {
                                 for (KuaidiRequest kuaidiRequest : kuaidiRequestList) {
-                                    if (!"500".equals(kuaidiRequest.getReturnCode())) {
-                                        isReqAgain = false;
-                                        break;
+                                    if(!StringUtils.isEmpty(kuaidiRequest.getReturnCode())){
+                                        if (!"500".equals(kuaidiRequest.getReturnCode())) {
+                                            isReqAgain = false;
+                                            break;
+                                        }
                                     }
                                 }
                             }

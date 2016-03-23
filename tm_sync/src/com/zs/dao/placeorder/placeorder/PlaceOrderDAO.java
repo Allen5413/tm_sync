@@ -8,4 +8,6 @@ public interface PlaceOrderDAO {
 	public List<Object[]> querySpotCourseScheduMaterial(String spotCode, int enYear, int enQuarter, String specCode, String levelCode);
 	
 	public String queryMaxOrderNumber(String spotCode, long semesterId);
+
+
 }

@@ -63,7 +63,7 @@
     </tr>
 </table>
 
-<a href="${pageContext.request.contextPath}/delOrderTM/sync6.htm">del</a>
+<a href="${pageContext.request.contextPath}/delOrderTM/sync6.htm">临时处理</a>
 
 <input type="text" id="code" />
 <a href="#" onclick="spring()">15春新生</a>

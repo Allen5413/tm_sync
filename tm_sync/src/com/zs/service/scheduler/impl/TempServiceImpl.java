@@ -14,6 +14,7 @@ import com.zs.dao.finance.studentexpense.FindRecordStudentCodeDao;
 import com.zs.dao.finance.studentexpensebuy.StudentExpenseBuyDao;
 import com.zs.dao.placeorder.placeorder.EditPlaceOrderStateByNuDAO;
 import com.zs.dao.placeorder.placeorder.PlaceOrderDAO;
+import com.zs.dao.placeorder.placeorder.TempFindOrderDAO;
 import com.zs.dao.placeorder.placeorderteachmatiral.PlaceOrderTeachMatiralDAO;
 import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForMaxCodeDAO;
@@ -37,6 +38,7 @@ import com.zs.domain.sale.StudentBookOrderTM;
 import com.zs.domain.sync.SelectedCourse;
 import com.zs.domain.sync.Spot;
 import com.zs.domain.sync.Student;
+import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
 import com.zs.service.basic.teachmaterial.FindTeachMaterialService;
 import com.zs.service.bean.PlaceOrderDetailShow;
 import com.zs.service.finance.spotexpensebuy.AddSpotExpenseBuyService;
@@ -105,7 +107,14 @@ public class TempServiceImpl implements TempService {
 
     @Resource
     private FindByStudentCodeDAO findByStudentCodeDAO;
-
+    @Resource
+    private TempFindOrderDAO tempFindOrderDAO;
+    @Resource
+    private AddSpotExpenseBuyService addSpotExpenseBuyService;
+    @Resource
+    private FindIssueRangeBySpotCodeService findIssueRangeBySpotCodeService;
+    @Resource
+    private FindTeachMaterialStockBytmIdAndChannelIdDAO findTeachMaterialStockBytmIdAndChannelIdDAO;
 
     //private Map<String, List<String>> map = new HashMap<String, List<String>>();
 //    private List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
@@ -1027,6 +1036,47 @@ public class TempServiceImpl implements TempService {
     @Override
     @Transactional
     public void doSync6() {
-    }
+        try {
+            List<TeachMaterialPlaceOrder> teachMaterialPlaceOrderList = tempFindOrderDAO.find();
+            for (TeachMaterialPlaceOrder teachMaterialPlaceOrder : teachMaterialPlaceOrderList) {
+                //查询明细
+                List<PlaceOrderTeachMaterial> placeOrderTeachMaterialList = placeOrderTeachMatiralDAO.getPlaceOrderTeachMaterialByOrderID(teachMaterialPlaceOrder.getId());
+                if (null != placeOrderTeachMaterialList) {
+                    for (PlaceOrderTeachMaterial placeOrderTeachMaterial : placeOrderTeachMaterialList) {
+                        Long tmId = placeOrderTeachMaterial.getTeachMaterialId();
+                        if (null != tmId && 0 < placeOrderTeachMaterial.getCount()) {
+                            TeachMaterial teachMaterial = findTeachMaterialByNameAndAuthorDAO.get(tmId);
+                            if (null != teachMaterial && teachMaterial.getState() == TeachMaterial.STATE_ENABLE) {
 
+                                //记录中心消费信息
+                                SpotExpenseBuy spotExpenseBuy = new SpotExpenseBuy();
+                                spotExpenseBuy.setSpotCode(teachMaterialPlaceOrder.getSpotCode());
+                                spotExpenseBuy.setSemesterId(3l);
+                                spotExpenseBuy.setType(SpotExpenseBuy.TYPE_BUY_TM);
+                                spotExpenseBuy.setDetail("购买了" + placeOrderTeachMaterial.getCount() + "本，[" + teachMaterial.getName() + "] 教材");
+                                spotExpenseBuy.setMoney(new BigDecimal(placeOrderTeachMaterial.getCount()).multiply(new BigDecimal(placeOrderTeachMaterial.getTmPrice())).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                                spotExpenseBuy.setTeachMaterialId(teachMaterial.getId());
+                                addSpotExpenseBuyService.addSpotExpenseBuy(spotExpenseBuy, "管理员");
+                                //减去教材库存
+                                IssueRange issueRange = findIssueRangeBySpotCodeService.getIssueRangeBySpotCode(teachMaterialPlaceOrder.getSpotCode());
+                                if (null != issueRange) {
+                                    TeachMaterialStock teachMaterialStock = findTeachMaterialStockBytmIdAndChannelIdDAO.getTeachMaterialStockBytmIdAndChannelId(teachMaterial.getId(), issueRange.getIssueChannelId());
+                                    if (null != teachMaterialStock) {
+                                        teachMaterialStock.setStock(teachMaterialStock.getStock() - placeOrderTeachMaterial.getCount());
+                                        findTeachMaterialStockBytmIdAndChannelIdDAO.update(teachMaterialStock);
+                                    }
+                                }
+
+                                //记录该订单明细为已发出
+                                placeOrderTeachMaterial.setIsSend(PlaceOrderTeachMaterial.IS_SEND_YES);
+                                placeOrderTeachMatiralDAO.update(placeOrderTeachMaterial);
+                            }
+                        }
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

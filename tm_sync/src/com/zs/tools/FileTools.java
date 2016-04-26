@@ -6,6 +6,7 @@ import net.sf.json.JSONObject;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -108,7 +109,11 @@ public class FileTools {
                 for (String childFile : childFiles) {
                     list.add(childFile);
                 }
-                Collections.sort(list);
+                Collections.sort(list,new Comparator<String>(){
+                    public int compare(String arg0, String arg1) {
+                        return arg1.compareTo(arg0);
+                    }
+                });
                 for (String childFile : list) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("path", path);

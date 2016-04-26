@@ -161,91 +161,111 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             detail += "性别由 男 改为 女、";
                         }
                         //证件类型
-                        if (StudentTemp.IDCARD_TYPE_IDCARD == studentTemp.getIdcardType() && Student.IDCARD_TYPE_IDCARD != student.getIdcardType()) {
+                        if (StudentTemp.IDCARD_TYPE_IDCARD == studentTemp.getIdcardType() && (null == student.getIdcardType() || Student.IDCARD_TYPE_IDCARD != student.getIdcardType())) {
                             detail += "证件类型由 ";
-                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
-                                detail += "港、澳、台居民证件 ";
-                            }
-                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
-                                detail += "军官证 ";
-                            }
-                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
-                                detail += "其它 ";
-                            }
-                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
-                                detail += "护照 ";
+                            if(null == student.getIdcardType()){
+                                detail += "Null ";
+                            }else {
+                                if (Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()) {
+                                    detail += "港、澳、台居民证件 ";
+                                }
+                                if (Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()) {
+                                    detail += "军官证 ";
+                                }
+                                if (Student.IDCARD_TYPE_OTHER != student.getIdcardType()) {
+                                    detail += "其它 ";
+                                }
+                                if (Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()) {
+                                    detail += "护照 ";
+                                }
                             }
                             detail += "改为 身份证、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_IDCARD);
                             isUpdate = true;
                         }
-                        if (StudentTemp.IDCARD_TYPE_MILITARY_OFFICER == studentTemp.getIdcardType() && Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()) {
+                        if (StudentTemp.IDCARD_TYPE_MILITARY_OFFICER == studentTemp.getIdcardType() && (null == student.getIdcardType() || Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType())) {
                             detail += "证件类型由 ";
-                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
-                                detail += "港、澳、台居民证件 ";
-                            }
-                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
-                                detail += "身份证 ";
-                            }
-                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
-                                detail += "其它 ";
-                            }
-                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
-                                detail += "护照 ";
+                            if(null == student.getIdcardType()){
+                                detail += "Null ";
+                            }else {
+                                if (Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()) {
+                                    detail += "港、澳、台居民证件 ";
+                                }
+                                if (Student.IDCARD_TYPE_IDCARD != student.getIdcardType()) {
+                                    detail += "身份证 ";
+                                }
+                                if (Student.IDCARD_TYPE_OTHER != student.getIdcardType()) {
+                                    detail += "其它 ";
+                                }
+                                if (Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()) {
+                                    detail += "护照 ";
+                                }
                             }
                             detail += "改为 军官证、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_MILITARY_OFFICER);
                             isUpdate = true;
                         }
-                        if (StudentTemp.IDCARD_TYPE_PASSPORT == studentTemp.getIdcardType() && Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()) {
+                        if (StudentTemp.IDCARD_TYPE_PASSPORT == studentTemp.getIdcardType() && (null == student.getIdcardType() || Student.IDCARD_TYPE_PASSPORT != student.getIdcardType())) {
                             detail += "证件类型由 ";
-                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
-                                detail += "港、澳、台居民证件 ";
-                            }
-                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
-                                detail += "军官证 ";
-                            }
-                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
-                                detail += "其它 ";
-                            }
-                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
-                                detail += "身份证 ";
+                            if(null == student.getIdcardType()){
+                                detail += "Null ";
+                            }else {
+                                if (Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()) {
+                                    detail += "港、澳、台居民证件 ";
+                                }
+                                if (Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()) {
+                                    detail += "军官证 ";
+                                }
+                                if (Student.IDCARD_TYPE_OTHER != student.getIdcardType()) {
+                                    detail += "其它 ";
+                                }
+                                if (Student.IDCARD_TYPE_IDCARD != student.getIdcardType()) {
+                                    detail += "身份证 ";
+                                }
                             }
                             detail += "改为 护照、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_PASSPORT);
                             isUpdate = true;
                         }
-                        if (StudentTemp.IDCARD_TYPE_HK_MACAO_TAIWAN == studentTemp.getIdcardType() && Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()) {
+                        if (StudentTemp.IDCARD_TYPE_HK_MACAO_TAIWAN == studentTemp.getIdcardType() && (null == student.getIdcardType() || Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType())) {
                             detail += "证件类型由 ";
-                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
-                                detail += "身份证 ";
-                            }
-                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
-                                detail += "军官证 ";
-                            }
-                            if(Student.IDCARD_TYPE_OTHER != student.getIdcardType()){
-                                detail += "其它 ";
-                            }
-                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
-                                detail += "护照 ";
+                            if(null == student.getIdcardType()){
+                                detail += "Null ";
+                            }else {
+                                if (Student.IDCARD_TYPE_IDCARD != student.getIdcardType()) {
+                                    detail += "身份证 ";
+                                }
+                                if (Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()) {
+                                    detail += "军官证 ";
+                                }
+                                if (Student.IDCARD_TYPE_OTHER != student.getIdcardType()) {
+                                    detail += "其它 ";
+                                }
+                                if (Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()) {
+                                    detail += "护照 ";
+                                }
                             }
                             detail += "改为 港、澳、台居民证件、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_HK_MACAO_TAIWAN);
                             isUpdate = true;
                         }
-                        if (StudentTemp.IDCARD_TYPE_OTHER == studentTemp.getIdcardType() && Student.IDCARD_TYPE_OTHER != student.getIdcardType()) {
+                        if (StudentTemp.IDCARD_TYPE_OTHER == studentTemp.getIdcardType() && (null == student.getIdcardType() || Student.IDCARD_TYPE_OTHER != student.getIdcardType())) {
                             detail += "证件类型由 ";
-                            if(Student.IDCARD_TYPE_IDCARD != student.getIdcardType()){
-                                detail += "身份证 ";
-                            }
-                            if(Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()){
-                                detail += "军官证 ";
-                            }
-                            if(Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()){
-                                detail += "港、澳、台居民证件 ";
-                            }
-                            if(Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()){
-                                detail += "护照 ";
+                            if(null == student.getIdcardType()){
+                                detail += "Null ";
+                            }else {
+                                if (Student.IDCARD_TYPE_IDCARD != student.getIdcardType()) {
+                                    detail += "身份证 ";
+                                }
+                                if (Student.IDCARD_TYPE_MILITARY_OFFICER != student.getIdcardType()) {
+                                    detail += "军官证 ";
+                                }
+                                if (Student.IDCARD_TYPE_HK_MACAO_TAIWAN != student.getIdcardType()) {
+                                    detail += "港、澳、台居民证件 ";
+                                }
+                                if (Student.IDCARD_TYPE_PASSPORT != student.getIdcardType()) {
+                                    detail += "护照 ";
+                                }
                             }
                             detail += "改为 其它、 ";
                             student.setIdcardType(Student.IDCARD_TYPE_OTHER);

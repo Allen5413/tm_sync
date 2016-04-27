@@ -821,10 +821,11 @@ public class TempServiceImpl implements TempService {
                         }
                         if(null == studentExpense2 || null == studentExpense2.getPay() || 0 >= studentExpense2.getPay()){
                             float buy = null == studentExpense.getBuy() ? 0 : studentExpense.getBuy();
+                            float pay = null == studentExpense.getPay() ? 0 : studentExpense.getPay();
                             studentExpense.setBuy(new BigDecimal(buy).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                             //写入操作人
                             studentExpense.setOperator("管理员");
-                            if (studentExpense.getBuy() > studentExpense.getPay()) {
+                            if (studentExpense.getBuy() > pay) {
                                 studentExpense.setClearTime(null);
                                 studentExpense.setState(1);
                             }

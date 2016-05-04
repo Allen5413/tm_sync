@@ -28,6 +28,9 @@
             学期id：<input type="text" id="semesterId" />
             <a href="#" onclick="addAoPengOrder()">添加订单</a>
         </td>
+        <td>
+            <a href="${pageContext.request.contextPath}/findBankPayReq/open.htm">请求查询银行支付结果</a>
+        </td>
     </tr>
     <tr>
         <td>

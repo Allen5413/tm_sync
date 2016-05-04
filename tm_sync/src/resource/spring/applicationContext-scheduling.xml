@@ -61,6 +61,17 @@
 	</bean>
 	<!-- 检查还没有签收的订单的快递信息信息业务接口END -->
 
+	<!-- 检查还没有结束的支付信息  每天1:30分执行-->
+	<task:scheduler id="CheckBankPayForStateWaitTaskScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="CheckBankPayForStateWaitTaskScheduler">
+		<task:scheduled ref="checkBankPayForStateWaitTaskService" method="check" cron="0 46 16 * * ?"/>
+	</task:scheduled-tasks>
+	<!-- 检查还没有结束的支付信息定时器 END-->
+	<!-- 检查还没有结束的支付信息业务接口 -->
+	<bean id="checkBankPayForStateWaitTaskService" class="com.zs.service.scheduler.impl.CheckBankPayForStateWaitTaskServiceImpl">
+	</bean>
+	<!-- 检查还没有结束的支付信息业务接口END -->
+
 	<!--&lt;!&ndash; 同步网院学习中心信息  每天3:00分执行&ndash;&gt;-->
 	<!--<task:scheduler id="syncSpotScheduler" pool-size="1"/>-->
 	<!--<task:scheduled-tasks scheduler="syncSpotScheduler">-->

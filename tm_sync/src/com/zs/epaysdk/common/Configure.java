@@ -16,12 +16,14 @@ public class Configure {
     private static final String version = "1.1.3";
 
     // 商户号，格式如A0000001
-    private static String appid = "Q0000468";
+    //private static String appid = "Q0000468";  //测试环境
+    private static String appid = "Q0000511";    //正式环境
 
     // 商户私有密钥，该密钥需要严格保密，只能出现在后台服务端代码中，不能放在可能被用户查看到的地方，如html、js代码等
     // 在发送报文给收付直通车时，会使用该密钥进行签名
     // 在收到收付直通车返回的报文时，将使用该密钥进行验签
-    private static String commKey = "DFFEC89329B74AC88E2A2F24516DA88D";
+    //private static String commKey = "DFFEC89329B74AC88E2A2F24516DA88D";  //测试环境
+    private static String commKey = "B1D0420A17F54B51A87CD79EF2F9EF47";    //正式环境
 
     // 商户客户端证书路径，该证书需要严格保密，支持classpath路径或绝对路径
     // 在发送报文给收付直通车时，会使用该密钥进行签名（RSA算法方式）

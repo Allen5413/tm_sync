@@ -33,6 +33,6 @@ public class GpPay extends IRedirectService {
         params.put("timestamp", DateTimeUtil.getDateTime());
         params.put("mac", Signature.generateMAC(params));
 
-        return buildRedirectFullPage(Configure.isDevEnv() ? Configure.GP_DEV_API : Configure.GP_PROD_API, params);
+        return buildRedirectFullPage(Configure.isDevEnv() ? Configure.GP_PROD_API : Configure.GP_DEV_API, params);
     }
 }

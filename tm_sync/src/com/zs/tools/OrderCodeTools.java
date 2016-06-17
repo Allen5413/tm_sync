@@ -12,6 +12,7 @@ public class OrderCodeTools {
     public static final String PURCHASE_ORDER_CODE_PREFIX_MANUAL = "GSM";
     public static final String STUDENT_ORDER_CODE_PREFIX_AUTO = "FSA";
     public static final String STUDENT_ORDER_CODE_PREFIX_MANUAL = "FSM";
+    public static final String STUDENT_ORDER_CODE_ONCE = "FSO";
     public static final String SPOT_ORDER_CODE_PREFIX = "YD";
 
 
@@ -55,6 +56,16 @@ public class OrderCodeTools {
      */
     public static String createStudentOrderCodeAuto(int year, int quarter, int number){
         StringBuilder sb = new StringBuilder(STUDENT_ORDER_CODE_PREFIX_AUTO);
+        sb.append(assembleCode(year, quarter, number, SIX_DIGIT));
+        return sb.toString();
+    }
+
+    /**
+     * 生成学生一次性订单编号
+     * @return
+     */
+    public static String createStudentOnceOrderCode(int year, int quarter, int number){
+        StringBuilder sb = new StringBuilder(STUDENT_ORDER_CODE_ONCE);
         sb.append(assembleCode(year, quarter, number, SIX_DIGIT));
         return sb.toString();
     }

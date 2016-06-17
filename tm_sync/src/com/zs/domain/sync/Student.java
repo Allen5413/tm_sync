@@ -25,6 +25,10 @@ public class Student extends AbstractEntity {
     public static final int IDCARD_TYPE_PASSPORT = 3;
     public static final int IDCARD_TYPE_HK_MACAO_TAIWAN = 4;
 
+    public static final int IS_ONCE_ORDER_NOT = 0;      //不是
+    public static final int IS_ONCE_ORDER_YES = 1;      //是，但是还没有确认订单
+    public static final int IS_ONCE_ORDER_BUY = 2;      //是，已经确认过订单，不再进行订单同步
+
 
     private Long id;                    //主键
     private String code;                //学号
@@ -47,6 +51,9 @@ public class Student extends AbstractEntity {
     private Integer studyQuarter;       //学籍入学季
     private String changeSpotDetail;    //学生转学习中心情况说明
     private Date operateTime = new Date();  //操作时间
+    private String openId;                  //记录微信的openid号
+    private Date wxBoundTime;               //微信绑定时间
+    private int isOnceOrder;                //是否设置成了一次性订购教材
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -216,5 +223,29 @@ public class Student extends AbstractEntity {
 
     public void setChangeSpotDetail(String changeSpotDetail) {
         this.changeSpotDetail = changeSpotDetail;
+    }
+
+    public int getIsOnceOrder() {
+        return isOnceOrder;
+    }
+
+    public void setIsOnceOrder(int isOnceOrder) {
+        this.isOnceOrder = isOnceOrder;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
+    public Date getWxBoundTime() {
+        return wxBoundTime;
+    }
+
+    public void setWxBoundTime(Date wxBoundTime) {
+        this.wxBoundTime = wxBoundTime;
     }
 }

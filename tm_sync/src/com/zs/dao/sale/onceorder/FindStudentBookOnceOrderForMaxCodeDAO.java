@@ -1,4 +1,4 @@
-package com.zs.dao.sale.studentbookonceorder;
+package com.zs.dao.sale.onceorder;
 
 import com.feinno.framework.common.dao.jpa.EntityJpaDao;
 import com.zs.domain.sale.StudentBookOnceOrder;

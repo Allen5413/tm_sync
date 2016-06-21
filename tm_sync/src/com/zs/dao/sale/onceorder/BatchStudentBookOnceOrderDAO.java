@@ -1,6 +1,4 @@
-package com.zs.dao.sale.studentbookonceorder;
-
-import com.zs.domain.sale.StudentBookOnceOrder;
+package com.zs.dao.sale.onceorder;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
-package com.zs.dao.sale.studentbookonceorder.impl;
+package com.zs.dao.sale.onceorder.impl;
 
 import com.zs.dao.BaseQueryDao;
-import com.zs.dao.sale.studentbookonceorder.BatchStudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

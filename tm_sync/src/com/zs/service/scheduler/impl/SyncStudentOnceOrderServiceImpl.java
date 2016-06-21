@@ -5,16 +5,15 @@ import com.feinno.framework.common.service.EntityServiceImpl;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
-import com.zs.dao.sale.studentbookonceorder.BatchStudentBookOnceOrderDAO;
-import com.zs.dao.sale.studentbookonceorder.FindStudentBookOnceOrderByStudentCodeForUnConfirmDAO;
-import com.zs.dao.sale.studentbookonceorder.FindStudentBookOnceOrderForMaxCodeDAO;
-import com.zs.dao.sale.studentbookonceorder.StudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderByStudentCodeForUnConfirmDAO;
+import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxCodeDAO;
+import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
 import com.zs.dao.sale.studentbookonceorderlog.BatchStudentBookOnceOrderLogDAO;
 import com.zs.dao.sale.studentbookonceordertm.BatchStudentBookOnceOrderTMDAO;
 import com.zs.dao.sale.studentbookonceordertm.DelStudentBookOnceOrderTMByCodeDAO;
 import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForUnconfirmedByStudentCodeDAO;
-import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookorderlog.FindStudentBookOrderLogByCodeDAO;
 import com.zs.dao.sale.studentbookorderlog.StudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
@@ -168,6 +167,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                             courseCode = objs[0].toString();
                             int courseType = Integer.parseInt(objs[1].toString());
                             boolean isBuyCourse = null == objs[2] ? false : true;
+                            int xf = Integer.parseInt(objs[3].toString());
 
                             List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
                             if (null == teachMaterialList) {
@@ -185,6 +185,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                                     orderTM.setIsSend(StudentBookOnceOrderTM.IS_SEND_NOT);
                                     orderTM.setIsMust(0 == courseType || 2 == courseType ? StudentBookOnceOrderTM.IS_MUST_YES : StudentBookOnceOrderTM.IS_MUST_NOT);
                                     orderTM.setIsBuy(isBuyCourse ? StudentBookOnceOrderTM.IS_BUY_YES : StudentBookOnceOrderTM.IS_BUY_NOT);
+                                    orderTM.setXf(xf);
                                     orderTM.setOperator("管理员");
                                     addOrderTMList.add(orderTM);
 

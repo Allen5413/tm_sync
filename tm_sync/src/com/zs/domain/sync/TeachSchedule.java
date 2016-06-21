@@ -23,6 +23,7 @@ public class TeachSchedule  extends AbstractEntity {
     private String levelCode;           //层次编号
     private String courseCode;          //课程编号
     private int courseType;             //课程类型[0（公必）1（公选）2（专必）3（专选）]
+    private int xf;                     //学分
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -96,5 +97,13 @@ public class TeachSchedule  extends AbstractEntity {
 
     public void setCourseType(int courseType) {
         this.courseType = courseType;
+    }
+
+    public int getXf() {
+        return xf;
+    }
+
+    public void setXf(int xf) {
+        this.xf = xf;
     }
 }

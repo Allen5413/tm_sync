@@ -31,6 +31,7 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
     private Integer isSend = 0;                 //是否发出
     private Integer isMust = 0;                 //是否必修
     private Integer isBuy = 0;                  //是否已经买过该书
+    private Integer xf;                         //学分
     private String operator;                    //操作人
     private Date operateTime = new Date();      //操作时间
     private Integer version;                    //版本号，用于乐观锁
@@ -132,5 +133,13 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
 
     public void setIsBuy(Integer isBuy) {
         this.isBuy = isBuy;
+    }
+
+    public Integer getXf() {
+        return xf;
+    }
+
+    public void setXf(Integer xf) {
+        this.xf = xf;
     }
 }

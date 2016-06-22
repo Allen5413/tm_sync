@@ -10,8 +10,8 @@ import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderByStudentCodeForUnConfi
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxCodeDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
 import com.zs.dao.sale.studentbookonceorderlog.BatchStudentBookOnceOrderLogDAO;
-import com.zs.dao.sale.studentbookonceordertm.BatchStudentBookOnceOrderTMDAO;
-import com.zs.dao.sale.studentbookonceordertm.DelStudentBookOnceOrderTMByCodeDAO;
+import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
+import com.zs.dao.sale.onceordertm.DelStudentBookOnceOrderTMByCodeDAO;
 import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForUnconfirmedByStudentCodeDAO;
 import com.zs.dao.sale.studentbookorderlog.FindStudentBookOrderLogByCodeDAO;
@@ -20,10 +20,12 @@ import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
 import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
 import com.zs.dao.sync.FindStudentForOnceOrderDAO;
 import com.zs.dao.sync.FindTeachScheduleByYearAndQuarterAndSpecAndLevelDAO;
+import com.zs.dao.sync.SelectedCourseDAO;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
 import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.sale.*;
+import com.zs.domain.sync.SelectedCourse;
 import com.zs.domain.sync.Student;
 import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
 import com.zs.service.scheduler.SyncStudentOnceOrderService;
@@ -82,6 +84,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private FindStudentBookOnceOrderByStudentCodeForUnConfirmDAO findStudentBookOnceOrderByStudentCodeForUnConfirmDAO;
     @Resource
     private DelStudentBookOnceOrderTMByCodeDAO delStudentBookOnceOrderTMByCodeDAO;
+    @Resource
+    private SelectedCourseDAO selectedCourseDAO;
 
     @Override
     @Transactional
@@ -162,6 +166,9 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                             delStudentBookOnceOrderTMByCodeDAO.del(orderCode);
                         }
 
+                        //查询该学生的已有选课
+                        List<SelectedCourse> selectedCourseList = selectedCourseDAO.findByStudentCode(studentCode);
+
                         //添加订单教材明细
                         for (Object[] objs : courseList) {
                             courseCode = objs[0].toString();
@@ -181,11 +188,12 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                                     orderTM.setCourseCode(courseCode);
                                     orderTM.setTeachMaterialId(teachMaterial.getId());
                                     orderTM.setPrice(teachMaterial.getPrice());
-                                    orderTM.setCount(1);
                                     orderTM.setIsSend(StudentBookOnceOrderTM.IS_SEND_NOT);
                                     orderTM.setIsMust(0 == courseType || 2 == courseType ? StudentBookOnceOrderTM.IS_MUST_YES : StudentBookOnceOrderTM.IS_MUST_NOT);
                                     orderTM.setIsBuy(isBuyCourse ? StudentBookOnceOrderTM.IS_BUY_YES : StudentBookOnceOrderTM.IS_BUY_NOT);
+                                    orderTM.setCount(isBuyCourse ? 0 : 1);
                                     orderTM.setXf(xf);
+                                    orderTM.setIsSelect(this.isSelectedCourse(selectedCourseList, courseCode));
                                     orderTM.setOperator("管理员");
                                     addOrderTMList.add(orderTM);
 
@@ -281,5 +289,16 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
         }
 
         return teachMaterialList;
+    }
+
+    protected int isSelectedCourse(List<SelectedCourse> selectedCourseList, String courseCode){
+        if(null != selectedCourseList && 0 < selectedCourseList.size()){
+            for(SelectedCourse selectedCourse : selectedCourseList){
+                if(courseCode.equals(selectedCourse.getCourseCode())){
+                    return StudentBookOnceOrderTM.IS_SELECT_YES;
+                }
+            }
+        }
+        return StudentBookOnceOrderTM.IS_SELECT_NOT;
     }
 }

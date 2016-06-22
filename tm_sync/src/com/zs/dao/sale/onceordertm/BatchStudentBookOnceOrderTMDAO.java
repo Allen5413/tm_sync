@@ -1,4 +1,4 @@
-package com.zs.dao.sale.studentbookonceordertm;
+package com.zs.dao.sale.onceordertm;
 
 import java.util.List;
 

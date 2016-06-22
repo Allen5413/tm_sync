@@ -22,6 +22,9 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
     public static final int IS_BUY_NOT = 0;        //未买过该课程
     public static final int IS_BUY_YES = 1;        //已经买过该课程
 
+    public static final int IS_SELECT_NOT = 0;     //未选该课程
+    public static final int IS_SELECT_YES = 1;     //已选该课程
+
     private Long id;                            //主键
     private String orderCode;                   //订单号
     private String courseCode;                  //课程编号
@@ -32,6 +35,7 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
     private Integer isMust = 0;                 //是否必修
     private Integer isBuy = 0;                  //是否已经买过该书
     private Integer xf;                         //学分
+    private Integer isSelect = 0;              //是否已经选过课
     private String operator;                    //操作人
     private Date operateTime = new Date();      //操作时间
     private Integer version;                    //版本号，用于乐观锁
@@ -141,5 +145,13 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
 
     public void setXf(Integer xf) {
         this.xf = xf;
+    }
+
+    public Integer getIsSelect() {
+        return isSelect;
+    }
+
+    public void setIsSelect(Integer isSelect) {
+        this.isSelect = isSelect;
     }
 }

@@ -16,6 +16,10 @@ public interface FindNotSignOrderForNuDAO extends EntityJpaDao<PlaceOrderPackage
             "where sbo.state = 4 and sbo.package_id = sbop.id and sbop.logistic_code is not null " +
             "UNION ALL " +
             "select DISTINCT pop.logistic_code from teach_material_place_order tmpo, place_order_package pop " +
-            "where tmpo.order_status = '4' and tmpo.package_id = pop.id and pop.logistic_code is not null) t")
+            "where tmpo.order_status = '4' and tmpo.package_id = pop.id and pop.logistic_code is not null " +
+            "UNION ALL " +
+            "select DISTINCT sbop.logistic_code from student_book_once_order sbo, student_book_order_package sbop " +
+            "where sbo.state = 5 and sbo.package_id = sbop.id and sbop.logistic_code is not null " +
+            ") t")
     public List<String> find();
 }

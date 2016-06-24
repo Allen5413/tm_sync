@@ -1,4 +1,4 @@
-package com.zs.dao.sale.studentbookonceorderlog;
+package com.zs.dao.sale.onceorderlog;
 
 import java.util.List;
 

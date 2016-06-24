@@ -9,7 +9,7 @@ import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderByStudentCodeForUnConfirmDAO;
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxCodeDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
-import com.zs.dao.sale.studentbookonceorderlog.BatchStudentBookOnceOrderLogDAO;
+import com.zs.dao.sale.onceorderlog.BatchStudentBookOnceOrderLogDAO;
 import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
 import com.zs.dao.sale.onceordertm.DelStudentBookOnceOrderTMByCodeDAO;
 import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;

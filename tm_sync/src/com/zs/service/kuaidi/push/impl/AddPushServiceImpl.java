@@ -6,6 +6,8 @@ import com.zs.dao.placeorder.placeorder.EditPlaceOrderStateByNuDAO;
 import com.zs.dao.placeorder.placeorderlog.PlaceOrderLogDAO;
 import com.zs.dao.placeorder.placeorderpackage.EditPlaceOrderPackageSignByNuDAO;
 import com.zs.dao.placeorder.placeorderpackage.FindPlaceOrderPackageByNuDAO;
+import com.zs.dao.sale.onceorder.EditOnceOrderStateByNuDAO;
+import com.zs.dao.sale.onceorderlog.OnceOrderLogDAO;
 import com.zs.dao.sale.studentbookorder.EditStudentOrderStateByNuDAO;
 import com.zs.dao.sale.studentbookorderlog.StudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookorderpackage.EditStudentBookOrderPackageSignByNuDAO;
@@ -13,6 +15,7 @@ import com.zs.dao.sale.studentbookorderpackage.FindStudentBookOrderPackageByNuDA
 import com.zs.domain.kuaidi.KuaidiPush;
 import com.zs.domain.placeorder.PlaceOrderPackage;
 import com.zs.domain.placeorder.TeachMaterialPlaceOrder;
+import com.zs.domain.sale.StudentBookOnceOrder;
 import com.zs.domain.sale.StudentBookOrder;
 import com.zs.domain.sale.StudentBookOrderPackage;
 import com.zs.service.kuaidi.push.AddPushService;
@@ -48,6 +51,10 @@ public class AddPushServiceImpl extends EntityServiceImpl<KuaidiPush, KuaidiPush
     private EditPlaceOrderPackageSignByNuDAO editPlaceOrderPackageSignByNuDAO;
     @Resource
     private EditPlaceOrderStateByNuDAO editPlaceOrderStateByNuDAO;
+    @Resource
+    private OnceOrderLogDAO onceOrderLogDAO;
+    @Resource
+    private EditOnceOrderStateByNuDAO editOnceOrderStateByNuDAO;
 
     @Override
     public KuaidiPush add(String json)throws Exception{
@@ -98,6 +105,10 @@ public class AddPushServiceImpl extends EntityServiceImpl<KuaidiPush, KuaidiPush
             editStudentOrderStateByNuDAO.editStudentOrderStateByNu(StudentBookOrder.STATE_SIGN, operateTime, nu);
             //增加订单状态日志记录
             studentBookOrderLogDAO.addSignOrderLog(nu);
+            //修改该快递单号下的一次性订单信息
+            editOnceOrderStateByNuDAO.editor(StudentBookOnceOrder.STATE_SIGN, operateTime, nu);
+            //增加一次性订单状态日志记录
+            onceOrderLogDAO.addSignOrderLog(nu);
         }else{
             //查询该订单号的预订单包
             count = findPlaceOrderPackageByNuDAO.findPlaceOrderPackageForNotSign(nu);

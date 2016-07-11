@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.Map;
 
 /**
  * Created by Allen on 2015/9/30.
@@ -33,13 +34,17 @@ public class KuaidiPushController extends LoggerController {
     public JSONObject index(@RequestParam(value = "param", required = false, defaultValue = "") String param){
         JSONObject jsonObject = new JSONObject();
         try{
-            System.out.println("param:  "+param);
-            KuaidiPush kuaidiPush = addPushService.add(param);
+            Map<String, Object> map = addPushService.add(param);
+            KuaidiPush kuaidiPush = (KuaidiPush) map.get("kuaidiPush");
+            String sendNewData = map.get("sendNewData").toString();
             if(null != kuaidiPush){
                 if(3 == kuaidiPush.getState()){
                     if(!StringUtils.isEmpty(kuaidiPush.getNu())) {
                         addPushService.editOrderState(kuaidiPush.getNu());
                     }
+                }
+                if(!StringUtils.isEmpty(sendNewData)){
+                    addPushService.sendOrderForWX(kuaidiPush.getNu(), sendNewData);
                 }
             }
         }catch (Exception e){

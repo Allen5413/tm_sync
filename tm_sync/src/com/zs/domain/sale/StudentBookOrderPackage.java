@@ -15,6 +15,9 @@ public class StudentBookOrderPackage extends AbstractEntity {
     public static int IS_SIGN_YES = 0;
     public static int IS_SIGN_NOT = 1;
 
+    public static int IS_ONCE_YES = 1;
+    public static int IS_ONCE_NOT = 0;
+
     private Long id;                            //主键
     private Long semesterId;                    //学期id
     private String spotCode;                    //学习中心编号
@@ -23,6 +26,7 @@ public class StudentBookOrderPackage extends AbstractEntity {
     private String logisticCode;                //快递单号
     private Integer isSign;                     //是否签收[0:是；1：否;]
     private Date sendTime;                      //发货时间
+    private int isOnce = 0;                     //学生订单还是一次性订单[0：学生订单；1：一次性订单]
     private String creator;                     //创建人
     private Date createTime = new Date();       //创建时间
     private String operator;                    //操作人
@@ -134,5 +138,13 @@ public class StudentBookOrderPackage extends AbstractEntity {
 
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    public int getIsOnce() {
+        return isOnce;
+    }
+
+    public void setIsOnce(int isOnce) {
+        this.isOnce = isOnce;
     }
 }

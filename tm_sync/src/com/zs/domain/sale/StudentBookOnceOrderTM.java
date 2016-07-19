@@ -26,7 +26,7 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
     public static final int IS_SELECT_YES = 1;     //已选该课程
 
     private Long id;                            //主键
-    private String orderCode;                   //订单号
+    private Long orderId;                   //订单id
     private String courseCode;                  //课程编号
     private Long teachMaterialId;               //教材id
     private Float price;                        //教材单价
@@ -50,12 +50,12 @@ public class StudentBookOnceOrderTM extends AbstractEntity {
         this.id = id;
     }
 
-    public String getOrderCode() {
-        return orderCode;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public String getCourseCode() {

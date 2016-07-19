@@ -14,7 +14,7 @@ import java.util.Date;
 public class StudentBookOnceOrderLog extends AbstractEntity {
 
     private Long id;                            //主键
-    private String orderCode;                   //订单号
+    private long orderId;                   //订单id
     private Integer state;                      //状态[0：未确认；1：已确认；2：分拣中；3：已打包；4：已发出；5：已签收]
     private String operator;                    //操作人
     private Date operateTime = new Date();      //操作时间
@@ -27,14 +27,6 @@ public class StudentBookOnceOrderLog extends AbstractEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getOrderCode() {
-        return orderCode;
-    }
-
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
     }
 
     public Integer getState() {
@@ -59,5 +51,13 @@ public class StudentBookOnceOrderLog extends AbstractEntity {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    public long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
     }
 }

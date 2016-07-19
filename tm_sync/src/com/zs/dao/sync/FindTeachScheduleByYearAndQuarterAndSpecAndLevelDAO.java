@@ -11,10 +11,6 @@ import java.util.List;
  * Created by Allen on 2016/6/16.
  */
 public interface FindTeachScheduleByYearAndQuarterAndSpecAndLevelDAO extends EntityJpaDao<TeachSchedule, Long> {
-//    @Query("FROM TeachSchedule ts " +
-//            "where (CASE WHEN ts.quarter = 1 THEN ts.academic_year <= ?1+1 " +
-//            "ELSE ts.academic_year <= ?1+1 or (ts.academic_year <= ?1+2 and ts.term = 1) END)\n" +
-//            "and ts.enter_year = ?1 and ts.quarter = ?2 and ts.spec_code = ?3 and ts.level_code = ?4")
     @Query(nativeQuery = true, value = "select t.course_code, t.course_type, t2.course_code code, t.xf from (" +
             "SELECT DISTINCT ts.course_code, ts.course_type, ts.xf FROM sync_teach_schedule ts " +
             "where ts.enter_year = ?1 and ts.quarter = ?2 " +

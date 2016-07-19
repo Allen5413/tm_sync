@@ -94,13 +94,6 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
             this.addOnceOrder(notExistsList);
             //修改存在的学生一次性订单
             this.editOnceOrder(existsList);
-
-//            if(null != addOrderList && 0 < addOrderList.size()){
-//                batchStudentBookOnceOrderDAO.batchAdd(addOrderList, 1000);
-//            }
-//            if(null != addOrderTMList && 0 < addOrderTMList.size()){
-//                batchStudentBookOnceOrderTMDAO.batchAdd(addOrderTMList, 1000);
-//            }
         }catch (Exception e){
             throw e;
         }finally {
@@ -147,9 +140,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     order.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
                     order.setCreator("管理员");
                     order.setOperator("管理员");
-                    //addOrderList.add(order);
                     findSyncOnceOrderStudentDAO.save(order);
-                    System.out.println("order.getId():   "+order.getId());
                     //添加订单明细
                     this.addOnceOrderTM(order.getId(), studentCode, year, quarter, specCode, levelCode, courseList);
                     num++;
@@ -221,7 +212,6 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         orderTM.setXf(xf);
                         orderTM.setIsSelect(this.isSelectedCourse(selectedCourseList, courseCode));
                         orderTM.setOperator("管理员");
-                        //addOrderTMList.add(orderTM);
                         delStudentBookOnceOrderTMByOrderIdDAO.save(orderTM);
                     }
                 }

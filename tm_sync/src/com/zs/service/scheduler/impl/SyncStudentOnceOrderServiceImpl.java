@@ -6,6 +6,7 @@ import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxCodeDAO;
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxIdDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
@@ -22,6 +23,7 @@ import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
 import com.zs.service.scheduler.SyncStudentOnceOrderService;
 import com.zs.tools.DateTools;
 import com.zs.tools.FileTools;
+import com.zs.tools.OrderCodeTools;
 import com.zs.tools.PropertiesTools;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +65,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private BatchStudentBookOnceOrderTMDAO batchStudentBookOnceOrderTMDAO;
     @Resource
     private FindStudentBookOnceOrderForMaxIdDAO findStudentBookOnceOrderForMaxIdDAO;
+    @Resource
+    private FindStudentBookOnceOrderForMaxCodeDAO findStudentBookOnceOrderForMaxCodeDAO;
 
     //课程对应的教材信息
     Map<String, List<TeachMaterial>> courseTMMap = null;
@@ -74,6 +78,9 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
     //变更信息描述
     String detail = null;
+
+    //查询当前学期
+    Semester semester = null;
 
     @Override
     @Transactional
@@ -87,7 +94,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
             detail = "";
 
             //查询当前学期
-            Semester semester = findNowSemesterDAO.getNowSemester();
+            semester = findNowSemesterDAO.getNowSemester();
             //查询已经存在的一次性订单学生
             List<Object[]> existsList = findSyncOnceOrderStudentDAO.findExists(semester.getId());
             //查询不存在的一次性订单学生
@@ -148,9 +155,19 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         maxId = maxIdOrder.getId();
                     }
 
+                    //得到当前学期最大的订单号
+                    StudentBookOnceOrder maxCodeOrder = findStudentBookOnceOrderForMaxCodeDAO.find(semester.getId());
+                    if(null != maxCodeOrder){
+                        String maxOrderCode = maxCodeOrder.getOrderCode();
+                        num = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length()-6, maxOrderCode.length()));
+                    }
+                    //生成学生订单号
+                    String orderCode = OrderCodeTools.createStudentOnceOrderCode(semester.getYear(), semester.getQuarter(), num + 1);
+
                     //添加订单信息
                     StudentBookOnceOrder order = new StudentBookOnceOrder();
                     order.setId(maxId+num);
+                    order.setOrderCode(orderCode);
                     order.setIssueChannelId(issueChannelId);
                     order.setStudentCode(studentCode);
                     order.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);

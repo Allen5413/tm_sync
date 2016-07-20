@@ -6,6 +6,7 @@ import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxIdDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
 import com.zs.dao.sale.onceordertm.DelStudentBookOnceOrderTMByOrderIdDAO;
@@ -60,6 +61,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private BatchStudentBookOnceOrderDAO batchStudentBookOnceOrderDAO;
     @Resource
     private BatchStudentBookOnceOrderTMDAO batchStudentBookOnceOrderTMDAO;
+    @Resource
+    private FindStudentBookOnceOrderForMaxIdDAO findStudentBookOnceOrderForMaxIdDAO;
 
     //课程对应的教材信息
     Map<String, List<TeachMaterial>> courseTMMap = null;
@@ -94,6 +97,13 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
             this.addOnceOrder(notExistsList);
             //修改存在的学生一次性订单
             this.editOnceOrder(existsList);
+
+            if(null != addOrderList && 0 < addOrderList.size()){
+                batchStudentBookOnceOrderDAO.batchAdd(addOrderList, 1000);
+            }
+            if(null != addOrderTMList && 0 < addOrderTMList.size()){
+                batchStudentBookOnceOrderTMDAO.batchAdd(addOrderTMList, 1000);
+            }
         }catch (Exception e){
             throw e;
         }finally {
@@ -112,7 +122,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     protected void addOnceOrder(List<Object[]> notExistsList)throws Exception {
         try {
             System.out.println("新增订单数量总共=============================================" + notExistsList.size());
-            int num = 0;
+            int num = 1;
             for (Object[] obj : notExistsList) {
                 String studentCode = obj[0].toString();
                 String spotCode = obj[1].toString();
@@ -132,19 +142,27 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     }
                     issueChannelId = issueRange.getIssueChannelId();
 
+                    long maxId = 0;
+                    StudentBookOnceOrder maxIdOrder = findStudentBookOnceOrderForMaxIdDAO.find();
+                    if(null != maxIdOrder){
+                        maxId = maxIdOrder.getId();
+                    }
+
                     //添加订单信息
                     StudentBookOnceOrder order = new StudentBookOnceOrder();
+                    order.setId(maxId+num);
                     order.setIssueChannelId(issueChannelId);
                     order.setStudentCode(studentCode);
                     order.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                     order.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
                     order.setCreator("管理员");
                     order.setOperator("管理员");
-                    findSyncOnceOrderStudentDAO.save(order);
+                    addOrderList.add(order);
+                    //findSyncOnceOrderStudentDAO.save(order);
                     //添加订单明细
                     this.addOnceOrderTM(order.getId(), studentCode, year, quarter, specCode, levelCode, courseList);
-                    num++;
                     System.out.println("新增订单数量============================================="+num);
+                    num++;
                 }
             }
         }catch (Exception e){
@@ -212,7 +230,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         orderTM.setXf(xf);
                         orderTM.setIsSelect(this.isSelectedCourse(selectedCourseList, courseCode));
                         orderTM.setOperator("管理员");
-                        delStudentBookOnceOrderTMByOrderIdDAO.save(orderTM);
+                        addOrderTMList.add(orderTM);
+                        //delStudentBookOnceOrderTMByOrderIdDAO.save(orderTM);
                     }
                 }
             }

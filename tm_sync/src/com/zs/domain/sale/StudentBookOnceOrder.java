@@ -42,7 +42,6 @@ public class StudentBookOnceOrder extends AbstractEntity {
     private Integer version;                    //版本号，用于乐观锁
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }

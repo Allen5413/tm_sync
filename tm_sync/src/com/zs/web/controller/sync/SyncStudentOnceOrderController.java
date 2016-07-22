@@ -4,6 +4,7 @@ import com.zs.service.scheduler.SyncStudentOnceOrderService;
 import com.zs.web.controller.LoggerController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +20,10 @@ public class SyncStudentOnceOrderController extends LoggerController {
     private SyncStudentOnceOrderService syncStudentOnceOrderService;
 
     @RequestMapping(value = "sync")
-    public void sync(HttpServletRequest request){
+    public void sync(HttpServletRequest request,
+                     @RequestParam("isOnlyAdd") int isOnlyAdd){
         try {
-            syncStudentOnceOrderService.sync();
+            syncStudentOnceOrderService.sync(isOnlyAdd);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface EditStudentBookOnceOrderTMForIsSelectDAO extends EntityJpaDao<StudentBookOnceOrderTM, Long> {
     @Modifying
-    @Query(nativeQuery = true, value = "update student_book_once_order_tm sbotm INNER JOIN student_book_once_order sbo on sbo.order_code = sbotm.order_code set sbotm.is_select = 1 " +
+    @Query(nativeQuery = true, value = "update student_book_once_order_tm sbotm INNER JOIN student_book_once_order sbo on sbo.id = sbotm.order_id set sbotm.is_select = 1 " +
             "where sbo.student_code = ?1 and sbotm.course_code = ?2")
     public void editor(String studentCode, String courseCode)throws Exception;
 }

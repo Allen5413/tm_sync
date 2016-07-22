@@ -18,8 +18,9 @@ public interface FindSyncOnceOrderStudentDAO extends EntityJpaDao<StudentBookOnc
      */
     @Query(nativeQuery = true, value = "SELECT DISTINCT sboo.id, sbo.student_code, s.study_enter_year, s.study_quarter, s.spec_code, s.level_code " +
             "FROM student_book_order sbo, sync_student s, student_book_once_order sboo where sbo.student_code = sboo.student_code and sboo.state = 0 " +
-            "and sbo.semester_id = ?1 and sbo.student_code = s.code and s.is_once_order = 0")
-    public List<Object[]> findExists(long semesterId);
+            "and sbo.semester_id = ?1 and sbo.student_code = s.code and s.is_once_order = 0 " +
+            "and (CASE WHEN s.study_enter_year = ?2 THEN s.study_quarter != ?3 WHEN s.study_enter_year != ?2 THEN 1=1 END)")
+    public List<Object[]> findExists(long semesterId, int year, int quarter);
 
     /**
      * 查询不存在的一次性订单的学生
@@ -28,6 +29,7 @@ public interface FindSyncOnceOrderStudentDAO extends EntityJpaDao<StudentBookOnc
      */
     @Query(nativeQuery = true, value = "SELECT DISTINCT sbo.student_code, s.spot_code, s.study_enter_year, s.study_quarter, s.spec_code, s.level_code " +
             "FROM student_book_order sbo, sync_student s " +
-            "where NOT EXISTS(select * from student_book_once_order sboo where sbo.student_code = sboo.student_code) and sbo.semester_id = ?1 and sbo.student_code = s.code and s.is_once_order = 0 ")
-    public List<Object[]> findNotExists(long semesterId);
+            "where NOT EXISTS(select * from student_book_once_order sboo where sbo.student_code = sboo.student_code) and sbo.semester_id = ?1 and sbo.student_code = s.code and s.is_once_order = 0 " +
+            "and (CASE WHEN s.study_enter_year = ?2 THEN s.study_quarter != ?3 WHEN s.study_enter_year != ?2 THEN 1=1 END)")
+    public List<Object[]> findNotExists(long semesterId, int year, int quarter);
 }

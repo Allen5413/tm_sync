@@ -7,5 +7,5 @@ import com.zs.domain.sale.StudentBookOnceOrder;
  * Created by Allen on 2016/6/16.
  */
 public interface SyncStudentOnceOrderService extends EntityService<StudentBookOnceOrder> {
-    public void sync()throws Exception;
+    public void sync(int isOnlyAdd)throws Exception;
 }

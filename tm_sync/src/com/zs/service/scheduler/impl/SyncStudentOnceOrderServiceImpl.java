@@ -84,7 +84,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
     @Override
     @Transactional
-    public void sync() throws Exception {
+    public void sync(int isOnlyAdd) throws Exception {
         try {
             courseTMMap = new HashMap<String, List<TeachMaterial>>();
             addOrderList = new ArrayList<StudentBookOnceOrder>();
@@ -95,15 +95,17 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
             //查询当前学期
             semester = findNowSemesterDAO.getNowSemester();
-            //查询已经存在的一次性订单学生
-            List<Object[]> existsList = findSyncOnceOrderStudentDAO.findExists(semester.getId());
             //查询不存在的一次性订单学生
-            List<Object[]> notExistsList = findSyncOnceOrderStudentDAO.findNotExists(semester.getId());
-
+            List<Object[]> notExistsList = findSyncOnceOrderStudentDAO.findNotExists(semester.getId(), semester.getYear(), semester.getQuarter());
             //新增不存在的学生一次性订单
             this.addOnceOrder(notExistsList);
-            //修改存在的学生一次性订单
-            this.editOnceOrder(existsList);
+
+            if(isOnlyAdd == 1) {
+                //查询已经存在的一次性订单学生
+                List<Object[]> existsList = findSyncOnceOrderStudentDAO.findExists(semester.getId(), semester.getYear(), semester.getQuarter());
+                //修改存在的学生一次性订单
+                this.editOnceOrder(existsList);
+            }
 
             if(null != addOrderList && 0 < addOrderList.size()){
                 batchStudentBookOnceOrderDAO.batchAdd(addOrderList, 1000);

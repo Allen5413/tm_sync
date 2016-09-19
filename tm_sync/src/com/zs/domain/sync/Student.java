@@ -28,6 +28,9 @@ public class Student extends AbstractEntity {
     public static final int IS_ONCE_ORDER_NOT = 0;      //不是
     public static final int IS_ONCE_ORDER_YES = 1;      //是
 
+    public static final int IS_SEND_STUDENT_NOT = 0;      //不是
+    public static final int IS_SEND_STUDENT_YES = 1;      //是
+
 
     private Long id;                    //主键
     private String code;                //学号
@@ -53,6 +56,8 @@ public class Student extends AbstractEntity {
     private String openId;                  //记录微信的openid号
     private Date wxBoundTime;               //微信绑定时间
     private int isOnceOrder;                //是否设置成了一次性订购教材
+    private int isSendStudent;              //订单是否邮寄给学生[0：否；1：是]
+    private String sendAddress;             //邮寄给学生的地址
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -246,5 +251,21 @@ public class Student extends AbstractEntity {
 
     public void setWxBoundTime(Date wxBoundTime) {
         this.wxBoundTime = wxBoundTime;
+    }
+
+    public int getIsSendStudent() {
+        return isSendStudent;
+    }
+
+    public void setIsSendStudent(int isSendStudent) {
+        this.isSendStudent = isSendStudent;
+    }
+
+    public String getSendAddress() {
+        return sendAddress;
+    }
+
+    public void setSendAddress(String sendAddress) {
+        this.sendAddress = sendAddress;
     }
 }

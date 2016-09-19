@@ -5,17 +5,10 @@ import com.zs.dao.finance.spotexpenseoth.FindBySpotCodeAndSemesterDAO;
 import com.zs.dao.finance.studentexpense.FindByStudentCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
-import com.zs.dao.sale.studentbookorder.BatchStudentBookOrderDAO;
-import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
-import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
 import com.zs.dao.sync.*;
 import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.finance.SpotExpenseOth;
 import com.zs.domain.finance.StudentExpense;
-import com.zs.domain.sale.StudentBookOrder;
-import com.zs.domain.sale.StudentBookOrderLog;
-import com.zs.domain.sale.StudentBookOrderTM;
-import com.zs.domain.sync.SelectedCourse;
 import com.zs.domain.sync.Student;
 import com.zs.domain.sync.StudentTemp;
 import com.zs.service.scheduler.SyncStudentTaskService;
@@ -54,14 +47,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     @Resource
     private BatchStudentDAO batchStudentDAO;
     @Resource
-    private BatchSelectedCourseDAO batchSelectedCourseDAO;
-    @Resource
-    private BatchStudentBookOrderDAO batchStudentBookOrderDAO;
-    @Resource
-    private BatchStudentBookOrderTMDAO batchStudentBookOrderTMDAO;
-    @Resource
-    private BatchStudentBookOrderLogDAO batchStudentBookOrderLogDAO;
-    @Resource
     private BatchSpotExpenseOthDAO batchSpotExpenseOthDAO;
 
 
@@ -76,10 +61,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
 
         List<Student> addStudentList = new ArrayList<Student>();
         List<Student> editStudentList = new ArrayList<Student>();
-        List<SelectedCourse> addSelectCourseList = new ArrayList<SelectedCourse>();
-        List<StudentBookOrder> addStudentBookOrderList = new ArrayList<StudentBookOrder>();
-        List<StudentBookOrderTM> addStudentBookOrderTMList = new ArrayList<StudentBookOrderTM>();
-        List<StudentBookOrderLog> addStudentBookOrderLogList = new ArrayList<StudentBookOrderLog>();
         List<SpotExpenseOth> addSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
         List<SpotExpenseOth> editSpotExpenseOthList = new ArrayList<SpotExpenseOth>();
 
@@ -825,6 +806,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
                             student.setStudyQuarter(1);
                         }
                     }
+                    student.setIsSendStudent(Student.IS_SEND_STUDENT_NOT);
                     student.setOperateTime(DateTools.getLongNowTime());
                     detail += "学号："+studentTemp.getCode()+", 为新增学生。\r\n";
                     addStudentList.add(student);
@@ -955,24 +937,7 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
     }
 
 
-    /**
-     * 通过课程查询课程关联的教材
-     * @param courseCode
-     * @return
-     * @throws Exception
-     */
-    protected List<TeachMaterial> getTeachMaterialByCourseCode(String courseCode)throws Exception{
-        List<TeachMaterial> teachMaterialList = new ArrayList<TeachMaterial>();
-        List<TeachMaterial> teachMaterialList2 = findTeachMaterialByCourseCodeDAO.getTeachMaterialByCourseCode(courseCode);
-        List<TeachMaterial> teachMaterialList3 = findTeachMaterialFromSetTMByCourseCodeDAO.getTeachMaterialFromSetTMByCourseCode(courseCode);
-        if(null != teachMaterialList2 && 0 < teachMaterialList2.size()){
-            teachMaterialList.addAll(teachMaterialList2);
-        }
-        if(null != teachMaterialList3 && 0 < teachMaterialList3.size()){
-            teachMaterialList.addAll(teachMaterialList3);
-        }
-        return teachMaterialList;
-    }
+
 
     protected Student getStudent(Object[] obj){
         Student student = new Student();
@@ -1061,19 +1026,6 @@ public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
         if(null != editStudentList && 0 < editStudentList.size()){
             batchStudentDAO.batchEdit(editStudentList, 1000);
         }
-
-//        if(null != addSelectCourseList && 0 < addSelectCourseList.size()){
-//            batchSelectedCourseDAO.batchAdd(addSelectCourseList, 1000);
-//        }
-//        if(null != addStudentBookOrderList && 0 < addStudentBookOrderList.size()){
-//            batchStudentBookOrderDAO.batchAdd(addStudentBookOrderList, 1000);
-//        }
-//        if(null != addStudentBookOrderTMList && 0 < addStudentBookOrderTMList.size()){
-//            batchStudentBookOrderTMDAO.batchAdd(addStudentBookOrderTMList, 1000);
-//        }
-//        if(null != addStudentBookOrderLogList && 0 < addStudentBookOrderLogList.size()){
-//            batchStudentBookOrderLogDAO.batchAdd(addStudentBookOrderLogList, 1000);
-//        }
         if(null != addSpotExpenseOthList && 0 < addSpotExpenseOthList.size()){
             batchSpotExpenseOthDAO.batchAdd(addSpotExpenseOthList, 1000);
         }

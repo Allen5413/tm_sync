@@ -29,6 +29,9 @@ public class StudentBookOrder extends AbstractEntity {
     public static final int STATE_SEND = 4;         //已发出
     public static final int STATE_SIGN = 5;         //已签收
 
+    public static final int IS_SEND_STUDENT_NOT = 0;      //不是
+    public static final int IS_SEND_STUDENT_YES = 1;      //是
+
 
     private Long id;                            //主键
     private Long semesterId;                    //学期id
@@ -42,6 +45,7 @@ public class StudentBookOrder extends AbstractEntity {
     private Long packageId;                     //订单打包id
     private Integer printSort;                  //打印顺序号
     private Integer studentSign;                //学生签收[0:是；1:否]
+    private int isSendStudent;                  //是否邮寄给学生[0:否；1:是]
     private String creator;                     //创建人
     private Date createTime = new Date();       //创建时间
     private String operator;                    //操作人
@@ -185,5 +189,13 @@ public class StudentBookOrder extends AbstractEntity {
 
     public void setStudentSign(Integer studentSign) {
         this.studentSign = studentSign;
+    }
+
+    public int getIsSendStudent() {
+        return isSendStudent;
+    }
+
+    public void setIsSendStudent(int isSendStudent) {
+        this.isSendStudent = isSendStudent;
     }
 }

@@ -197,6 +197,12 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                                 studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
                                 studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
                                 studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
+                                if(Student.IS_SEND_STUDENT_NOT == student.getIsSendStudent()){
+                                    studentBookOrder.setIsSendStudent(StudentBookOrder.IS_SEND_STUDENT_NOT);
+                                }
+                                if(Student.IS_SEND_STUDENT_YES == student.getIsSendStudent()){
+                                    studentBookOrder.setIsSendStudent(StudentBookOrder.IS_SEND_STUDENT_YES);
+                                }
                                 studentBookOrder.setCreator("管理员");
                                 studentBookOrder.setOperator("管理员");
                                 addStudentBookOrderList.add(studentBookOrder);

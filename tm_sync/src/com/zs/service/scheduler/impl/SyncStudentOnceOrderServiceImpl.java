@@ -12,6 +12,7 @@ import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
 import com.zs.dao.sale.onceordertm.DelStudentBookOnceOrderTMByOrderIdDAO;
 import com.zs.dao.sale.studentbookorder.FindSyncOnceOrderStudentDAO;
+import com.zs.dao.sync.FindStudentByCodeDAO;
 import com.zs.dao.sync.FindTeachScheduleByYearAndQuarterAndSpecAndLevelDAO;
 import com.zs.dao.sync.SelectedCourseDAO;
 import com.zs.domain.basic.IssueRange;
@@ -19,6 +20,7 @@ import com.zs.domain.basic.Semester;
 import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.sale.*;
 import com.zs.domain.sync.SelectedCourse;
+import com.zs.domain.sync.Student;
 import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
 import com.zs.service.scheduler.SyncStudentOnceOrderService;
 import com.zs.tools.DateTools;
@@ -67,6 +69,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private FindStudentBookOnceOrderForMaxIdDAO findStudentBookOnceOrderForMaxIdDAO;
     @Resource
     private FindStudentBookOnceOrderForMaxCodeDAO findStudentBookOnceOrderForMaxCodeDAO;
+    @Resource
+    private FindStudentByCodeDAO findStudentByCodeDAO;
 
     //课程对应的教材信息
     Map<String, List<TeachMaterial>> courseTMMap = null;
@@ -166,6 +170,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     //生成学生订单号
                     String orderCode = OrderCodeTools.createStudentOnceOrderCode(semester.getYear(), semester.getQuarter(), num + 1);
 
+                    Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
                     //添加订单信息
                     StudentBookOnceOrder order = new StudentBookOnceOrder();
                     order.setId(maxId+num);
@@ -174,6 +179,12 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     order.setStudentCode(studentCode);
                     order.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                     order.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
+                    if(Student.IS_SEND_STUDENT_NOT == student.getIsSendStudent()){
+                        order.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
+                    }
+                    if(Student.IS_SEND_STUDENT_YES == student.getIsSendStudent()){
+                        order.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_YES);
+                    }
                     order.setCreator("管理员");
                     order.setOperator("管理员");
                     addOrderList.add(order);

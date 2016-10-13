@@ -18,7 +18,7 @@ public interface FindTeachScheduleByYearAndQuarterAndSpecAndLevelDAO extends Ent
             "and ts.spec_code = ?3 and ts.level_code = ?4" +
             ") t LEFT JOIN " +
             "(select DISTINCT sbotm.course_code from student_book_order sbo, student_book_order_tm sbotm " +
-            "where sbo.order_code = sbotm.order_code and sbo.student_code = ?5 and sbotm.course_code is not null and sbo.state > 0" +
+            "where sbo.order_code = sbotm.order_code and sbo.student_code = ?5 and sbotm.course_code is not null and sbo.state > 0 and sbotm.count > 0 " +
             ") t2 on t.course_code = t2.course_code")
     public List<Object[]> find(int year, int quarter, String specCode, String levelCode, String studentCode);
 }

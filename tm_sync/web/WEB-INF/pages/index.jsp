@@ -63,12 +63,7 @@
     </tr>
     <tr>
         <td>
-            <a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm?isOnlyAdd=1">开始同步学生一次性订单</a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm?isOnlyAdd=0">只同步还未生成的一次性订单</a>
+            <a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm">开始同步学生一次性订单</a>
         </td>
     </tr>
 </table>

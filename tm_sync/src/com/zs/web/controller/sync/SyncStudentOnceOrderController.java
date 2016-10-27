@@ -20,10 +20,9 @@ public class SyncStudentOnceOrderController extends LoggerController {
     private SyncStudentOnceOrderService syncStudentOnceOrderService;
 
     @RequestMapping(value = "sync")
-    public void sync(HttpServletRequest request,
-                     @RequestParam("isOnlyAdd") int isOnlyAdd){
+    public void sync(){
         try {
-            syncStudentOnceOrderService.sync(isOnlyAdd);
+            syncStudentOnceOrderService.sync();
         } catch (Exception e) {
             e.printStackTrace();
         }

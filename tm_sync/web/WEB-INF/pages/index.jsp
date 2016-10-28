@@ -7,7 +7,7 @@
   <%@ include file="/common/taglibs.jsp"%>
 </head>
 <body>
-<table>
+<table width="100%">
     <tr>
         <th>同步</th>
         <th>快递</th>
@@ -64,6 +64,7 @@
     <tr>
         <td>
             <a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm">开始同步学生一次性订单</a>
+            <a href="${pageContext.request.contextPath}/delOnceOrderForNotTM/del.htm">删除没有明细的一次性订单</a>
         </td>
     </tr>
 </table>

@@ -77,8 +77,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
         Map<String, List<TeachMaterial>> courseTMMap = new HashMap<String, List<TeachMaterial>>();
 
-        int tempNum = 1;
-
+        long num = 1;
         try {
             //查询学生剩余选课
             List<Object[]> list = oldSelectedCourseTempDAO.find();
@@ -131,7 +130,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
                         //添加订单信息
                         StudentBookOnceOrder studentBookOnceOrder = new StudentBookOnceOrder();
-                        studentBookOnceOrder.setId(maxId+tempNum);
+                        studentBookOnceOrder.setId(maxId+num);
                         studentBookOnceOrder.setIssueChannelId(issueChannelId);
                         studentBookOnceOrder.setStudentCode(studentCode);
                         studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
@@ -173,6 +172,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                                 addOrderTMList.add(studentBookOnceOrderTM);
                             }
                         }
+
+                        num++;
                     } else {
                         StudentBookOnceOrderTM beforeStudentBookOnceOrderTM = addOrderTMList.get(addOrderTMList.size() - 1);
                         long orderId = beforeStudentBookOnceOrderTM.getOrderId();
@@ -197,9 +198,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                             }
                         }
                     }
-
                     beforeStudentCode = studentCode;
-                    tempNum++;
                 }
 
                 //添加新的选课信息进选课表

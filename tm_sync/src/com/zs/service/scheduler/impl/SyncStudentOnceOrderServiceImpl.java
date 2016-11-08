@@ -113,6 +113,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     courseCode = objs[2].toString();
                     int isSendStudent = Integer.parseInt(objs[3].toString());
 
+                    long orderId = 0l;
                     if (!beforeStudentCode.equals(studentCode)) {
                         //根据学生的学习中心查询关联的发行渠道
                         IssueRange issueRange = findIssueRangeBySpotCodeService.getIssueRangeBySpotCode(spotCode);
@@ -129,8 +130,9 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         }
 
                         //添加订单信息
+                        orderId = maxId+num;
                         StudentBookOnceOrder studentBookOnceOrder = new StudentBookOnceOrder();
-                        studentBookOnceOrder.setId(maxId+num);
+                        studentBookOnceOrder.setId(orderId);
                         studentBookOnceOrder.setIssueChannelId(issueChannelId);
                         studentBookOnceOrder.setStudentCode(studentCode);
                         studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
@@ -175,9 +177,6 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
                         num++;
                     } else {
-                        StudentBookOnceOrderTM beforeStudentBookOnceOrderTM = addOrderTMList.get(addOrderTMList.size() - 1);
-                        long orderId = beforeStudentBookOnceOrderTM.getOrderId();
-
                         //通过课程查询课程关联的教材
                         List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
                         if (null == teachMaterialList || 1 > teachMaterialList.size()) {

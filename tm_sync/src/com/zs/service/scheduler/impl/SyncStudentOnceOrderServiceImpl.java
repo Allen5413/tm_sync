@@ -104,16 +104,16 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                 String beforeStudentCode = "";
 
                 int i=0;
+                long orderId = 0l;
                 //生成新选课的订单数据
                 for (Object[] objs : list){
-                    System.out.println("i: "+i);
+                    System.out.println("i: "+i+"   "+orderId);
                     i++;
                     studentCode = objs[0].toString();
                     spotCode = objs[1].toString();
                     courseCode = objs[2].toString();
                     int isSendStudent = Integer.parseInt(objs[3].toString());
 
-                    long orderId = 0l;
                     if (!beforeStudentCode.equals(studentCode)) {
                         //根据学生的学习中心查询关联的发行渠道
                         IssueRange issueRange = findIssueRangeBySpotCodeService.getIssueRangeBySpotCode(spotCode);

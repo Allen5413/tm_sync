@@ -65,6 +65,9 @@
         <td>
             <a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm">开始同步学生一次性订单</a>
             <a href="${pageContext.request.contextPath}/delOnceOrderForNotTM/del.htm">删除没有明细的一次性订单</a>
+            <br/>
+            <input id="spotCode" size="1">中心<input id="levelCode" size="1">层次<input id="specCode" size="1">专业<input id="year" size="1">入学年<input id="quarter" size="1">入学季<input id="studentCodes" size="1">学号
+            <a href="#" onclick="syncTempAdjust()">一次性订单临时改动同步</a>
         </td>
     </tr>
 </table>
@@ -97,5 +100,15 @@
     function addAoPengOrder(){
         var semesterId = $("#semesterId").val();
         location.href = "${pageContext.request.contextPath}/addAoPengOrder/add.htm?semesterId="+semesterId
+    }
+
+    function syncTempAdjust(){
+        var spotCode = $("#spotCode").val();
+        var year = $("#year").val();
+        var quarter = $("#quarter").val();
+        var specCode = $("#specCode").val();
+        var levelCode = $("#levelCode").val();
+        var studentCodes = $("#studentCodes").val();
+        location.href = "${pageContext.request.contextPath}/syncStudentOnceOrder/syncTempAdjust.htm?spotCode="+spotCode+"&specCode="+specCode+"&levelCode="+levelCode+"&year="+year+"&quarter="+quarter+"&studentCodes="+studentCodes;
     }
 </script>

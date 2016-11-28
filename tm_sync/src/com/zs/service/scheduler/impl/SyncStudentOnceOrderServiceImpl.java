@@ -2,19 +2,24 @@ package com.zs.service.scheduler.impl;
 
 import com.feinno.framework.common.exception.BusinessException;
 import com.feinno.framework.common.service.EntityServiceImpl;
+import com.zs.dao.FindListByWhereDAO;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxIdDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.impl.FindOnceOrderByWhereDAOImpl;
 import com.zs.dao.sale.onceorderlog.BatchStudentBookOnceOrderLogDAO;
+import com.zs.dao.sale.onceorderlog.OnceOrderLogDAO;
 import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
+import com.zs.dao.sale.onceordertm.DelStudentBookOnceOrderTMByOrderIdDAO;
 import com.zs.dao.sync.*;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
 import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.sale.*;
+import com.zs.domain.sync.OldSelectedCourseTemp2;
 import com.zs.domain.sync.SelectedCourse;
 import com.zs.domain.sync.Student;
 import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
@@ -58,9 +63,14 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private BatchSelectedCourseDAO batchSelectedCourseDAO;
     @Resource
     private BatchStudentBookOnceOrderLogDAO batchStudentBookOnceOrderLogDAO;
-
-
-
+    @Resource
+    private FindListByWhereDAO findOnceOrderByWhereDAO;
+    @Resource
+    private DelStudentBookOnceOrderTMByOrderIdDAO delStudentBookOnceOrderTMByOrderIdDAO;
+    @Resource
+    private OnceOrderLogDAO onceOrderLogDAO;
+    @Resource
+    private OldSelectedCourseTemp2DAO oldSelectedCourseTemp2DAO;
 
     @Override
     @Transactional
@@ -246,6 +256,65 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
             String nowDate = DateTools.transferLongToDate("yyyy-MM-dd", System.currentTimeMillis());
             FileTools.createFile(rootPath + filePath, nowDate + ".txt");
             FileTools.writeTxtFile(msg.toString(), rootPath + filePath + nowDate + ".txt");
+        }
+    }
+
+    /**
+     * 临时调整选课有变化的学生
+     * @param map
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public void syncTempAdjust(Map<String, String> map) throws Exception {
+        Map<String, List<TeachMaterial>> courseTMMap = new HashMap<String, List<TeachMaterial>>();
+        List<Object[]> list = findOnceOrderByWhereDAO.findListByWhere(map, null);
+        if(null != list && 0 < list.size()){
+            for(Object[] objs : list){
+                long orderId = Long.parseLong(objs[0].toString());
+                String studentCode = objs[1].toString();
+                int state = Integer.parseInt(objs[2].toString());
+                //删除掉现有订单明细
+                delStudentBookOnceOrderTMByOrderIdDAO.del(orderId);
+                if(state == StudentBookOnceOrder.STATE_CONFIRMED){
+                    //如果订单已经确认了，修改成未确认
+                    StudentBookOnceOrder studentBookOnceOrder = super.get(orderId);
+                    studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                    super.update(studentBookOnceOrder);
+                    //记录状态变更
+                    StudentBookOnceOrderLog studentBookOnceOrderLog = new StudentBookOnceOrderLog();
+                    studentBookOnceOrderLog.setOrderId(orderId);
+                    studentBookOnceOrderLog.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                    studentBookOnceOrderLog.setOperator("管理员");
+                    onceOrderLogDAO.save(studentBookOnceOrderLog);
+                }
+                //查询该学生新的选课，然后重新生成订单明细
+                List<OldSelectedCourseTemp2> oldSelectedCourseTemp2List = oldSelectedCourseTemp2DAO.find(studentCode);
+                if(null != oldSelectedCourseTemp2List && 0 < oldSelectedCourseTemp2List.size()){
+                    for(OldSelectedCourseTemp2 oldSelectedCourseTemp2 : oldSelectedCourseTemp2List){
+                        String courseCode = oldSelectedCourseTemp2.getCourseCode();
+                        //通过课程查询课程关联的教材
+                        List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                        if (null == teachMaterialList || 1 > teachMaterialList.size()) {
+                            teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                            courseTMMap.put(courseCode, teachMaterialList);
+                        }
+                        if (null != teachMaterialList && 0 < teachMaterialList.size()) {
+                            for (TeachMaterial teachMaterial : teachMaterialList) {
+                                StudentBookOnceOrderTM studentBookOnceOrderTM = new StudentBookOnceOrderTM();
+                                studentBookOnceOrderTM.setOrderId(orderId);
+                                studentBookOnceOrderTM.setCourseCode(courseCode);
+                                studentBookOnceOrderTM.setTeachMaterialId(teachMaterial.getId());
+                                studentBookOnceOrderTM.setPrice(teachMaterial.getPrice());
+                                studentBookOnceOrderTM.setCount(1);
+                                studentBookOnceOrderTM.setIsSend(StudentBookOnceOrderTM.IS_SEND_NOT);
+                                studentBookOnceOrderTM.setOperator("管理员");
+                                delStudentBookOnceOrderTMByOrderIdDAO.save(studentBookOnceOrderTM);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

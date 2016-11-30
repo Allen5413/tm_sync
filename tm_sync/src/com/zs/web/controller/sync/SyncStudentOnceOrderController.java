@@ -35,7 +35,7 @@ public class SyncStudentOnceOrderController extends LoggerController {
     }
 
     @RequestMapping(value = "syncTempAdjust")
-    public void find(@RequestParam(value="spotCode", required=false, defaultValue="") String spotCode,
+    public void syncTempAdjust(@RequestParam(value="spotCode", required=false, defaultValue="") String spotCode,
                        @RequestParam(value="specCode", required=false, defaultValue="") String specCode,
                        @RequestParam(value="levelCode", required=false, defaultValue="") String levelCode,
                        @RequestParam(value="studentCodes", required=false, defaultValue="") String studentCodes,
@@ -50,6 +50,18 @@ public class SyncStudentOnceOrderController extends LoggerController {
             params.put("year", year);
             params.put("quarter", quarter);
             syncStudentOnceOrderService.syncTempAdjust(params);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "syncNewStudentForNotOrder")
+    public void syncNewStudentForNotOrder(
+                     @RequestParam(value="studentCodes", required=false, defaultValue="") String studentCodes){
+        try{
+            String[] studentCodeArray = studentCodes.split(",");
+            syncStudentOnceOrderService.syncNewStudentForNotOrder(studentCodeArray);
         }
         catch(Exception e){
             e.printStackTrace();

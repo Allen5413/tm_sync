@@ -68,6 +68,7 @@
             <br/>
             <input id="spotCode" size="1">中心<input id="levelCode" size="1">层次<input id="specCode" size="1">专业<input id="year" size="1">入学年<input id="quarter" size="1">入学季<input id="studentCodes" size="1">学号
             <a href="#" onclick="syncTempAdjust()">一次性订单临时改动同步</a>
+            <a href="#" onclick="syncNewStudentForNotOrder()">一次性订单临时新增同步</a>
         </td>
     </tr>
 </table>
@@ -110,5 +111,10 @@
         var levelCode = $("#levelCode").val();
         var studentCodes = $("#studentCodes").val();
         location.href = "${pageContext.request.contextPath}/syncStudentOnceOrder/syncTempAdjust.htm?spotCode="+spotCode+"&specCode="+specCode+"&levelCode="+levelCode+"&year="+year+"&quarter="+quarter+"&studentCodes="+studentCodes;
+    }
+
+    function syncNewStudentForNotOrder(){
+        var studentCodes = $("#studentCodes").val();
+        location.href = "${pageContext.request.contextPath}/syncStudentOnceOrder/syncNewStudentForNotOrder.htm?studentCodes="+studentCodes;
     }
 </script>

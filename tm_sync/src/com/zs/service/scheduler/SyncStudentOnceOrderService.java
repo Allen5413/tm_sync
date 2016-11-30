@@ -12,4 +12,6 @@ public interface SyncStudentOnceOrderService extends EntityService<StudentBookOn
     public void sync()throws Exception;
 
     public void syncTempAdjust(Map<String, String> map)throws Exception;
+
+    public void syncNewStudentForNotOrder(String... studentCodes)throws Exception;
 }

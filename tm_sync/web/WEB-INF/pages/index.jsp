@@ -71,6 +71,12 @@
             <a href="#" onclick="syncNewStudentForNotOrder()">一次性订单临时新增同步</a>
         </td>
     </tr>
+    <tr>
+        <td>
+            学期id：<input id="semesterId2">
+            <a href="#" onclick="editOrderForSendBySemesterId()">设置已打包的学生订单为已发出</a>
+        </td>
+    </tr>
 </table>
 
 <a href="${pageContext.request.contextPath}/delOrderTM/sync6.htm">临时处理</a>
@@ -116,5 +122,10 @@
     function syncNewStudentForNotOrder(){
         var studentCodes = $("#studentCodes").val();
         location.href = "${pageContext.request.contextPath}/syncStudentOnceOrder/syncNewStudentForNotOrder.htm?studentCodes="+studentCodes;
+    }
+
+    function editOrderForSendBySemesterId(){
+        var id = $("#semesterId2").val();
+        location.href = "${pageContext.request.contextPath}/editOrderForSendBySemesterId/editor.htm?id="+id;
     }
 </script>

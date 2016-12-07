@@ -17,4 +17,7 @@ public interface FindRecordStudentCodeDao extends EntityJpaDao<StudentExpense,Lo
 
     @Query("from StudentExpense where studentCode = ?1 and semester_id = ?2")
     public StudentExpense getRecordByStuCode(String studentCode, long semesterId);
+
+    @Query("from StudentExpense where semesterId = ?1")
+    public List<StudentExpense> getRecordBySemesterId(long semesterId);
 }

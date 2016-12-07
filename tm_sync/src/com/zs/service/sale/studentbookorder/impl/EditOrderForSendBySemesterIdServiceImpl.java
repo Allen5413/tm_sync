@@ -4,6 +4,8 @@ import com.feinno.framework.common.exception.BusinessException;
 import com.feinno.framework.common.service.EntityServiceImpl;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterialstock.FindTeachMaterialStockBytmIdAndChannelIdDAO;
+import com.zs.dao.finance.studentexpense.FindRecordStudentCodeDao;
+import com.zs.dao.finance.studentexpense.StudentExpenseDao;
 import com.zs.dao.finance.studentexpensebuy.StudentExpenseBuyDao;
 import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForStatePackageBySemesterIdDAO;
 import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
@@ -13,6 +15,7 @@ import com.zs.dao.sync.FindStudentByCodeDAO;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.basic.TeachMaterialStock;
+import com.zs.domain.finance.StudentExpense;
 import com.zs.domain.finance.StudentExpenseBuy;
 import com.zs.domain.sale.StudentBookOrder;
 import com.zs.domain.sale.StudentBookOrderLog;
@@ -57,6 +60,8 @@ public class EditOrderForSendBySemesterIdServiceImpl extends EntityServiceImpl<S
     private FindIssueRangeBySpotCodeService findIssueRangeBySpotCodeService;
     @Resource
     private FindTeachMaterialStockBytmIdAndChannelIdDAO findTeachMaterialStockBytmIdAndChannelIdDAO;
+    @Resource
+    private FindRecordStudentCodeDao findRecordStudentCodeDao;
 
 
     @Override
@@ -125,6 +130,35 @@ public class EditOrderForSendBySemesterIdServiceImpl extends EntityServiceImpl<S
                             studentBookOrderTmDAO.update(studentBookOrderTM);
                         }
                     }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void edit2(long semesterId, long nowSemesterId) throws Exception {
+        List<StudentExpense> studentExpenseList = findRecordStudentCodeDao.getRecordBySemesterId(nowSemesterId);
+        if(null != studentExpenseList && 0 < studentExpenseList.size()){
+            for(StudentExpense studentExpense : studentExpenseList){
+                //查询之前的学期是否存在财务记录；如果存在就修改，不存在就把当前学期的改成之前学期的
+                StudentExpense studentExpense2 = findRecordStudentCodeDao.getRecordByStuCode(studentExpense.getStudentCode(), semesterId);
+                if(null == studentExpense2 || null == studentExpense2.getId()){
+                    studentExpense.setSemesterId(semesterId);
+                    findRecordStudentCodeDao.update(studentExpense);
+                }else{
+                    float pay = new BigDecimal(studentExpense.getPay()).add(new BigDecimal(studentExpense2.getPay())).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+                    float buy = new BigDecimal(studentExpense.getBuy()).add(new BigDecimal(studentExpense2.getBuy())).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+                    studentExpense2.setPay(pay);
+                    studentExpense2.setBuy(buy);
+                    if(pay >= buy){
+                        if(null != studentExpense2.getClearTime()){
+
+                        }studentExpense2.setClearTime(DateTools.getLongNowTime());
+                    }else{
+                        studentExpense2.setClearTime(null);
+                    }
+                    findRecordStudentCodeDao.update(studentExpense2);
+                    findRecordStudentCodeDao.remove(studentExpense);
                 }
             }
         }

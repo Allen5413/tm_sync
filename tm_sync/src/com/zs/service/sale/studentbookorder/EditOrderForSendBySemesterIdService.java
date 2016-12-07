@@ -8,4 +8,6 @@ import com.zs.domain.sale.StudentBookOrder;
  */
 public interface EditOrderForSendBySemesterIdService extends EntityService<StudentBookOrder> {
     public void edit(long semesterId)throws Exception;
+
+    public void edit2(long semesterId, long nowSemesterId)throws Exception;
 }

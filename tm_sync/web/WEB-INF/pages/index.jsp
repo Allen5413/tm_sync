@@ -74,7 +74,7 @@
     <tr>
         <td>
             学期id：<input id="semesterId2">
-            <a href="#" onclick="editOrderForSendBySemesterId()">设置已打包的学生订单为已发出</a>
+            <a href="#" onclick="editOrderForSendBySemesterId()">设置已打包的学生订单为已发出(操作之前看下逻辑，每次情况了能不一样)</a>
         </td>
     </tr>
 </table>

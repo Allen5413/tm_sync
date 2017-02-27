@@ -19,4 +19,15 @@ public interface SelectedCourseDAO extends EntityJpaDao<SelectedCourse, Long> {
      */
     @Query("FROM SelectedCourse WHERE studentCode = ?1")
     public List<SelectedCourse> findByStudentCode(String studentCode)throws Exception;
+
+
+    /**
+     * 查询变更的选课， 把之前选了，后面没选的课程删掉
+     * @return
+     * @throws Exception
+     */
+    @Query(nativeQuery = true, value = "select t.* from " +
+            "(select DISTINCT sc.* from sync_selected_course sc, sync_selected_course_temp sct where sc.student_code = sct.student_code) t " +
+            "where not EXISTS(select * from sync_selected_course_temp sct where t.student_code = sct.student_code and t.course_code = sct.course_code)")
+    public List<SelectedCourse> findDelSelectedCourse()throws Exception;
 }

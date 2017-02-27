@@ -21,5 +21,6 @@ public class SyncSelectedCourseController extends LoggerController {
     @RequestMapping(value = "sync")
     public void sync(HttpServletRequest request){
         syncSelectedCourseTaskService.syncSelectedCourse();
+        syncSelectedCourseTaskService.delChangeSelectedCourse();
     }
 }

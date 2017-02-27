@@ -9,8 +9,10 @@ import com.zs.dao.sale.studentbookorder.FindStudentBookOrderForMaxCodeDAO;
 import com.zs.dao.sale.studentbookorder.StudentBookOrderDAO;
 import com.zs.dao.sale.studentbookorderlog.BatchStudentBookOrderLogDAO;
 import com.zs.dao.sale.studentbookordertm.BatchStudentBookOrderTMDAO;
+import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
 import com.zs.dao.sync.BatchSelectedCourseDAO;
 import com.zs.dao.sync.FindStudentByCodeDAO;
+import com.zs.dao.sync.SelectedCourseDAO;
 import com.zs.dao.sync.SelectedCourseTempDAO;
 import com.zs.domain.basic.IssueRange;
 import com.zs.domain.basic.Semester;
@@ -68,6 +70,10 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
     private BatchStudentBookOrderLogDAO batchStudentBookOrderLogDAO;
     @Resource
     private BatchStudentBookOrderTMDAO batchStudentBookOrderTMDAO;
+    @Resource
+    private SelectedCourseDAO selectedCourseDAO;
+    @Resource
+    private StudentBookOrderTmDAO studentBookOrderTmDAO;
 
     //变更信息描述
     private String detail = "";
@@ -291,6 +297,31 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
             String nowDate = DateTools.transferLongToDate("yyyy-MM-dd", System.currentTimeMillis());
             FileTools.createFile(rootPath + filePath, nowDate + ".txt");
             FileTools.writeTxtFile(msg.toString(), rootPath + filePath + nowDate + ".txt");
+        }
+    }
+
+    /**
+     * 删除掉更换的选课，以及还没有发书的订单明细
+     */
+    @Override
+    @Transactional
+    public void delChangeSelectedCourse() {
+        try {
+            List<SelectedCourse> selectedCourseList = selectedCourseDAO.findDelSelectedCourse();
+            List<Object[]> orderTmList = studentBookOrderTmDAO.findDelChangeSelectCourse();
+            if(null != selectedCourseList && 0 < selectedCourseList.size()){
+                for(SelectedCourse selectedCourse : selectedCourseList){
+                    selectedCourseDAO.delete(selectedCourse.getId());
+                }
+            }
+            if(null != orderTmList && 0 < orderTmList.size()){
+                for(Object[] objs : orderTmList){
+                    long orderTmId = Long.parseLong(objs[0].toString());
+                    studentBookOrderTmDAO.delete(orderTmId);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

@@ -5,4 +5,6 @@ package com.zs.service.scheduler;
  */
 public interface SyncSelectedCourseTaskService {
     public void syncSelectedCourse();
+
+    public void delChangeSelectedCourse();
 }

@@ -32,9 +32,9 @@ public class SetSpotExpenseOthBySpotCodeServiceImpl
         if(null != list && 0 < list.size()){
             for(Object[] objs : list){
                 float pay = null == objs[1] ? 0 : Float.parseFloat(objs[1].toString());
-                float buy = null == objs[1] ? 0 : Float.parseFloat(objs[2].toString());
-                float own = null == objs[1] ? 0 : Float.parseFloat(objs[3].toString());
-                float acc = null == objs[1] ? 0 : Float.parseFloat(objs[4].toString());
+                float buy = null == objs[2] ? 0 : Float.parseFloat(objs[2].toString());
+                float own = null == objs[3] ? 0 : Float.parseFloat(objs[3].toString());
+                float acc = null == objs[4] ? 0 : Float.parseFloat(objs[4].toString());
                 long semesterId = Long.parseLong(objs[5].toString());
 
                 //查询现有的记录

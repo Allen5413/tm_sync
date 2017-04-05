@@ -7,4 +7,6 @@ public interface SyncSelectedCourseTaskService {
     public void syncSelectedCourse();
 
     public void delChangeSelectedCourse();
+
+    public void delHSTmBySermesterId();
 }

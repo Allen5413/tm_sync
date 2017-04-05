@@ -22,5 +22,6 @@ public class SyncSelectedCourseController extends LoggerController {
     public void sync(HttpServletRequest request){
         syncSelectedCourseTaskService.syncSelectedCourse();
         syncSelectedCourseTaskService.delChangeSelectedCourse();
+        syncSelectedCourseTaskService.delHSTmBySermesterId();
     }
 }

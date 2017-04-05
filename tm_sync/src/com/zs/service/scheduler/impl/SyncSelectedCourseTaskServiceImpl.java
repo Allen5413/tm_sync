@@ -122,8 +122,6 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                 String beforeStudentCode = "";
                 int i=0;
                 Student student = null;
-                //判断是否是函授站学生，学号H开头的就是； 函授站的学生不管0481课程，0483课程只需要《计算机应用基础》这一本书
-                boolean isHStudent = false;
                 //生成新选课的订单数据
                 for (SelectedCourseTemp selectedCourseTemp : copySelectedCourseTempList){
                     System.out.println("i: "+i);
@@ -132,34 +130,27 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                     courseCode = selectedCourseTemp.getCourseCode();
 
                     if (!beforeStudentCode.equals(studentCode)) {
-                        if(studentCode.indexOf("H") == 0 || studentCode.indexOf("h") == 0){
-                            isHStudent = true;
-                        }
                         //查询学生当前学期有没有未确认的订单， 如果有，就把新课程的教材加进去，如果没得就新生成一个订单
                         List<StudentBookOrder> studentBookOrderList = studentBookOrderDAO.findByStudentCodeAndSemesterIdForUnconfirmed(studentCode, semester.getId());
                         if (null != studentBookOrderList && 0 < studentBookOrderList.size()) {
                             StudentBookOrder studentBookOrder = studentBookOrderList.get(0);
-                            if(!isHStudent || (isHStudent && !"0481".equals(courseCode))) {
-                                //通过课程查询课程关联的教材
-                                List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
-                                if (null == teachMaterialList || 1 > teachMaterialList.size()) {
-                                    teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
-                                    courseTMMap.put(courseCode, teachMaterialList);
-                                }
-                                if (null != teachMaterialList && 0 < teachMaterialList.size()) {
-                                    for (TeachMaterial teachMaterial : teachMaterialList) {
-                                        if(!isHStudent || (isHStudent && (("0483".equals(courseCode) && 1393 != teachMaterial.getId()) || !"0483".equals(courseCode)))) {
-                                            StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                                            studentBookOrderTM.setOrderCode(studentBookOrder.getOrderCode());
-                                            studentBookOrderTM.setCourseCode(courseCode);
-                                            studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
-                                            studentBookOrderTM.setPrice(teachMaterial.getPrice());
-                                            studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
-                                            studentBookOrderTM.setCount(1);
-                                            studentBookOrderTM.setOperator("管理员");
-                                            addStudentBookOrderTMList.add(studentBookOrderTM);
-                                        }
-                                    }
+                            //通过课程查询课程关联的教材
+                            List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                            if (null == teachMaterialList || 1 > teachMaterialList.size()) {
+                                teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                                courseTMMap.put(courseCode, teachMaterialList);
+                            }
+                            if (null != teachMaterialList && 0 < teachMaterialList.size()) {
+                                for (TeachMaterial teachMaterial : teachMaterialList) {
+                                    StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                                    studentBookOrderTM.setOrderCode(studentBookOrder.getOrderCode());
+                                    studentBookOrderTM.setCourseCode(courseCode);
+                                    studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
+                                    studentBookOrderTM.setPrice(teachMaterial.getPrice());
+                                    studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
+                                    studentBookOrderTM.setCount(1);
+                                    studentBookOrderTM.setOperator("管理员");
+                                    addStudentBookOrderTMList.add(studentBookOrderTM);
                                 }
                             }
                         } else {
@@ -211,26 +202,22 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                             addStudentBookOrderLogList.add(studentBookOrderLog);
 
                             //通过课程查询课程关联的教材
-                            if(!isHStudent || (isHStudent && !"0481".equals(courseCode))) {
-                                List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
-                                if (null == teachMaterialList || 1 > teachMaterialList.size()) {
-                                    teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
-                                    courseTMMap.put(courseCode, teachMaterialList);
-                                }
-                                if (null != teachMaterialList && 0 < teachMaterialList.size()) {
-                                    for (TeachMaterial teachMaterial : teachMaterialList) {
-                                        if(!isHStudent || (isHStudent && (("0483".equals(courseCode) && 1393 != teachMaterial.getId()) || !"0483".equals(courseCode)))) {
-                                            StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                                            studentBookOrderTM.setOrderCode(orderCode);
-                                            studentBookOrderTM.setCourseCode(courseCode);
-                                            studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
-                                            studentBookOrderTM.setPrice(teachMaterial.getPrice());
-                                            studentBookOrderTM.setCount(1);
-                                            studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
-                                            studentBookOrderTM.setOperator("管理员");
-                                            addStudentBookOrderTMList.add(studentBookOrderTM);
-                                        }
-                                    }
+                            List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                            if (null == teachMaterialList || 1 > teachMaterialList.size()) {
+                                teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                                courseTMMap.put(courseCode, teachMaterialList);
+                            }
+                            if (null != teachMaterialList && 0 < teachMaterialList.size()) {
+                                for (TeachMaterial teachMaterial : teachMaterialList) {
+                                    StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                                    studentBookOrderTM.setOrderCode(orderCode);
+                                    studentBookOrderTM.setCourseCode(courseCode);
+                                    studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
+                                    studentBookOrderTM.setPrice(teachMaterial.getPrice());
+                                    studentBookOrderTM.setCount(1);
+                                    studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
+                                    studentBookOrderTM.setOperator("管理员");
+                                    addStudentBookOrderTMList.add(studentBookOrderTM);
                                 }
                             }
                         }
@@ -239,26 +226,22 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                         String orderCode = beforeStudentBookOrderTM.getOrderCode();
 
                         //通过课程查询课程关联的教材
-                        if(!isHStudent || (isHStudent && !"0481".equals(courseCode))) {
-                            List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
-                            if (null == teachMaterialList || 1 > teachMaterialList.size()) {
-                                teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
-                                courseTMMap.put(courseCode, teachMaterialList);
-                            }
-                            if (null != teachMaterialList && 0 < teachMaterialList.size()) {
-                                for (TeachMaterial teachMaterial : teachMaterialList) {
-                                    if(!isHStudent || (isHStudent && (("0483".equals(courseCode) && 1393 != teachMaterial.getId()) || !"0483".equals(courseCode)))) {
-                                        StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
-                                        studentBookOrderTM.setOrderCode(orderCode);
-                                        studentBookOrderTM.setCourseCode(courseCode);
-                                        studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
-                                        studentBookOrderTM.setPrice(teachMaterial.getPrice());
-                                        studentBookOrderTM.setCount(1);
-                                        studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
-                                        studentBookOrderTM.setOperator("管理员");
-                                        addStudentBookOrderTMList.add(studentBookOrderTM);
-                                    }
-                                }
+                        List<TeachMaterial> teachMaterialList = courseTMMap.get(courseCode);
+                        if (null == teachMaterialList || 1 > teachMaterialList.size()) {
+                            teachMaterialList = this.getTeachMaterialByCourseCode(courseCode);
+                            courseTMMap.put(courseCode, teachMaterialList);
+                        }
+                        if (null != teachMaterialList && 0 < teachMaterialList.size()) {
+                            for (TeachMaterial teachMaterial : teachMaterialList) {
+                                StudentBookOrderTM studentBookOrderTM = new StudentBookOrderTM();
+                                studentBookOrderTM.setOrderCode(orderCode);
+                                studentBookOrderTM.setCourseCode(courseCode);
+                                studentBookOrderTM.setTeachMaterialId(teachMaterial.getId());
+                                studentBookOrderTM.setPrice(teachMaterial.getPrice());
+                                studentBookOrderTM.setCount(1);
+                                studentBookOrderTM.setIsSend(StudentBookOrderTM.IS_SEND_NOT);
+                                studentBookOrderTM.setOperator("管理员");
+                                addStudentBookOrderTMList.add(studentBookOrderTM);
                             }
                         }
                     }
@@ -343,6 +326,20 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
     }
 
     /**
+     * 删除掉函授学生的0481课程对应教材和0483课程对应的id：1393教材
+     */
+    @Override
+    @Transactional
+    public void delHSTmBySermesterId() {
+        try {
+            Semester semester = findNowSemesterDAO.getNowSemester();
+            studentBookOrderTmDAO.delHSTmBySermesterId(semester.getId());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 通过课程查询课程关联的教材
      * @param courseCode
      * @return
@@ -361,4 +358,6 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
 
         return teachMaterialList;
     }
+
+
 }

@@ -130,8 +130,8 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                     courseCode = selectedCourseTemp.getCourseCode();
 
                     if (!beforeStudentCode.equals(studentCode)) {
-                        //查询学生当前学期有没有未确认的订单， 如果有，就把新课程的教材加进去，如果没得就新生成一个订单
-                        List<StudentBookOrder> studentBookOrderList = studentBookOrderDAO.findByStudentCodeAndSemesterIdForUnconfirmed(studentCode, semester.getId());
+                        //查询学生当前学期有没有未分拣的订单， 如果有，就把新课程的教材加进去，如果没得就新生成一个订单
+                        List<StudentBookOrder> studentBookOrderList = studentBookOrderDAO.findByStudentCodeAndSemesterIdForSorting(studentCode, semester.getId());
                         if (null != studentBookOrderList && 0 < studentBookOrderList.size()) {
                             StudentBookOrder studentBookOrder = studentBookOrderList.get(0);
                             //通过课程查询课程关联的教材
@@ -301,23 +301,20 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
     }
 
     /**
-     * 删除掉更换的选课，以及还没有发书的订单明细
+     * 删除掉更换的选课，以及还没有分拣的订单明细
      */
     @Override
     @Transactional
     public void delChangeSelectedCourse() {
         try {
-            List<SelectedCourse> selectedCourseList = selectedCourseDAO.findDelSelectedCourse();
             List<Object[]> orderTmList = studentBookOrderTmDAO.findDelChangeSelectCourse();
-            if(null != selectedCourseList && 0 < selectedCourseList.size()){
-                for(SelectedCourse selectedCourse : selectedCourseList){
-                    selectedCourseDAO.delete(selectedCourse.getId());
-                }
-            }
             if(null != orderTmList && 0 < orderTmList.size()){
                 for(Object[] objs : orderTmList){
                     long orderTmId = Long.parseLong(objs[0].toString());
+                    String studentCode = objs[1].toString();
+                    String courseCode = objs[2].toString();
                     studentBookOrderTmDAO.delete(orderTmId);
+                    selectedCourseDAO.delByStudentCodeAndCourseCode(studentCode, courseCode);
                 }
             }
         }catch (Exception e){

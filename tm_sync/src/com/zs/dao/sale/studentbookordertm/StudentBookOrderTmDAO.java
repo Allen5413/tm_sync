@@ -16,7 +16,7 @@ public interface StudentBookOrderTmDAO extends EntityJpaDao<StudentBookOrderTM, 
 
     @Query(nativeQuery = true, value = "select t.* from " +
             "(select DISTINCT sbotm.id, sbo.student_code, sbotm.course_code from student_book_order sbo, student_book_order_tm sbotm, sync_selected_course_temp sct " +
-            "where sbo.student_code = sct.student_code and sbo.order_code = sbotm.order_code and sbo.state < 4) t " +
+            "where sbo.student_code = sct.student_code and sbo.order_code = sbotm.order_code and sbo.state < 2) t " +
             "where not EXISTS(select * from sync_selected_course_temp sct where t.student_code = sct.student_code and t.course_code = sct.course_code)")
     public List<Object[]> findDelChangeSelectCourse()throws Exception;
 

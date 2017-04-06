@@ -2,6 +2,7 @@ package com.zs.dao.sync;
 
 import com.feinno.framework.common.dao.jpa.EntityJpaDao;
 import com.zs.domain.sync.SelectedCourse;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -30,4 +31,8 @@ public interface SelectedCourseDAO extends EntityJpaDao<SelectedCourse, Long> {
             "(select DISTINCT sc.* from sync_selected_course sc, sync_selected_course_temp sct where sc.student_code = sct.student_code) t " +
             "where not EXISTS(select * from sync_selected_course_temp sct where t.student_code = sct.student_code and t.course_code = sct.course_code)")
     public List<SelectedCourse> findDelSelectedCourse()throws Exception;
+
+    @Modifying
+    @Query(nativeQuery = true, value = "delete from sync_selected_course where student_code = ?1 and course_code = ?2")
+    public void delByStudentCodeAndCourseCode(String studentCode, String courseCode);
 }

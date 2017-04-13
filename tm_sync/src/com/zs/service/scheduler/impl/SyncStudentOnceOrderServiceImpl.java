@@ -149,12 +149,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         studentBookOnceOrder.setStudentCode(studentCode);
                         studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                         studentBookOnceOrder.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
-                        if(Student.IS_SEND_STUDENT_NOT == isSendStudent){
-                            studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
-                        }
-                        if(Student.IS_SEND_STUDENT_YES == isSendStudent){
-                            studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_YES);
-                        }
+                        studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
                         studentBookOnceOrder.setCreator("管理员");
                         studentBookOnceOrder.setOperator("管理员");
                         addOrderList.add(studentBookOnceOrder);
@@ -367,12 +362,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     studentBookOnceOrder.setStudentCode(studentCode);
                     studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                     studentBookOnceOrder.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
-                    if (Student.IS_SEND_STUDENT_NOT == student.getIsSendStudent()) {
-                        studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
-                    }
-                    if (Student.IS_SEND_STUDENT_YES == student.getIsSendStudent()) {
-                        studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_YES);
-                    }
+                    studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
                     studentBookOnceOrder.setCreator("管理员");
                     studentBookOnceOrder.setOperator("管理员");
                     addOrderList.add(studentBookOnceOrder);

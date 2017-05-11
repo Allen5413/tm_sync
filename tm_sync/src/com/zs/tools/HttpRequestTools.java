@@ -1,6 +1,5 @@
 package com.zs.tools;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +26,16 @@ public class HttpRequestTools {
     //快递100 key
     private static String key;
 
+    //网院请求url
+    private static String wangYuanUrl;
+
     static{
         try {
             PropertiesTools propertiesTools = new PropertiesTools("resource/commons.properties");
             kuaidiReqUrl = propertiesTools.getProperty("kuaidi100.url");
             kuaidiCallBackUrl = propertiesTools.getProperty("kuaidi100.callback.url");
             key = propertiesTools.getProperty("kuaidi100.key");
+            wangYuanUrl = propertiesTools.getProperty("wangyuan.url");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,9 +63,71 @@ public class HttpRequestTools {
         return callbackJSON;
     }
 
+    /**
+     * 通过网院接口获取课程信息
+     * @return
+     * @throws Exception
+     */
+    public static JSONObject getCourse()throws Exception{
+        String url = wangYuanUrl+"getCourse?code=&signature"+DesTools.encrypt("getCourse", "eduwest");
+        String result = sendGet(url);
+        JSONObject callbackJSON = new JSONObject();
+        callbackJSON = callbackJSON.fromObject(result);
+        callbackJSON.put("reqUrl", url);
+        return callbackJSON;
+    }
+
+    /**
+     * 通过网院接口获取学习中心信息
+     * @return
+     * @throws Exception
+     */
+    public static JSONObject getSpot()throws Exception{
+        String url = wangYuanUrl+"getStudyCenter?code=&signature="+DesTools.encrypt("getStudyCenter", "eduwest");
+        String result = sendGet(url);
+        JSONObject callbackJSON = new JSONObject();
+        callbackJSON = callbackJSON.fromObject(result);
+        callbackJSON.put("reqUrl", url);
+        return callbackJSON;
+    }
+
+    /**
+     * 通过网院接口获取学生信息
+     * @param year
+     * @param term
+     * @return
+     * @throws Exception
+     */
+    public static JSONObject getStudent(int year, int term)throws Exception{
+        String url = wangYuanUrl+"getStudent?year="+year+"&term="+term+"&studyCenterCode=&pageNo=0&pageSize=0&signature="+DesTools.encrypt("getStudent", "eduwest");
+        String result = sendGet(url);
+        JSONObject callbackJSON = new JSONObject();
+        callbackJSON = callbackJSON.fromObject(result);
+        callbackJSON.put("reqUrl", url);
+        return callbackJSON;
+    }
+
+    /**
+     * 通过网院接口获取学生选课信息
+     * @param year
+     * @param term
+     * @return
+     * @throws Exception
+     */
+    public static JSONObject getSelectCourse(int stuYear, int stuTerm, int courseYear, int courseTerm)throws Exception{
+        String url = wangYuanUrl+"getSelectCourse?stuYear="+stuYear+"&stuYerm="+stuTerm+"&courseYear="+courseYear+"&courseTerm="+courseTerm+"&courseCode=&pageNo=0&pageSize=0&signature="+DesTools.encrypt("getSelectCourse", "eduwest");
+        String result = sendGet(url);
+        JSONObject callbackJSON = new JSONObject();
+        callbackJSON = callbackJSON.fromObject(result);
+        callbackJSON.put("reqUrl", url);
+        return callbackJSON;
+    }
+
+
+
     public static void main(String[] args){
         try {
-            reqKuaidi100("ems", "123456");
+            getStudent(2017, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }

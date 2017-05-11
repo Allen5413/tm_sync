@@ -58,6 +58,11 @@
     </tr>
     <tr>
         <td>
+            <a href="${pageContext.request.contextPath}/syncWangYuanApi/sync.htm">开始同步网院接口信息</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href="${pageContext.request.contextPath}/delOrderTM/sync5.htm">合并还未确认的学生订单</a>
         </td>
     </tr>

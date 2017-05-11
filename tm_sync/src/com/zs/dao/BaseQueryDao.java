@@ -4,8 +4,10 @@ import com.feinno.framework.common.dao.jpa.JapDynamicQueryDao;
 import com.feinno.framework.common.dao.support.PageInfo;
 import com.zs.domain.sale.StudentBookOrder;
 import com.zs.domain.sale.StudentBookOrderTM;
+import com.zs.domain.sync.StudentTemp;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.Query;
@@ -84,7 +86,7 @@ public class BaseQueryDao extends JapDynamicQueryDao {
         pageInfo.setPageResults(query.getResultList());
         return pageInfo;
     }
-    
+
     protected void batchInsert(List list, int num)throws Exception{
         try {
             if(null != list && 0 < list.size()) {

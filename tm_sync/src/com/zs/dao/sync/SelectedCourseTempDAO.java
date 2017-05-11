@@ -2,7 +2,9 @@ package com.zs.dao.sync;
 
 import com.feinno.framework.common.dao.jpa.EntityJpaDao;
 import com.zs.domain.sync.SelectedCourseTemp;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,4 +32,8 @@ public interface SelectedCourseTempDAO extends EntityJpaDao<SelectedCourseTemp,L
             "AND EXISTS (select id from sync_student s where sct.student_code = s.code  and s.state = 0) " +
             "order by student_code, course_code")
     public List<SelectedCourseTemp> findNewSelectedCourse()throws Exception;
+
+    @Modifying
+    @Query("delete from SelectedCourseTemp")
+    public void delAll()throws Exception;
 }

@@ -6,21 +6,21 @@
 	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd"
 	default-lazy-init="true">
 
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息  每天0:10分执行&ndash;&gt;-->
-	<!--<task:scheduler id="syncStudentScheduler" pool-size="1"/>-->
-	<!--<task:scheduled-tasks scheduler="syncStudentScheduler">-->
-		<!--<task:scheduled ref="syncStudentTaskService" method="syncStudent" cron="0 10 00 * * ?"/>-->
-	<!--</task:scheduled-tasks>-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息定时器 END&ndash;&gt;-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口 &ndash;&gt;-->
-	<!--<bean id="syncStudentTaskService" class="com.zs.service.scheduler.impl.SyncStudentTaskServiceImpl">-->
-	<!--</bean>-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口END &ndash;&gt;-->
+	<!-- 同步网院中心、学生和选课信息  每天23:00分执行-->
+	<task:scheduler id="syncWangYuanApiScheduler" pool-size="1"/>
+	<task:scheduled-tasks scheduler="syncWangYuanApiScheduler">
+		<task:scheduled ref="syncWangYuanApiService" method="sync" cron="0 00 23 * * ?"/>
+	</task:scheduled-tasks>
+	<!-- 同步网院中心、学生和选课信息定时器 END-->
+	<!-- 同步网院中心、学生和选课信息业务接口 -->
+	<bean id="syncWangYuanApiService" class="com.zs.service.scheduler.impl.SyncWangYuanApiServiceImpl">
+	</bean>
+	<!-- 同步网院中心、学生和选课信息业务接口END -->
 
-	<!-- 同步还没有签收的快递信息  每天1:00分执行-->
+	<!-- 同步还没有签收的快递信息  每天0:30分执行-->
 	<task:scheduler id="syncKuaidiScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="syncKuaidiScheduler">
-		<task:scheduled ref="syncNotSignKuaidiTaskService" method="syncKuaidi" cron="0 00 01 * * ?"/>
+		<task:scheduled ref="syncNotSignKuaidiTaskService" method="syncKuaidi" cron="0 30 00 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 同步还没有签收的快递信息定时器 END-->
 	<!-- 同步还没有签收的快递信息业务接口 -->
@@ -39,57 +39,25 @@
 	</bean>
 	<!-- 检查还没有签收的订单的快递信息信息业务接口END -->
 
-	<!-- 检查当前学期学生订单明细没有记录到学生财务信息  每天1:30分执行-->
-	<task:scheduler id="checkLeaveOutStudentOrderTMScheduler" pool-size="1"/>
-	<task:scheduled-tasks scheduler="checkLeaveOutStudentOrderTMScheduler">
-		<task:scheduled ref="checkLeaveOutStudentOrderTMService" method="check" cron="0 33 14 * * ?"/>
-	</task:scheduled-tasks>
-	<!-- 检查还没有签收的订单的快递信息定时器 END-->
-	<!-- 检查还没有签收的订单的快递信息信息业务接口 -->
-	<bean id="checkLeaveOutStudentOrderTMService" class="com.zs.service.scheduler.impl.CheckLeaveOutStudentOrderTMServiceImpl">
-	</bean>
-	<!-- 检查还没有签收的订单的快递信息信息业务接口END -->
-
-	<!-- 重置学习中心的学生费用情况  每天1:30分执行-->
+	<!-- 重置学习中心的学生费用情况  每天1:00分执行-->
 	<task:scheduler id="checkSpotExpenseOthTaskScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="checkSpotExpenseOthTaskScheduler">
-		<task:scheduled ref="checkSpotExpenseOthTaskService" method="checkSpotExpenseOthTask" cron="0 09 14 * * ?"/>
+		<task:scheduled ref="checkSpotExpenseOthTaskService" method="checkSpotExpenseOthTask" cron="0 00 01 * * ?"/>
 	</task:scheduled-tasks>
-	<!-- 检查还没有签收的订单的快递信息定时器 END-->
-	<!-- 检查还没有签收的订单的快递信息信息业务接口 -->
+	<!-- 重置学习中心的学生费用情况定时器 END-->
+	<!-- 重置学习中心的学生费用情况业务接口 -->
 	<bean id="checkSpotExpenseOthTaskService" class="com.zs.service.scheduler.impl.CheckSpotExpenseOthTaskServiceImpl">
 	</bean>
-	<!-- 检查还没有签收的订单的快递信息信息业务接口END -->
+	<!-- 重置学习中心的学生费用情况业务接口END -->
 
 	<!-- 检查还没有结束的支付信息  每天1:30分执行-->
 	<task:scheduler id="CheckBankPayForStateWaitTaskScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="CheckBankPayForStateWaitTaskScheduler">
-		<task:scheduled ref="checkBankPayForStateWaitTaskService" method="check" cron="0 46 16 * * ?"/>
+		<task:scheduled ref="checkBankPayForStateWaitTaskService" method="check" cron="0 30 01 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 检查还没有结束的支付信息定时器 END-->
 	<!-- 检查还没有结束的支付信息业务接口 -->
 	<bean id="checkBankPayForStateWaitTaskService" class="com.zs.service.scheduler.impl.CheckBankPayForStateWaitTaskServiceImpl">
 	</bean>
 	<!-- 检查还没有结束的支付信息业务接口END -->
-
-	<!--&lt;!&ndash; 同步网院学习中心信息  每天3:00分执行&ndash;&gt;-->
-	<!--<task:scheduler id="syncSpotScheduler" pool-size="1"/>-->
-	<!--<task:scheduled-tasks scheduler="syncSpotScheduler">-->
-		<!--<task:scheduled ref="syncSpotTaskService" method="syncSpot" cron="0 00 03 * * ?"/>-->
-	<!--</task:scheduled-tasks>-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息定时器 END&ndash;&gt;-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口 &ndash;&gt;-->
-	<!--<bean id="syncSpotTaskService" class="com.zs.service.scheduler.impl.SyncSpotTaskServiceImpl">-->
-	<!--</bean>-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口END &ndash;&gt;-->
-
-
-	<!--<task:scheduler id="createStudentOrderFor15Scheduler" pool-size="1"/>-->
-	<!--<task:scheduled-tasks scheduler="createStudentOrderFor15Scheduler">-->
-		<!--<task:scheduled ref="createStudentOrderFor15Service" method="create" cron="0 47 15 * * ?"/>-->
-	<!--</task:scheduled-tasks>-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息定时器 END&ndash;&gt;-->
-	<!--&lt;!&ndash; 同步网院学生信息和选课信息业务接口 &ndash;&gt;-->
-	<!--<bean id="createStudentOrderFor15Service" class="com.zs.service.scheduler.impl.CreateStudentOrderFor15ServiceImpl">-->
-	<!--</bean>-->
 </beans>

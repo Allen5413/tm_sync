@@ -150,7 +150,9 @@ public class AddStuEBuyServiceImpl extends EntityServiceImpl<StudentExpense,Stud
                 spotExpenseOth.setClearTime(null);
             }else{
                 spotExpenseOth.setState(0);
-                spotExpenseOth.setClearTime(operateTime);
+                if(null == spotExpenseOth.getClearTime()) {
+                    spotExpenseOth.setClearTime(operateTime);
+                }
             }
             spotExpenseOth.setOperator(userName);
             spotExpenseOth.setOperateTime(operateTime);
@@ -225,7 +227,9 @@ public class AddStuEBuyServiceImpl extends EntityServiceImpl<StudentExpense,Stud
         }
         if(spotExpenseOth.getStuOwnTot() <= 0){
             spotExpenseOth.setState(0);
-            spotExpenseOth.setClearTime(operateTime);
+            if(null == spotExpenseOth.getClearTime()) {
+                spotExpenseOth.setClearTime(operateTime);
+            }
         }else{
             spotExpenseOth.setState(1);
             spotExpenseOth.setClearTime(null);
@@ -246,11 +250,14 @@ public class AddStuEBuyServiceImpl extends EntityServiceImpl<StudentExpense,Stud
                 spotExpenseOth.setStuAccTot(new BigDecimal(pay).subtract(new BigDecimal(buy)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                 spotExpenseOth.setStuOwnTot(0);
                 spotExpenseOth.setState(0);
-                spotExpenseOth.setClearTime(operateTime);
+                if(null == spotExpenseOth.getClearTime()) {
+                    spotExpenseOth.setClearTime(operateTime);
+                }
             }else{
                 spotExpenseOth.setStuAccTot(0);
                 spotExpenseOth.setStuOwnTot(new BigDecimal(buy).subtract(new BigDecimal(pay)).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                 spotExpenseOth.setState(1);
+                spotExpenseOth.setClearTime(null);
             }
             spotExpenseOth.setCreator(userName);
             spotExpenseOth.setOperator(userName);

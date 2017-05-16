@@ -39,6 +39,10 @@
         <td>
             <a href="${pageContext.request.contextPath}/kuaidiPush/find.htm">查询快递100推送记录</a>
         </td>
+        <td>
+            <input id="onceOrder"/>
+            <a href="#" onclick="editOnceOrderForSend()">一次性订单从已打包改为已发出</a>
+        </td>
     </tr>
     <tr>
         <td>
@@ -94,6 +98,10 @@
 </body>
 </html>
 <script>
+    function editOnceOrderForSend(){
+        var code = $("#onceOrder").val();
+        location.href = "${pageContext.request.contextPath}/editOnceOrderForSend/editor.htm?orderCode="+code;
+    }
     function spring(){
         var code = $("#code").val();
         location.href = "${pageContext.request.contextPath}/delOrderTM/sync2.htm?code="+code

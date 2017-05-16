@@ -92,8 +92,11 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
                 //先清空临时表
                 studentTempDAO.deleteAll();
                 if(null != studentTempList && 0 < studentTempList.size()){
+                    System.out.println("studentTempList.size()     ----------     "+studentTempList.size());
+                    int i=0;
                     for(StudentTemp studentTemp : studentTempList){
                         studentTempDAO.save(studentTemp);
+                        System.out.println("studentTempList.size()     ----------     " + i++);
                     }
                 }
                 //batchStudentTempDAO.batchAdd(studentTempList, 1000);
@@ -103,8 +106,11 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
             if (0 < selectedCourseTempList.size()) {
                 selectedCourseTempDAO.deleteAll();
                 if(null != selectedCourseTempList && 0 < selectedCourseTempList.size()){
+                    System.out.println("selectedCourseTempList.size()     ----------     "+selectedCourseTempList.size());
+                    int i=0;
                     for(SelectedCourseTemp selectedCourseTemp : selectedCourseTempList){
                         selectedCourseTempDAO.save(selectedCourseTemp);
+                        System.out.println("studentTempList.size()     ----------     " + i++);
                     }
                 }
                 //batchSelectedCourseTempDAO.batchAdd(selectedCourseTempList, 1000);

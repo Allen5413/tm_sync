@@ -22,4 +22,12 @@ public class SyncWangYuanApiController extends LoggerController {
     public void sync(HttpServletRequest request){
         syncWangYuanApiService.sync();
     }
+
+    @RequestMapping(value = "syncAllStudent")
+    public void syncAllStudent(HttpServletRequest request){
+        for(int year = 2000; year < 2018; year++){
+            syncWangYuanApiService.allStudent(year, 1);
+            syncWangYuanApiService.allStudent(year, 2);
+        }
+    }
 }

@@ -6,4 +6,6 @@ package com.zs.service.scheduler;
  */
 public interface SyncWangYuanApiService {
     public void sync();
+
+    public void allStudent(int year, int term);
 }

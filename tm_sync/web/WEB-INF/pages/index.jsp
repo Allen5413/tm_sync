@@ -63,6 +63,7 @@
     <tr>
         <td>
             <a href="${pageContext.request.contextPath}/syncWangYuanApi/sync.htm">开始同步网院接口信息</a>
+            <a href="${pageContext.request.contextPath}/syncWangYuanApi/syncAllStudent.htm">开始同步网院所有学生</a>
         </td>
     </tr>
     <tr>

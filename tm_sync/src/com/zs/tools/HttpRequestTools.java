@@ -108,6 +108,22 @@ public class HttpRequestTools {
     }
 
     /**
+     * 通过网院接口获取学生信息
+     * @param year
+     * @param term
+     * @return
+     * @throws Exception
+     */
+    public static JSONObject getStudent(int year, int term, String spotCode)throws Exception{
+        String url = wangYuanUrl+"getStudent?year="+year+"&term="+term+"&studyCenterCode="+spotCode+"&pageNo=0&pageSize=0&signature="+DesTools.encrypt("getStudent", "eduwest");
+        String result = sendGet(url);
+        JSONObject callbackJSON = new JSONObject();
+        callbackJSON = callbackJSON.fromObject(result);
+        callbackJSON.put("reqUrl", url);
+        return callbackJSON;
+    }
+
+    /**
      * 通过网院接口获取学生选课信息
      * @param year
      * @param term
@@ -127,7 +143,7 @@ public class HttpRequestTools {
 
     public static void main(String[] args){
         try {
-            getStudent(2017, 1);
+            getStudent(2001, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }

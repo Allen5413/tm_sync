@@ -4,11 +4,13 @@ import com.feinno.framework.common.exception.BusinessException;
 import com.zs.dao.api.WangYuanApiDAO;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.sync.*;
+import com.zs.dao.temp.BatchAaaDAO;
 import com.zs.domain.api.WangYuanApi;
 import com.zs.domain.basic.Semester;
 import com.zs.domain.sync.SelectedCourseTemp;
 import com.zs.domain.sync.SpotTemp;
 import com.zs.domain.sync.StudentTemp;
+import com.zs.domain.temp.Aaa;
 import com.zs.service.scheduler.SyncSelectedCourseTaskService;
 import com.zs.service.scheduler.SyncSpotTaskService;
 import com.zs.service.scheduler.SyncStudentTaskService;
@@ -16,6 +18,7 @@ import com.zs.service.scheduler.SyncWangYuanApiService;
 import com.zs.tools.HttpRequestTools;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -44,6 +47,8 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
     private SyncStudentTaskService syncStudentTaskService;
     @Resource
     private SyncSelectedCourseTaskService syncSelectedCourseTaskService;
+    @Resource
+    private BatchAaaDAO batchAaaDAO;
 
     @Override
     public void sync() {
@@ -123,6 +128,34 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
             syncSelectedCourseTaskService.delChangeSelectedCourse();
             syncSelectedCourseTaskService.delHSTmBySermesterId();
         }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    @Override
+    public void allStudent(int year, int term) {
+        List<Aaa> aaaList = new ArrayList<Aaa>();
+        try{
+            JSONObject studentJSON = HttpRequestTools.getStudent(year, term);
+            if((Boolean)studentJSON.get("result")){
+                List list = (List) studentJSON.get("stuList");
+                if(null != list && 0 < list.size()){
+                    for(int i=0; i<list.size(); i++){
+                        JSONObject json = (JSONObject)list.get(i);
+                        Aaa aaa = new Aaa();
+                        aaa.setName(null == json.get("name") ? "" : "null".equals(json.get("name").toString()) ? "" : json.get("name").toString());
+                        aaa.setIdcardType(null == json.get("idCardType") ? null : "null".equals(json.get("idCardType").toString()) ? null : Integer.parseInt(json.get("idCardType").toString()));
+                        aaa.setIdcardNo(null == json.get("idCardNo") ? "" : "null".equals(json.get("idCardNo").toString()) ? "" : json.get("idCardNo").toString());
+                        aaa.setMobile(null == json.get("mobile") ? "" : "null".equals(json.get("mobile").toString()) ? "" : json.get("mobile").toString());
+                        aaaList.add(aaa);
+                    }
+                }
+            }
+            if(null != aaaList && 0 < aaaList.size()) {
+                batchAaaDAO.batchAdd(aaaList, 1000);
+            }
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
@@ -231,18 +264,5 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
         wangYuanApi.setReqData(reqUrl);
         wangYuanApi.setResultData(jsonStr);
         wangYuanApiDAO.save(wangYuanApi);
-//        int num = jsonStr.length() / 2000000000 + 1;
-//        for(int i=0; i<num; i++){
-//            String resultData = "";
-//            if(i * 2000000000 + 2000000000 > jsonStr.length()) {
-//                resultData = jsonStr.substring(i * 2000000000, jsonStr.length());
-//            }else{
-//                resultData = jsonStr.substring(i * 2000000000, i * 2000000000 + 2000000000);
-//            }
-//            WangYuanApi wangYuanApi = new WangYuanApi();
-//            wangYuanApi.setReqData(reqUrl);
-//            wangYuanApi.setResultData(resultData);
-//            wangYuanApiDAO.save(wangYuanApi);
-//        }
     }
 }

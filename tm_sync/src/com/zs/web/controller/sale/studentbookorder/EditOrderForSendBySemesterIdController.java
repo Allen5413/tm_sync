@@ -26,10 +26,11 @@ public class EditOrderForSendBySemesterIdController extends LoggerController {
     public void editor(HttpServletRequest request, @RequestParam("id")long id){
         try {
             Semester semester = findNowSemesterDAO.getNowSemester();
-            //editOrderForSendBySemesterIdService.edit(id);
             //如果不是当前学期，还需要把添加成当前学期的student_expense表的数据返回到传进来的学期
             if(id != semester.getId()){
                 editOrderForSendBySemesterIdService.edit2(id, semester.getId());
+            }else{
+                editOrderForSendBySemesterIdService.edit(id);
             }
         } catch (Exception e) {
             e.printStackTrace();

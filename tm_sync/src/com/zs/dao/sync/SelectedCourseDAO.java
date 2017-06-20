@@ -35,4 +35,8 @@ public interface SelectedCourseDAO extends EntityJpaDao<SelectedCourse, Long> {
     @Modifying
     @Query(nativeQuery = true, value = "delete from sync_selected_course where student_code = ?1 and course_code = ?2")
     public void delByStudentCodeAndCourseCode(String studentCode, String courseCode);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "delete from sync_selected_course where student_code = ?1")
+    public void delByStudentCode(String studentCode);
 }

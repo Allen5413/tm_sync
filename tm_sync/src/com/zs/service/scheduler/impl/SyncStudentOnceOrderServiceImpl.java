@@ -9,7 +9,6 @@ import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxIdDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
-import com.zs.dao.sale.onceorder.impl.FindOnceOrderByWhereDAOImpl;
 import com.zs.dao.sale.onceorderlog.BatchStudentBookOnceOrderLogDAO;
 import com.zs.dao.sale.onceorderlog.OnceOrderLogDAO;
 import com.zs.dao.sale.onceordertm.BatchStudentBookOnceOrderTMDAO;
@@ -73,10 +72,13 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private OnceOrderLogDAO onceOrderLogDAO;
     @Resource
     private OldSelectedCourseTemp2DAO oldSelectedCourseTemp2DAO;
+    @Resource
+    private SelectedCourseDAO selectedCourseDAO;
 
     @Override
     @Transactional
     public void sync() throws Exception {
+        long a = System.currentTimeMillis();
         //变更信息描述
         String detail = null;
         List<StudentBookOnceOrderTM> addOrderTMList = new ArrayList<StudentBookOnceOrderTM>();
@@ -124,7 +126,6 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     studentCode = objs[0].toString();
                     spotCode = objs[1].toString();
                     courseCode = objs[2].toString();
-                    int isSendStudent = Integer.parseInt(objs[3].toString());
 
                     if (!beforeStudentCode.equals(studentCode)) {
                         //根据学生的学习中心查询关联的发行渠道
@@ -145,6 +146,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         orderId = maxId+num;
                         StudentBookOnceOrder studentBookOnceOrder = new StudentBookOnceOrder();
                         studentBookOnceOrder.setId(orderId);
+                        studentBookOnceOrder.setSemesterId(semester.getId());
                         studentBookOnceOrder.setIssueChannelId(issueChannelId);
                         studentBookOnceOrder.setStudentCode(studentCode);
                         studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
@@ -153,7 +155,6 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         studentBookOnceOrder.setCreator("管理员");
                         studentBookOnceOrder.setOperator("管理员");
                         addOrderList.add(studentBookOnceOrder);
-
 
                         //添加订单日志信息
                         StudentBookOnceOrderLog studentBookOnceOrderLog = new StudentBookOnceOrderLog();
@@ -181,7 +182,6 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                                 addOrderTMList.add(studentBookOnceOrderTM);
                             }
                         }
-
                         num++;
                     } else {
                         //通过课程查询课程关联的教材
@@ -215,6 +215,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     studentCode = objs[0].toString();
                     courseCode = objs[2].toString();
 
+                    //删除之前的选课信息
+                    selectedCourseDAO.delByStudentCode(studentCode);
                     //把新选的课程添加进表
                     SelectedCourse selectedCourse = new SelectedCourse();
                     selectedCourse.setSemesterId(semester.getId());
@@ -241,6 +243,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                 }
 
             }
+            System.out.println("time.................    "+a);
+            System.out.println("time.................    "+System.currentTimeMillis());
         }catch (Exception e){
             throw e;
         }finally {

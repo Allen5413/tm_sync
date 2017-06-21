@@ -74,6 +74,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private OldSelectedCourseTemp2DAO oldSelectedCourseTemp2DAO;
     @Resource
     private SelectedCourseDAO selectedCourseDAO;
+    @Resource
+    private StudentBookOnceOrderDAO studentBookOnceOrde;
 
     @Override
     @Transactional
@@ -94,7 +96,21 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
         long num = 1;
         try {
             //查询学生剩余选课
-            List<Object[]> list = oldSelectedCourseTempDAO.find();
+            List<Object[]> dataList = oldSelectedCourseTempDAO.find();
+            List<Object[]> list = new ArrayList<Object[]>();
+            System.out.println("dataList:                  "+dataList.size());
+            for(int i=0; i<dataList.size(); i++){
+                System.out.println("dataList:   i   :                  "+i);
+                Object[] objs  = dataList.get(i);
+                String stuCode = objs[0].toString();
+                String couCode = objs[2].toString();
+                //查询该学生的该课程是否已经购买过
+                List<Object[]> isSendList = studentBookOnceOrde.findByStudentCodeAndCourseCodeForSend(stuCode, couCode);
+                if(null == isSendList || 0 >= isSendList.size()){
+                    list.add(objs);
+                }
+            }
+
             List<Object[]> copyList = new ArrayList<Object[]>();
             System.out.println("list:   "+list.size());
             if(null != list && 0 < list.size()) {

@@ -3,6 +3,8 @@ package com.zs.service.scheduler.impl;
 import com.feinno.framework.common.exception.BusinessException;
 import com.zs.dao.api.WangYuanApiDAO;
 import com.zs.dao.basic.semester.FindNowSemesterDAO;
+import com.zs.dao.sale.onceordertm.DelStudentBookOnceOrderTMByOrderIdDAO;
+import com.zs.dao.sale.studentbookordertm.StudentBookOrderTmDAO;
 import com.zs.dao.sync.*;
 import com.zs.dao.temp.BatchAaaDAO;
 import com.zs.domain.api.WangYuanApi;
@@ -49,6 +51,10 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
     private SyncSelectedCourseTaskService syncSelectedCourseTaskService;
     @Resource
     private BatchAaaDAO batchAaaDAO;
+    @Resource
+    private DelStudentBookOnceOrderTMByOrderIdDAO delStudentBookOnceOrderTMByOrderIdDAO;
+    @Resource
+    private StudentBookOrderTmDAO studentBookOrderTmDAO;
 
     @Override
     public void sync() {
@@ -127,6 +133,28 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
             syncSelectedCourseTaskService.syncSelectedCourse();
             syncSelectedCourseTaskService.delChangeSelectedCourse();
             syncSelectedCourseTaskService.delHSTmBySermesterId();
+
+            //得到已获得学分的课程，然后把没有发出的订单有该课程的明细给删了
+            int year5 = 0, quarter5 = 0;
+            if (0 == quarter) {
+                year5 = year - 1;
+                quarter5 = 2;
+            } else {
+                year5 = year;
+                quarter5 = 1;
+            }
+            JSONObject resultJson = HttpRequestTools.getScoreCourse(year5, quarter5);
+            this.addWangYuanApi(resultJson);
+            List list = (List) resultJson.get("scList");
+            if(null != list && 0 < list.size()){
+                for(int i=0; i<list.size(); i++){
+                    JSONObject json = (JSONObject)list.get(i);
+                    String studentCode =json.get("stuCode").toString();
+                    String courseCode =json.get("courseCode").toString();
+                    studentBookOrderTmDAO.delByStudentCodeAndCourseCodeForNotSend(studentCode, courseCode);
+                    delStudentBookOnceOrderTMByOrderIdDAO.delByStudentCodeAndCourseCodeForNotSend(studentCode, courseCode);
+                }
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

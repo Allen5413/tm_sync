@@ -33,4 +33,9 @@ public interface StudentBookOrderTmDAO extends EntityJpaDao<StudentBookOrderTM, 
             "where sbo.order_code = sbotm.order_code and (SUBSTR(sbo.student_code,1,1) = 'H' or SUBSTR(sbo.student_code,1 ,1) = 'h') " +
             "and (sbotm.course_code = '0481' or (sbotm.course_code = '0483' and sbotm.teach_material_id = 1393)) and sbo.semester_id = ?1")
     public void delHSTmBySermesterId(long semesterId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "delete sbotm.* from student_book_order sbo, student_book_order_tm sbotm " +
+            "where sbo.order_code = sbotm.order_code and sbo.state < 4 and substr(sbo.order_code, 1, 3) = 'FSA' and sbo.student_code = ?1 and sbotm.course_code = ?2")
+    public void delByStudentCodeAndCourseCodeForNotSend(String studentCode, String courseCode)throws Exception;
 }

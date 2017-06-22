@@ -100,7 +100,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
             List<Object[]> sendList = studentBookOnceOrde.findForSend();
             List<Object[]> list = new ArrayList<Object[]>();
             System.out.println("dataList:        sendList          "+dataList.size()+"    "+sendList.size());
-            for(int m=0; m < dataList.size(); m++) {
+            for(int m=0; m < 10000; m++) {
                 System.out.println("dataList:   m   :                  "+m);
                 Object[] objs  = dataList.get(m);
                 String stuCode = objs[0].toString();
@@ -115,7 +115,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         break;
                     }
                 }
-                if(flag){
+                if(!flag){
                     list.add(objs);
                 }
             }

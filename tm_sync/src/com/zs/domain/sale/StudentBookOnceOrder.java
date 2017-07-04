@@ -44,6 +44,9 @@ public class StudentBookOnceOrder extends AbstractEntity {
     private String operator;                    //操作人
     private Date operateTime = new Date();      //操作时间
     private Integer version;                    //版本号，用于乐观锁
+    private String sendAddress;             //邮寄给学生的地址
+    private String sendPhone;               //邮寄给学生的手机
+    private String sendZipCode;             //邮寄给学生的邮编
 
     @Id
     public Long getId() {
@@ -174,5 +177,29 @@ public class StudentBookOnceOrder extends AbstractEntity {
 
     public void setIsSendStudent(int isSendStudent) {
         this.isSendStudent = isSendStudent;
+    }
+
+    public String getSendAddress() {
+        return sendAddress;
+    }
+
+    public void setSendAddress(String sendAddress) {
+        this.sendAddress = sendAddress;
+    }
+
+    public String getSendPhone() {
+        return sendPhone;
+    }
+
+    public void setSendPhone(String sendPhone) {
+        this.sendPhone = sendPhone;
+    }
+
+    public String getSendZipCode() {
+        return sendZipCode;
+    }
+
+    public void setSendZipCode(String sendZipCode) {
+        this.sendZipCode = sendZipCode;
     }
 }

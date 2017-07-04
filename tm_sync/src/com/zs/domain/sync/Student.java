@@ -58,6 +58,8 @@ public class Student extends AbstractEntity {
     private int isOnceOrder;                //是否设置成了一次性订购教材
     private int isSendStudent;              //订单是否邮寄给学生[0：否；1：是]
     private String sendAddress;             //邮寄给学生的地址
+    private String sendPhone;               //邮寄给学生的手机
+    private String sendZipCode;             //邮寄给学生的邮编
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -267,5 +269,21 @@ public class Student extends AbstractEntity {
 
     public void setSendAddress(String sendAddress) {
         this.sendAddress = sendAddress;
+    }
+
+    public String getSendPhone() {
+        return sendPhone;
+    }
+
+    public void setSendPhone(String sendPhone) {
+        this.sendPhone = sendPhone;
+    }
+
+    public String getSendZipCode() {
+        return sendZipCode;
+    }
+
+    public void setSendZipCode(String sendZipCode) {
+        this.sendZipCode = sendZipCode;
     }
 }

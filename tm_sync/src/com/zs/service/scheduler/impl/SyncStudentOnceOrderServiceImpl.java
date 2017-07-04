@@ -153,6 +153,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     courseCode = objs[2].toString();
 
                     if (!beforeStudentCode.equals(studentCode)) {
+                        //查询学生信息
+                        Student student = findStudentByCodeDAO.getStudentByCode(studentCode);
                         //根据学生的学习中心查询关联的发行渠道
                         IssueRange issueRange = findIssueRangeBySpotCodeService.getIssueRangeBySpotCode(spotCode);
                         Long issueChannelId = 0l;
@@ -176,7 +178,15 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         studentBookOnceOrder.setStudentCode(studentCode);
                         studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                         studentBookOnceOrder.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
-                        studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
+                        if(student.getIsSendStudent() == Student.IS_SEND_STUDENT_NOT) {
+                            studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
+                        }
+                        if(student.getIsSendStudent() == Student.IS_SEND_STUDENT_YES) {
+                            studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_YES);
+                            studentBookOnceOrder.setSendPhone(student.getSendPhone());
+                            studentBookOnceOrder.setSendZipCode(student.getSendZipCode());
+                            studentBookOnceOrder.setSendAddress(student.getSendAddress());
+                        }
                         studentBookOnceOrder.setCreator("管理员");
                         studentBookOnceOrder.setOperator("管理员");
                         addOrderList.add(studentBookOnceOrder);
@@ -391,7 +401,15 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     studentBookOnceOrder.setStudentCode(studentCode);
                     studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                     studentBookOnceOrder.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
-                    studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
+                    if(student.getIsSendStudent() == Student.IS_SEND_STUDENT_NOT) {
+                        studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
+                    }
+                    if(student.getIsSendStudent() == Student.IS_SEND_STUDENT_YES) {
+                        studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_YES);
+                        studentBookOnceOrder.setSendPhone(student.getSendPhone());
+                        studentBookOnceOrder.setSendZipCode(student.getSendZipCode());
+                        studentBookOnceOrder.setSendAddress(student.getSendAddress());
+                    }
                     studentBookOnceOrder.setCreator("管理员");
                     studentBookOnceOrder.setOperator("管理员");
                     addOrderList.add(studentBookOnceOrder);

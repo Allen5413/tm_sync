@@ -176,7 +176,11 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         studentBookOnceOrder.setSemesterId(semester.getId());
                         studentBookOnceOrder.setIssueChannelId(issueChannelId);
                         studentBookOnceOrder.setStudentCode(studentCode);
-                        studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                        if(student.getIsForeverSnedTm() == Student.IS_FOREVER_SNEDTM_YES){
+                            studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_CONFIRMED);
+                        }else {
+                            studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                        }
                         studentBookOnceOrder.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
                         if(student.getIsSendStudent() == Student.IS_SEND_STUDENT_NOT) {
                             studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
@@ -194,7 +198,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         //添加订单日志信息
                         StudentBookOnceOrderLog studentBookOnceOrderLog = new StudentBookOnceOrderLog();
                         studentBookOnceOrderLog.setOrderId(studentBookOnceOrder.getId());
-                        studentBookOnceOrderLog.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                        studentBookOnceOrderLog.setState(studentBookOnceOrder.getState());
                         studentBookOnceOrderLog.setOperator("管理员");
                         addOrderLogList.add(studentBookOnceOrderLog);
 
@@ -399,7 +403,11 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     studentBookOnceOrder.setId(orderId);
                     studentBookOnceOrder.setIssueChannelId(issueChannelId);
                     studentBookOnceOrder.setStudentCode(studentCode);
-                    studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                    if(student.getIsForeverSnedTm() == Student.IS_FOREVER_SNEDTM_YES){
+                        studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_CONFIRMED);
+                    }else {
+                        studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                    }
                     studentBookOnceOrder.setStudentSign(StudentBookOnceOrder.STUDENTSIGN_NOT);
                     if(student.getIsSendStudent() == Student.IS_SEND_STUDENT_NOT) {
                         studentBookOnceOrder.setIsSendStudent(StudentBookOnceOrder.IS_SEND_STUDENT_NOT);
@@ -418,7 +426,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                     //添加订单日志信息
                     StudentBookOnceOrderLog studentBookOnceOrderLog = new StudentBookOnceOrderLog();
                     studentBookOnceOrderLog.setOrderId(studentBookOnceOrder.getId());
-                    studentBookOnceOrderLog.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
+                    studentBookOnceOrderLog.setState(studentBookOnceOrder.getState());
                     studentBookOnceOrderLog.setOperator("管理员");
                     addOrderLogList.add(studentBookOnceOrderLog);
 

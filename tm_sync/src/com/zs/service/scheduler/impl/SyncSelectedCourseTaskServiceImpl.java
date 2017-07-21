@@ -180,7 +180,11 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                             studentBookOrder.setIssueChannelId(issueChannelId);
                             studentBookOrder.setOrderCode(orderCode);
                             studentBookOrder.setStudentCode(studentCode);
-                            studentBookOrder.setState(StudentBookOrder.STATE_UNCONFIRMED);
+                            if(student.getIsForeverSnedTm() == Student.IS_FOREVER_SNEDTM_YES){
+                                studentBookOrder.setState(StudentBookOrder.STATE_CONFIRMED);
+                            }else {
+                                studentBookOrder.setState(StudentBookOrder.STATE_UNCONFIRMED);
+                            }
                             studentBookOrder.setIsStock(StudentBookOrder.ISSTOCK_YES);
                             studentBookOrder.setIsSpotOrder(StudentBookOrder.ISSPOTORDER_NOT);
                             studentBookOrder.setStudentSign(StudentBookOrder.STUDENTSIGN_NOT);
@@ -200,7 +204,7 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
                             //添加订单日志信息
                             StudentBookOrderLog studentBookOrderLog = new StudentBookOrderLog();
                             studentBookOrderLog.setOrderCode(orderCode);
-                            studentBookOrderLog.setState(StudentBookOrder.STATE_UNCONFIRMED);
+                            studentBookOrderLog.setState(studentBookOrder.getState());
                             studentBookOrderLog.setOperator("管理员");
                             addStudentBookOrderLogList.add(studentBookOrderLog);
 

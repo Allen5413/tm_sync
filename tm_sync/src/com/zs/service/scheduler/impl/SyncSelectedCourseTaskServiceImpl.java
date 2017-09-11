@@ -362,6 +362,4 @@ public class SyncSelectedCourseTaskServiceImpl implements SyncSelectedCourseTask
 
         return teachMaterialList;
     }
-
-
 }

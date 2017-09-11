@@ -12,6 +12,14 @@ import java.util.List;
 public interface StudentBookOrderDAO extends EntityJpaDao<StudentBookOrder, Long> {
 
     /**
+     * @param orderCode
+     * @return
+     * @throws Exception
+     */
+    @Query("FROM StudentBookOrder WHERE orderCode = ?1")
+    public StudentBookOrder findByOrderCode(String orderCode)throws Exception;
+
+    /**
      * 查询学生一个学期的未确认的订单
      * @param studentCode
      * @param semesterId

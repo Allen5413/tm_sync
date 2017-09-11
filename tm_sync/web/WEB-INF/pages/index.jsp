@@ -51,6 +51,10 @@
         <td>
             <a href="${pageContext.request.contextPath}/kuaidiReq/findByNumber.htm">查询快递100请求结果</a>
         </td>
+        <td>
+            <input id="onceOrders"/>
+            <a href="#" onclick="editOrderForSend()">新生订单从已打包改为已发出</a>
+        </td>
     </tr>
     <tr>
         <td>
@@ -102,6 +106,10 @@
     function editOnceOrderForSend(){
         var code = $("#onceOrder").val();
         location.href = "${pageContext.request.contextPath}/editOnceOrderForSend/editor.htm?orderCode="+code;
+    }
+    function editOrderForSend(){
+        var codes = $("#onceOrders").val();
+        location.href = "${pageContext.request.contextPath}/editOrderForSend/editor.htm?orderCodes="+codes;
     }
     function spring(){
         var code = $("#code").val();

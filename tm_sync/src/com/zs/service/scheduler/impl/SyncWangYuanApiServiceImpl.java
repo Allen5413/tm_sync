@@ -13,10 +13,7 @@ import com.zs.domain.sync.SelectedCourseTemp;
 import com.zs.domain.sync.SpotTemp;
 import com.zs.domain.sync.StudentTemp;
 import com.zs.domain.temp.Aaa;
-import com.zs.service.scheduler.SyncSelectedCourseTaskService;
-import com.zs.service.scheduler.SyncSpotTaskService;
-import com.zs.service.scheduler.SyncStudentTaskService;
-import com.zs.service.scheduler.SyncWangYuanApiService;
+import com.zs.service.scheduler.*;
 import com.zs.tools.HttpRequestTools;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -55,6 +52,8 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
     private DelStudentBookOnceOrderTMByOrderIdDAO delStudentBookOnceOrderTMByOrderIdDAO;
     @Resource
     private StudentBookOrderTmDAO studentBookOrderTmDAO;
+    @Resource
+    private SyncCourseTaskService syncCourseTaskService;
 
     @Override
     public void sync() {
@@ -127,12 +126,13 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
                 //batchSelectedCourseTempDAO.batchAdd(selectedCourseTempList, 1000);
             }
 
-            //执行同步；顺序 学习中心 - 学生 -选课
+            //执行同步；顺序 学习中心 - 学生 - 选课 - 课程基本信息
             syncSpotTaskService.syncSpot();
             syncStudentTaskService.syncStudent();
             syncSelectedCourseTaskService.syncSelectedCourse();
             syncSelectedCourseTaskService.delChangeSelectedCourse();
             syncSelectedCourseTaskService.delHSTmBySermesterId();
+            syncCourseTaskService.sync();
 
             //得到已获得学分的课程，然后把没有发出的订单有该课程的明细给删了
             int year5 = 0, quarter5 = 0;

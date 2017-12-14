@@ -69,7 +69,7 @@ public class HttpRequestTools {
      * @throws Exception
      */
     public static JSONObject getCourse()throws Exception{
-        String url = wangYuanUrl+"getCourse?code=&signature"+DesTools.encrypt("getCourse", "eduwest");
+        String url = wangYuanUrl+"getCourse?code=&signature="+DesTools.encrypt("getCourse", "eduwest");
         String result = sendGet(url);
         JSONObject callbackJSON = new JSONObject();
         callbackJSON = callbackJSON.fromObject(result);
@@ -83,6 +83,7 @@ public class HttpRequestTools {
      * @throws Exception
      */
     public static JSONObject getSpot()throws Exception{
+
         String url = wangYuanUrl+"getStudyCenter?code=&signature="+DesTools.encrypt("getStudyCenter", "eduwest");
         String result = sendGet(url);
         JSONObject callbackJSON = new JSONObject();
@@ -155,11 +156,9 @@ public class HttpRequestTools {
         return callbackJSON;
     }
 
-
-
     public static void main(String[] args){
         try {
-            getScoreCourse(2017, 1);
+            getCourse();
         } catch (Exception e) {
             e.printStackTrace();
         }

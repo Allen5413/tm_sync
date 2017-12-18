@@ -158,7 +158,7 @@ public class HttpRequestTools {
 
     public static void main(String[] args){
         try {
-            getCourse();
+            getSelectCourse(2017, 2, 2018, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -77,7 +77,8 @@
     </tr>
     <tr>
         <td>
-            <a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm">开始同步学生一次性订单</a>
+            学年季：<input type="text" id="stuYearTerm" size="1">课年季：<input type="text" id="courseYearTerms" size="10">&nbsp;&nbsp;<a href="#" onclick="syncOldSc()">同步剩余选课</a>操作前先清空oldselectedcourse表，1：春季，2：秋季
+            <br /><a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm">开始同步学生一次性订单</a>
             <a href="${pageContext.request.contextPath}/delOnceOrderForNotTM/del.htm">删除没有明细的一次性订单</a>
             <br/>
             <input id="spotCode" size="1">中心<input id="levelCode" size="1">层次<input id="specCode" size="1">专业<input id="year" size="1">入学年<input id="quarter" size="1">入学季<input id="studentCodes" size="1">学号
@@ -103,6 +104,11 @@
 </body>
 </html>
 <script>
+    function syncOldSc(){
+        var stuYearTerm = $("#stuYearTerm").val();
+        var courseYearTerms = $("#courseYearTerms").val();
+        location.href = "${pageContext.request.contextPath}/syncOldSelectedCourse/sync.htm?stuYearTerm="+stuYearTerm+"&courseYearTerms="+courseYearTerms;
+    }
     function editOnceOrderForSend(){
         var code = $("#onceOrder").val();
         location.href = "${pageContext.request.contextPath}/editOnceOrderForSend/editor.htm?orderCode="+code;

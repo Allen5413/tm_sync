@@ -14,6 +14,7 @@ public class OldSelectedCourseTemp extends AbstractEntity {
     private Long id;                //主键
     private String studentCode;     //学号
     private String courseCode;      //课程编号
+    private int score;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,5 +40,13 @@ public class OldSelectedCourseTemp extends AbstractEntity {
 
     public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

@@ -100,7 +100,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
             List<Object[]> sendList = studentBookOnceOrde.findForSend();
             List<Object[]> list = new ArrayList<Object[]>();
             System.out.println("dataList:        sendList          "+dataList.size()+"    "+sendList.size());
-            for(int m=0; m < 10000; m++) {
+            for(int m=0; m < dataList.size(); m++) {
                 System.out.println("dataList:   m   :                  "+m);
                 Object[] objs  = dataList.get(m);
                 String stuCode = objs[0].toString();
@@ -108,7 +108,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                 boolean flag = false;
                 //查询该学生的该课程是否已经购买过
                 for(int n=0; n<sendList.size(); n++){
-                    Object[] objs2  = dataList.get(n);
+                    Object[] objs2  = sendList.get(n);
                     if(stuCode.equals(objs2[0].toString()) && couCode.equals(objs2[1].toString())){
                         flag = true;
                         sendList.remove(objs2);

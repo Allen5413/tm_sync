@@ -7,6 +7,7 @@ import com.zs.dao.basic.semester.FindNowSemesterDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sale.onceorder.BatchStudentBookOnceOrderDAO;
+import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxCodeDAO;
 import com.zs.dao.sale.onceorder.FindStudentBookOnceOrderForMaxIdDAO;
 import com.zs.dao.sale.onceorder.StudentBookOnceOrderDAO;
 import com.zs.dao.sale.onceorderlog.BatchStudentBookOnceOrderLogDAO;
@@ -25,6 +26,7 @@ import com.zs.service.basic.issuerange.FindIssueRangeBySpotCodeService;
 import com.zs.service.scheduler.SyncStudentOnceOrderService;
 import com.zs.tools.DateTools;
 import com.zs.tools.FileTools;
+import com.zs.tools.OrderCodeTools;
 import com.zs.tools.PropertiesTools;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +78,8 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
     private SelectedCourseDAO selectedCourseDAO;
     @Resource
     private StudentBookOnceOrderDAO studentBookOnceOrde;
+    @Resource
+    private FindStudentBookOnceOrderForMaxCodeDAO findStudentBookOnceOrderForMaxCodeDAO;
 
     @Override
     @Transactional
@@ -178,6 +182,16 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         studentBookOnceOrder.setStudentCode(studentCode);
                         if(student.getIsForeverSnedTm() == Student.IS_FOREVER_SNEDTM_YES){
                             studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_CONFIRMED);
+                            //订单确认的话，要生成订单号
+                            int num2 = 0;
+                            StudentBookOnceOrder maxCodeOrder = findStudentBookOnceOrderForMaxCodeDAO.find(semester.getId());
+                            if(null != maxCodeOrder){
+                                String maxOrderCode = maxCodeOrder.getOrderCode();
+                                num2 = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length()-6, maxOrderCode.length()));
+                            }
+                            //生成学生订单号
+                            String orderCode = OrderCodeTools.createStudentOnceOrderCodeForConfirm(semester.getYear(), semester.getQuarter(), num2 + 1);
+                            studentBookOnceOrder.setOrderCode(orderCode);
                         }else {
                             studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);
                         }

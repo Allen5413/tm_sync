@@ -12,10 +12,10 @@ import java.util.List;
  */
 public interface FindNotSignNuDAO extends EntityJpaDao<PlaceOrderPackage, Long> {
     @Query(nativeQuery = true, value = "select DISTINCT t.logistic_code from (" +
-            "select DISTINCT sbop.logistic_code from student_book_order_package sbop " +
-            "WHERE sbop.is_sign = 1 " +
+            "select DISTINCT sbop.logistic_code from student_book_order_package sbop, semester s " +
+            "WHERE sbop.is_sign = 1 and sbop.semester_id = s.id and s.is_now_semester = 0 " +
             "union all " +
-            "select DISTINCT pop.logistic_code from place_order_package pop " +
-            "where pop.is_sign = 1) t")
+            "select DISTINCT pop.logistic_code from place_order_package pop, semester s " +
+            "where pop.is_sign = 1 and pop.semester_id = s.id and s.is_now_semester = 0) t")
     public List<String> findNotSignNu();
 }

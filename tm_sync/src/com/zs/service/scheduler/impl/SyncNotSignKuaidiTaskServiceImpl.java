@@ -1,5 +1,6 @@
 package com.zs.service.scheduler.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zs.dao.kuaidi.FindNotSignNuDAO;
 import com.zs.dao.kuaidi.push.KuaidiPushDAO;
 import com.zs.dao.kuaidi.request.KuaidiRequestDAO;
@@ -8,6 +9,7 @@ import com.zs.domain.kuaidi.KuaidiRequest;
 import com.zs.service.kuaidi.push.AddPushService;
 import com.zs.service.kuaidi.request.AddReqService;
 import com.zs.service.scheduler.SyncNotSignKuaidiTaskService;
+import com.zs.tools.ApiTools;
 import com.zs.tools.HttpRequestTools;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -37,32 +39,21 @@ public class SyncNotSignKuaidiTaskServiceImpl implements SyncNotSignKuaidiTaskSe
     public void syncKuaidi() {
         int i = 1;
         try {
-            //查询还没有签收的快递单号
+            //查询当前学期还没有签收的快递单号
             List<String> logisticCodeList = findNotSignNuDAO.findNotSignNu();
             if (null != logisticCodeList && 0 < logisticCodeList.size()) {
                 for (String logisticCode : logisticCodeList) {
                     String[] nus = logisticCode.split(",");
                     if (null != nus) {
                         for (String nu : nus) {
-                            //查询nu是否已经请求过，如果没有请求过，或者请求的返回状态是[500: 服务器错误],我们就重新在再请求一次
-                            List<KuaidiRequest> kuaidiRequestList = kuaidiRequestDAO.findByNumber(nu);
-                            boolean isReqAgain = true;
-                            if (null != kuaidiRequestList && 0 < kuaidiRequestList.size()) {
-                                for (KuaidiRequest kuaidiRequest : kuaidiRequestList) {
-                                    if(!StringUtils.isEmpty(kuaidiRequest.getReturnCode())){
-                                        if (!"500".equals(kuaidiRequest.getReturnCode())) {
-                                            isReqAgain = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (isReqAgain) {
-                                Thread.sleep(10000);
-                                addReqService.add("ems", nu);
-                                System.out.println("i     "+i);
-                                i++;
-                            }
+                            //调用接口，查询快递信息
+                            JSONObject json = ApiTools.getKuaiDi(nu);
+                            //记录请求数据
+                            addReqService.add("ems", nu, null == json.get("msg") ? "null" : json.get("msg").toString(), null == json.get("status") ? "null" : json.get("status").toString());
+                            //更新快递信息
+
+
+
                         }
                     }
                 }

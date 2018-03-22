@@ -21,17 +21,16 @@ public class AddReqServiceImpl extends EntityServiceImpl<KuaidiRequest, KuaidiRe
     private KuaidiRequestDAO kuaidiRequestDAO;
 
     @Override
-    public KuaidiRequest add(String com, String nu) throws Exception {
-        TaskResponse taskResponse = PostOrder.reqKuaidi100(com, nu.trim());
+    public KuaidiRequest add(String com, String nu, String msg, String returnCode) throws Exception {
+        //不再请求快递100接口，改用阿里云接口2017-12-29
+        //TaskResponse taskResponse = PostOrder.reqKuaidi100(com, nu.trim());
 
         KuaidiRequest kuaidiRequest = new KuaidiRequest();
         kuaidiRequest.setCompany(com);
         kuaidiRequest.setNumber(nu);
-        if(null != taskResponse){
-            kuaidiRequest.setMessage(taskResponse.getMessage());
-            kuaidiRequest.setResult(taskResponse.getResult().toString());
-            kuaidiRequest.setReturnCode(taskResponse.getReturnCode());
-        }
+        kuaidiRequest.setMessage(msg);
+        kuaidiRequest.setResult("true");
+        kuaidiRequest.setReturnCode(returnCode);
         kuaidiRequestDAO.save(kuaidiRequest);
         return kuaidiRequest;
     }

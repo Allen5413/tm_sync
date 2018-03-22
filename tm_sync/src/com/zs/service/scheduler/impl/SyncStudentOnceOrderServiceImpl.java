@@ -148,6 +148,7 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
 
                 int i=0;
                 long orderId = 0l;
+                int num2 = 0;
                 //生成新选课的订单数据
                 for (Object[] objs : list){
                     System.out.println("i: "+i+"   "+orderId);
@@ -183,14 +184,13 @@ public class SyncStudentOnceOrderServiceImpl extends EntityServiceImpl<StudentBo
                         if(student.getIsForeverSnedTm() == Student.IS_FOREVER_SNEDTM_YES){
                             studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_CONFIRMED);
                             //订单确认的话，要生成订单号
-                            int num2 = 0;
                             StudentBookOnceOrder maxCodeOrder = findStudentBookOnceOrderForMaxCodeDAO.find(semester.getId());
                             if(null != maxCodeOrder){
                                 String maxOrderCode = maxCodeOrder.getOrderCode();
                                 num2 = Integer.parseInt(maxOrderCode.substring(maxOrderCode.length()-6, maxOrderCode.length()));
                             }
                             //生成学生订单号
-                            String orderCode = OrderCodeTools.createStudentOnceOrderCodeForConfirm(semester.getYear(), semester.getQuarter(), num2 + 1);
+                            String orderCode = OrderCodeTools.createStudentOnceOrderCodeForConfirm(semester.getYear(), semester.getQuarter(), num2++);
                             studentBookOnceOrder.setOrderCode(orderCode);
                         }else {
                             studentBookOnceOrder.setState(StudentBookOnceOrder.STATE_UNCONFIRMED);

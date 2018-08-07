@@ -156,6 +156,21 @@ public class HttpRequestTools {
         return callbackJSON;
     }
 
+    /**
+     * 查询学生当前应该缴费金额
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    public static JSONObject getStudentFinance(String code)throws Exception{
+        String url = "http://xiwang.attop.com/api/getStudentFinance.htm?code="+code;
+        String result = sendGet(url);
+        JSONObject callbackJSON = new JSONObject();
+        callbackJSON = callbackJSON.fromObject(result);
+        callbackJSON.put("reqUrl", url);
+        return callbackJSON;
+    }
+
     public static void main(String[] args){
         try {
             getSelectCourse(2017, 2, 2018, 0);

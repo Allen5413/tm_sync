@@ -92,6 +92,21 @@
             <a href="#" onclick="editOrderForSendBySemesterId()">设置已打包的学生订单为已发出(操作之前看下逻辑，每次情况了能不一样)</a>
         </td>
     </tr>
+    <tr>
+        <td>
+            发学生开学短信：
+            入学年：<input type="text" id="year2" />
+            入学季：<select id="quarter2">
+                        <option value="0">春</option>
+                        <option value="1">秋</option>
+                    </select>
+            短信模板：<select id="isNewMb">
+                        <option value="1">新生版</option>
+                        <option value="0">旧生版</option>
+                    </select>
+            <a href="#" onclick="sendMsg()">发送</a>
+        </td>
+    </tr>
 </table>
 
 <a href="${pageContext.request.contextPath}/delOrderTM/sync6.htm">临时处理</a>
@@ -155,5 +170,12 @@
     function editOrderForSendBySemesterId(){
         var id = $("#semesterId2").val();
         location.href = "${pageContext.request.contextPath}/editOrderForSendBySemesterId/editor.htm?id="+id;
+    }
+
+    function sendMsg(){
+        var year = $("#year2").val();
+        var quarter = $("#quarter2").val();
+        var isNewMb = $("#isNewMb").val();
+        location.href = "${pageContext.request.contextPath}/sendMsgStudent/send.htm?year="+year+"&quarter="+quarter+"&isNewMb="+isNewMb;
     }
 </script>

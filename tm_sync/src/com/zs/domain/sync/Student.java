@@ -34,6 +34,9 @@ public class Student extends AbstractEntity {
     public static final int IS_FOREVER_SNEDTM_NOT = 0;      //不是
     public static final int IS_FOREVER_SNEDTM_YES = 1;      //是
 
+    public static final int ISSENDMSG_NOT = 0;      //不是
+    public static final int ISSENDMSG_YES = 1;      //是
+
 
     private Long id;                    //主键
     private String code;                //学号
@@ -64,6 +67,7 @@ public class Student extends AbstractEntity {
     private String sendPhone;               //邮寄给学生的手机
     private String sendZipCode;             //邮寄给学生的邮编
     private int isForeverSnedTm;            //是否永久发书[0:否；1:是] 如果学生在pc端进行过支付，那么就设置为是
+    private int isSendMsg;                  //是否发送过短信，开学短信
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -297,5 +301,13 @@ public class Student extends AbstractEntity {
 
     public void setIsForeverSnedTm(int isForeverSnedTm) {
         this.isForeverSnedTm = isForeverSnedTm;
+    }
+
+    public int getIsSendMsg() {
+        return isSendMsg;
+    }
+
+    public void setIsSendMsg(int isSendMsg) {
+        this.isSendMsg = isSendMsg;
     }
 }

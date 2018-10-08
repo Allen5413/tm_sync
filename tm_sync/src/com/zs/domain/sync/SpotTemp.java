@@ -27,6 +27,7 @@ public class SpotTemp extends AbstractEntity {
     private String tel;         //管理员固定电话
     private String address;     //管理员地址
     private String postalCode;  //管理员邮编
+    private String accountList; //中心用户账号列表
     private Date operateTime = new Date();  //操作时间
 
 
@@ -126,5 +127,13 @@ public class SpotTemp extends AbstractEntity {
 
     public void setProvCode(String provCode) {
         this.provCode = provCode;
+    }
+
+    public String getAccountList() {
+        return accountList;
+    }
+
+    public void setAccountList(String accountList) {
+        this.accountList = accountList;
     }
 }

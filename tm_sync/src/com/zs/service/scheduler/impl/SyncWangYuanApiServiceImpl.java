@@ -176,6 +176,8 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
                         aaa.setIdcardType(null == json.get("idCardType") ? null : "null".equals(json.get("idCardType").toString()) ? null : Integer.parseInt(json.get("idCardType").toString()));
                         aaa.setIdcardNo(null == json.get("idCardNo") ? "" : "null".equals(json.get("idCardNo").toString()) ? "" : json.get("idCardNo").toString());
                         aaa.setMobile(null == json.get("mobile") ? "" : "null".equals(json.get("mobile").toString()) ? "" : json.get("mobile").toString());
+                        aaa.setSex(null == json.get("sex") ? "" : "null".equals(json.get("sex").toString()) ? "" : json.get("sex").toString());
+                        aaa.setEmail(null == json.get("email") ? "" : "null".equals(json.get("email").toString()) ? "" : json.get("email").toString());
                         aaaList.add(aaa);
                     }
                 }
@@ -212,6 +214,7 @@ public class SyncWangYuanApiServiceImpl implements SyncWangYuanApiService {
                 spotTemp.setPostalCode(null == json.get("zipCode") ? "" : "null".equals(json.get("zipCode").toString()) ? "" : json.get("zipCode").toString());
                 spotTemp.setPhone(null == json.get("leaderMobile") ? "" : "null".equals(json.get("leaderMobile").toString()) ? "" : json.get("leaderMobile").toString());
                 spotTemp.setTel(null == json.get("leaderTel") ? "" : "null".equals(json.get("leaderTel").toString()) ? "" : json.get("leaderTel").toString());
+                spotTemp.setAccountList(null == json.get("accountList") ? "" : "null".equals(json.get("accountList").toString()) ? "" : json.get("accountList").toString());
                 spotTempList.add(spotTemp);
             }
         }

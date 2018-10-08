@@ -25,7 +25,7 @@ public class SyncWangYuanApiController extends LoggerController {
 
     @RequestMapping(value = "syncAllStudent")
     public void syncAllStudent(HttpServletRequest request){
-        for(int year = 2000; year < 2018; year++){
+        for(int year = 1995; year < 2018; year++){
             syncWangYuanApiService.allStudent(year, 1);
             syncWangYuanApiService.allStudent(year, 2);
         }

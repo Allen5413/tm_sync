@@ -1,5 +1,7 @@
 package com.zs.service.scheduler.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zs.dao.basic.issuerange.FindIssueRangeBySpotCodeDAO;
 import com.zs.dao.sync.EduwestUserDAO;
 import com.zs.dao.sync.SpotDAO;
@@ -14,6 +16,7 @@ import com.zs.service.scheduler.SyncSpotTaskService;
 import com.zs.tools.DateTools;
 import com.zs.tools.FileTools;
 import com.zs.tools.PropertiesTools;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -140,17 +143,31 @@ public class SyncSpotTaskServiceImpl implements SyncSpotTaskService {
                         issueRange.setIsIssue(IssueRange.ISISSUE_YES);
                         issueRange.setOperator("管理员");
                         findIssueRangeBySpotCodeDAO.save(issueRange);
-                        //增加中心用户
-                        EduwestUser eduwestUser = new EduwestUser();
-                        eduwestUser.setPin("spot"+spotCode);
-                        eduwestUser.setName(spot.getName());
-                        eduwestUser.setType(EduwestUser.TYPE_SPOT);
-                        eduwestUser.setState(EduwestUser.STATE_ENABLE);
-                        eduwestUser.setProvCode(spotTemp.getProvCode());
-                        eduwestUser.setSpotCode(spotCode);
-                        eduwestUserDAO.save(eduwestUser);
-
                         detail += "\r\n中心编号["+spotCode+"]: 为新增中心";
+                    }
+
+                    //增加中心用户
+                    if(!StringUtils.isEmpty(spotTemp.getAccountList())) {
+                        JSONArray eduwestUserList = JSONArray.parseArray(spotTemp.getAccountList());
+                        if(null != eduwestUserList && 0 < eduwestUserList.size()) {
+                            for(int i=0; i<eduwestUserList.size(); i++) {
+                                JSONObject json = (JSONObject) eduwestUserList.get(i);
+                                String pin = json.get("loginName").toString();
+                                String name = json.get("name").toString();
+                                //查询该用户是否存在
+                                EduwestUser eduwestUser = eduwestUserDAO.findByPin(pin);
+                                if(null == eduwestUser) {
+                                    eduwestUser = new EduwestUser();
+                                    eduwestUser.setPin(pin);
+                                    eduwestUser.setName(name);
+                                    eduwestUser.setType(EduwestUser.TYPE_SPOT);
+                                    eduwestUser.setState(EduwestUser.STATE_ENABLE);
+                                    eduwestUser.setProvCode(spotTemp.getProvCode());
+                                    eduwestUser.setSpotCode(spotCode);
+                                    eduwestUserDAO.save(eduwestUser);
+                                }
+                            }
+                        }
                     }
                     tempNum++;
                 }

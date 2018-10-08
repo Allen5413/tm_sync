@@ -1,4 +1,4 @@
-﻿package com.zs.service.scheduler.impl;
+package com.zs.service.scheduler.impl;
 
 import com.zs.dao.finance.spotexpenseoth.BatchSpotExpenseOthDAO;
 import com.zs.dao.finance.spotexpenseoth.FindBySpotCodeAndSemesterDAO;
@@ -6,7 +6,6 @@ import com.zs.dao.finance.studentexpense.FindByStudentCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialByCourseCodeDAO;
 import com.zs.dao.basic.teachmaterial.FindTeachMaterialFromSetTMByCourseCodeDAO;
 import com.zs.dao.sync.*;
-import com.zs.domain.basic.TeachMaterial;
 import com.zs.domain.finance.SpotExpenseOth;
 import com.zs.domain.finance.StudentExpense;
 import com.zs.domain.sync.Student;
@@ -32,6 +31,10 @@ import java.util.List;
  * Created by Allen on 2015/9/17.
  */
 @Service("syncStudentTaskService")
+
+/**
+ * Created by Allen on 2018/9/20.
+ */
 public class SyncStudentTaskServiceImpl implements SyncStudentTaskService {
 
     @Resource

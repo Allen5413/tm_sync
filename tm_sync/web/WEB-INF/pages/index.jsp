@@ -77,7 +77,7 @@
     </tr>
     <tr>
         <td>
-            学年季：<input type="text" id="stuYearTerm" size="1">课年季：<input type="text" id="courseYearTerms" size="10">&nbsp;&nbsp;<a href="#" onclick="syncOldSc()">同步剩余选课</a>操作前先清空oldselectedcourse表，1：春季，2：秋季
+            学年季：<input type="text" id="stuYearTerm" size="1">课年季：<input type="text" id="courseYearTerms" size="10">&nbsp;&nbsp;<a href="#" onclick="syncOldSc()">同步剩余选课</a>操作前先清空sync_old_selected_course_temp表，1：春季，2：秋季
             <br /><a href="${pageContext.request.contextPath}/syncStudentOnceOrder/sync.htm">开始同步学生一次性订单</a>
             <a href="${pageContext.request.contextPath}/delOnceOrderForNotTM/del.htm">删除没有明细的一次性订单</a>
             <br/>

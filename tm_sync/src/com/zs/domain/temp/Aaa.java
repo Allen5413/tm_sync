@@ -16,6 +16,8 @@ public class Aaa extends AbstractEntity {
     private String idcardNo;            //证件号码
     private String mobile;              //移动电话
     private String homeTel;             //住宅电话
+    private String sex;
+    private String email;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,5 +68,21 @@ public class Aaa extends AbstractEntity {
 
     public void setHomeTel(String homeTel) {
         this.homeTel = homeTel;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

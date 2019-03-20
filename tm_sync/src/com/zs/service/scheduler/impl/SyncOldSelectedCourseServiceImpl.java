@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by Allen on 2017/12/18.
  */
-@Service("syncOldSelectedCourse")
+@Service("syncOldSelectedCourseService")
 public class SyncOldSelectedCourseServiceImpl extends EntityServiceImpl<OldSelectedCourseTemp, OldSelectedCourseTempDAO> implements SyncOldSelectedCourseService {
 
     @Override

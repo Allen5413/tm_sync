@@ -9,7 +9,7 @@
 	<!-- 同步网院中心、学生和选课信息  每天23:00分执行-->
 	<task:scheduler id="syncWangYuanApiScheduler" pool-size="1"/>
 	<task:scheduled-tasks scheduler="syncWangYuanApiScheduler">
-		<task:scheduled ref="syncWangYuanApiService" method="sync" cron="0 28 16 * * ?"/>
+		<task:scheduled ref="syncWangYuanApiService" method="sync" cron="0 31 21 * * ?"/>
 	</task:scheduled-tasks>
 	<!-- 同步网院中心、学生和选课信息定时器 END-->
 	<!-- 同步网院中心、学生和选课信息业务接口 -->

@@ -30,14 +30,14 @@ public class KuaidiReqController extends LoggerController {
     @ResponseBody
     public JSONObject index(@RequestParam("com") String com, @RequestParam("nu") String nu){
         JSONObject json = new JSONObject();
-        try{
-            KuaidiRequest kuaidiRequest = addReqService.add(com, nu);
-            json.put("state", 0);
-            json.put("kuaidiRequest", kuaidiRequest);
-        }catch (Exception e){
-            e.printStackTrace();
-            json.put("state", 1);
-        }
+//        try{
+//            KuaidiRequest kuaidiRequest = addReqService.add(com, nu);
+//            json.put("state", 0);
+//            json.put("kuaidiRequest", kuaidiRequest);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            json.put("state", 1);
+//        }
         return json;
     }
 

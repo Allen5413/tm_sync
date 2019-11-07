@@ -49,7 +49,7 @@ public class SyncNotSignKuaidiTaskServiceImpl implements SyncNotSignKuaidiTaskSe
                             //调用接口，查询快递信息
                             JSONObject json = ApiTools.getKuaiDi(nu);
                             //记录请求数据
-                            addReqService.add("ems", nu, null == json.get("msg") ? "null" : json.get("msg").toString(), null == json.get("status") ? "null" : json.get("status").toString());
+                            addReqService.add("tiantian", nu, null == json.get("msg") ? "null" : json.get("msg").toString(), null == json.get("status") ? "null" : json.get("status").toString());
                             //更新快递信息
 
 

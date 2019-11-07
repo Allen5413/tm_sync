@@ -59,7 +59,7 @@ public class PostOrder {
 
 	public static void main(String[] args){
 		TaskRequest req = new TaskRequest();
-		req.setCompany("ems");
+		req.setCompany("tiantian");
 		req.setNumber("9920051849015");
 		req.getParameters().put("callbackurl", "http://xiwang.attop.com:8080/kuaidiPush/push.htm");
 		req.setKey("bwgCJUSX1701");
